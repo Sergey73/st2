@@ -2,7 +2,7 @@
   <ion-navbar>
     <ion-title>Home</ion-title>
     <ion-buttons end> 
-      <button ion-button icon-only (click)="addSound()">
+      <button ion-button icon-only (click)="loginP()">
         <ion-icon name="add"></ion-icon>
       </button>
     </ion-buttons>
@@ -10,6 +10,20 @@
 </ion-header>
 
 <ion-content padding>
-  <h2>Главная страница</h2>
+
+  <ion-card>
+    <ion-card-header>
+      Вход
+    </ion-card-header>
+    <ion-card-content>
+      {{ users | async | json }}
+    </ion-card-content>
+  </ion-card>
+  
+  <ion-list>
+    <ion-item *ngFor="let book of books | async">
+      {{book.$key}}
+    </ion-item>
+  </ion-list>
   <!--директива логина-->
 </ion-content>

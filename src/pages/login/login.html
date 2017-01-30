@@ -1,0 +1,17 @@
+<ion-view>
+  <ion-header>
+    <ion-toolbar></ion-toolbar>
+  </ion-header>
+  
+  <ion-content>
+    <form id="login-form">
+      <ion-input type="text" name="email" placeholder="Почта"></ion-input>
+      <ion-input type="password" name="password" placeholder="Пароль"></ion-input>
+      <button 
+        type="submit" 
+        class="btn btn-default"
+        [disabled]="!login-form.form.valid"
+      >Войти</button>
+    </form>
+  </ion-content>
+</ion-view>
