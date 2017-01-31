@@ -2,10 +2,11 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
-import { LoginPage } from '../pages/login/login';
 // import { AboutPage } from '../pages/about/about';
 // import { ContactPage } from '../pages/contact/contact';
 // import { TabsPage } from '../pages/tabs/tabs';
+import { LoginPage } from '../pages/login/login';
+import { AuthService } from '../providers/auth';
 import {AngularFireModule} from 'angularfire2';
 
 export const firebaseConfig = {
@@ -40,6 +41,6 @@ export const firebaseConfig = {
     // ContactPage,
     // TabsPage
   ],
-  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}]
+  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, AuthService ]
 })
 export class AppModule {}

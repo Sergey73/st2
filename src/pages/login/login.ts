@@ -11,7 +11,9 @@ export class LoginPage implements OnInit {
   }
 
   ngOnInit() { 
-    var root = this.element.nativeElement;
-    console.dir(root);
+    // var root = this.element.nativeElement;
+    // console.dir(root);
   }
 }
+
+// https://javebratt.com/firebase-3-email-auth/
