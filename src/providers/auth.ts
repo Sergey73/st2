@@ -8,7 +8,6 @@ export class AuthService {
   constructor(public auth$: AngularFireAuth) {
     this.authState = auth$.getAuth();
     auth$.subscribe((state: FirebaseAuthState) => {
-      debugger
       this.authState = state;
     });
   }
@@ -16,13 +15,6 @@ export class AuthService {
   get authenticated(): boolean {
     return this.authState !== null;
   }
-
-  // signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
-  //   return this.auth$.login({
-  //     provider: AuthProviders.Facebook,
-  //     method: AuthMethods.Popup
-  //   });
-  // }
 
   signOut(): void {
     this.auth$.logout();
