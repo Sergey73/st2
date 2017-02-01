@@ -17,27 +17,33 @@ export class AuthService {
     return this.authState !== null;
   }
 
-  signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
-    return this.auth$.login({
-      provider: AuthProviders.Facebook,
-      method: AuthMethods.Popup
-    });
-  }
+  // signInWithFacebook(): firebase.Promise<FirebaseAuthState> {
+  //   return this.auth$.login({
+  //     provider: AuthProviders.Facebook,
+  //     method: AuthMethods.Popup
+  //   });
+  // }
 
   signOut(): void {
     this.auth$.logout();
   }
-
-  displayName(): string {
-    if (this.authState != null) {
-      return this.authState.facebook.displayName;
-    } else {
-      return '';
-    }
-  }
   
-  //   login(email: string, password: string): void {
-  //   // return firebase.auth().signInWithEmailAndPassword(email, password);
-  // }
+  // сделать promise
+  login(email: string, password: string): firebase.Promise<FirebaseAuthState> {
+    return this.auth$.login({ email: email, password: password }).then((data) => {
+      return data;
+    }).catch((error) => {
+    });
+  }
+
+  // login(email: string, password: string): Promise<boolean> {
+  //           var creds: any = { email: email, password: password };
+  //           var res: Promise<boolean> = new Promise((resolve, reject) => {
+  //               this.auth.login(creds).then(result => {
+  //                   resolve(result);
+  //               })
+  //           });
+  //           return res;
+  //       }
 
 }

@@ -13,21 +13,14 @@ import { AuthService } from '../providers/auth';
   templateUrl: 'app.html'
 })
 export class MyApp {
-  login: string = 'streetCity73@gmail.com';
-  password: string = '671310';
   rootPage: any;
 
-  constructor(public auth: AuthService) {
-    
-    // this.auth.login(this.login, this.password).then((isLoggedIn) => {
-    //   debugger;
-      
-      if (this.auth.authenticated) {
-        this.rootPage = HomePage;
-      } else {
-        this.rootPage = LoginPage;
-      }
-    // });
+  constructor(public authService: AuthService) {  
+    if (this.authService.authenticated) {
+      this.rootPage = HomePage;
+    } else {
+      this.rootPage = LoginPage;
+    }
   }
   
 }

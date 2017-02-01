@@ -1,13 +1,12 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
+
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
-// import { AboutPage } from '../pages/about/about';
-// import { ContactPage } from '../pages/contact/contact';
-// import { TabsPage } from '../pages/tabs/tabs';
+
 import { LoginPage } from '../pages/login/login';
 import { AuthService } from '../providers/auth';
-import {AngularFireModule} from 'angularfire2';
+import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyD8cHdez2j1JTcQ4hfPoFs3YCsRSgtPfGY',
@@ -15,6 +14,12 @@ export const firebaseConfig = {
   databaseURL: 'https://streetcity73-a464b.firebaseio.com',
   storageBucket: 'streetcity73-a464b.appspot.com',
   messagingSenderId: '367568561460'
+};
+
+// данные входе
+const myFirebaseAuthConfig = {
+  provider: AuthProviders.Password,
+  method: AuthMethods.Password
 };
 
 @NgModule({
@@ -28,7 +33,7 @@ export const firebaseConfig = {
   ],
   imports: [
     IonicModule.forRoot(MyApp),
-    AngularFireModule.initializeApp(firebaseConfig)
+    AngularFireModule.initializeApp(firebaseConfig, myFirebaseAuthConfig)
   ],
   bootstrap: [IonicApp],
   entryComponents: [
