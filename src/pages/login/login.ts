@@ -8,8 +8,7 @@ import {
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../providers/auth';
 
-
-// import { SignupPage } from '../../pages/signup/signup';
+import { SignupPage } from '../../pages/signup/signup';
 import { HomePage } from '../../pages/home/home';
 // import { ResetPasswordPage } from '../../pages/reset-password/reset-password';
 
@@ -23,7 +22,6 @@ export class LoginPage implements OnInit {
   emailChanged: boolean = false;
   passwordChanged: boolean = false;
   submitAttempt: boolean = false;
-  loading: any;
 
   login: string = 'streetCity73@gmail.com';
   password: string = '671310';
@@ -34,7 +32,6 @@ export class LoginPage implements OnInit {
     public formBuilder: FormBuilder,
     public alertCtrl: AlertController, 
     public loadingCtrl: LoadingController
-    // public element: ElementRef
   ) { 
     this.loginForm = formBuilder.group({
         email: ['', Validators.compose([Validators.required])],
@@ -58,9 +55,8 @@ export class LoginPage implements OnInit {
       console.log(this.loginForm.value);
     } else {
       this.authService.login(this.loginForm.value.email, this.loginForm.value.password).then( authData => {
-      this.navCtrl.setRoot(HomePage);
-    }, error => {
-      this.loading.dismiss().then( () => {
+        this.navCtrl.setRoot(HomePage);
+      }, error => {
         let alert = this.alertCtrl.create({
           message: error.message,
           buttons: [
@@ -72,17 +68,11 @@ export class LoginPage implements OnInit {
         });
         alert.present();
       });
-    });
-
-    this.loading = this.loadingCtrl.create({
-      dismissOnPageChange: true,
-    });
-    this.loading.present();
     }
   }
 
   goToSignup(){
-    // this.navCtrl.push(SignupPage);
+    this.navCtrl.push(SignupPage);
   }
 
   goToResetPassword(){

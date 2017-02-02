@@ -21,11 +21,13 @@ export class AuthService {
   }
   
   // сделать promise
-  login(email: string, password: string): firebase.Promise<FirebaseAuthState> {
-    return this.auth$.login({ email: email, password: password }).then((data) => {
-      return data;
-    }).catch((error) => {
-    });
+  // login(email: string, password: string): firebase.Promise<FirebaseAuthState> {
+  login(email: string, password: string) {
+    return this.auth$.login({ email: email, password: password });
+  }
+
+  signup(email: string, password: string){
+    return this.auth$.createUser({ email: email, password: password });
   }
 
   // login(email: string, password: string): Promise<boolean> {
