@@ -1,4 +1,4 @@
-import { NavController, LoadingController, AlertController } from 'ionic-angular';
+import { NavController, AlertController } from 'ionic-angular';
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../providers/auth';
@@ -13,14 +13,12 @@ export class SignupPage {
   emailChanged: boolean = false;
   passwordChanged: boolean = false;
   submitAttempt: boolean = false;
-  loading: any;
 
 
   constructor(
     public navCtrl: NavController, 
     public authService: AuthService, 
     public formBuilder: FormBuilder,
-    public loadingCtrl: LoadingController, 
     public alertCtrl: AlertController
   ) {
 

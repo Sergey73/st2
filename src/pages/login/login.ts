@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { 
   NavController, 
-  LoadingController, 
   AlertController
 } from 'ionic-angular';
 
@@ -30,8 +29,7 @@ export class LoginPage implements OnInit {
     public navCtrl: NavController, 
     public authService: AuthService,
     public formBuilder: FormBuilder,
-    public alertCtrl: AlertController, 
-    public loadingCtrl: LoadingController
+    public alertCtrl: AlertController
   ) { 
     this.loginForm = formBuilder.group({
         email: ['', Validators.compose([Validators.required])],
