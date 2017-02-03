@@ -1,11 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { AuthProviders, AngularFireAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
+import * as firebase from 'firebase';
 
 @Injectable()
 export class AuthService {
   private authState: FirebaseAuthState;
 
-  constructor(public auth$: AngularFireAuth) {
+  constructor(
+    public auth$: AngularFireAuth
+  ) {
     this.authState = auth$.getAuth();
     auth$.subscribe((state: FirebaseAuthState) => {
       this.authState = state;
@@ -28,6 +31,11 @@ export class AuthService {
 
   signup(email: string, password: string){
     return this.auth$.createUser({ email: email, password: password });
+  }
+
+  resetPassword(email: string){
+    var auf = firebase.auth();
+    return auf.sendPasswordResetEmail(email);
   }
 
   // login(email: string, password: string): Promise<boolean> {

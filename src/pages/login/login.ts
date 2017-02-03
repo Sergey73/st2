@@ -9,7 +9,7 @@ import { AuthService } from '../../providers/auth';
 
 import { SignupPage } from '../../pages/signup/signup';
 import { HomePage } from '../../pages/home/home';
-// import { ResetPasswordPage } from '../../pages/reset-password/reset-password';
+import { ResetPasswordPage } from '../../pages/reset-password/reset-password';
 
 @Component({
   selector: 'page-login',
@@ -32,8 +32,8 @@ export class LoginPage implements OnInit {
     public alertCtrl: AlertController
   ) { 
     this.loginForm = formBuilder.group({
-        email: ['', Validators.compose([Validators.required])],
-        password: ['', Validators.compose([Validators.minLength(6), Validators.required])]
+        email: [this.login, Validators.compose([Validators.required])],
+        password: [this.password, Validators.compose([Validators.minLength(6), Validators.required])]
       });
   }
 
@@ -74,6 +74,6 @@ export class LoginPage implements OnInit {
   }
 
   goToResetPassword(){
-    // this.navCtrl.push(ResetPasswordPage);
+    this.navCtrl.push(ResetPasswordPage);
   }
 }

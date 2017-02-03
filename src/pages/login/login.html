@@ -19,7 +19,7 @@
         [class.invalid]="!loginForm.controls.email.valid && (emailChanged || submitAttempt)"></ion-input>
     </ion-item>
     <ion-item class="error-message" *ngIf="!loginForm.controls.email.valid  && (emailChanged || submitAttempt)">
-      <p>Не корректный адрес почты.</p>
+      <p>Не корректный адрес почты</p>
     </ion-item>
 
     <ion-item>
@@ -29,7 +29,7 @@
         [class.invalid]="!loginForm.controls.password.valid && (passwordChanged || submitAttempt)"></ion-input>
     </ion-item>
     <ion-item class="error-message" *ngIf="!loginForm.controls.password.valid  && (passwordChanged || submitAttempt)">
-      <p> Длина пароля должна быть больше 6 символов.</p>
+      <p>Длина пароля должна быть больше 6 символов</p>
     </ion-item>
 
     <button ion-button block type="submit">
