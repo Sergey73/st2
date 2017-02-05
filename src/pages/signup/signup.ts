@@ -1,8 +1,8 @@
-import { NavController, AlertController } from 'ionic-angular';
+import { NavController } from 'ionic-angular';
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../providers/auth';
-import { HomePage } from '../../pages/home/home';
+import { MsgService } from '../../providers/msg-service';
 
 @Component({
   selector: 'page-signup',
@@ -19,7 +19,7 @@ export class SignupPage {
     public navCtrl: NavController, 
     public authService: AuthService, 
     public formBuilder: FormBuilder,
-    public alertCtrl: AlertController
+    public msgService: MsgService
   ) {
 
     this.signupForm = formBuilder.group({
@@ -49,18 +49,16 @@ export class SignupPage {
       console.log(this.signupForm.value);
     } else {
       this.authService.signup(this.signupForm.value.email, this.signupForm.value.password).then((data) => {
-        this.navCtrl.setRoot(HomePage);
-      }, error => {
-        let alert = this.alertCtrl.create({
-          message: error.message,
-          buttons: [
-            {
-              text: "Ok",
-              role: 'cancel'
-            }
-          ]
+        data.auth.sendEmailVerification().then(() => {
+          this.navCtrl.pop();
+          
+          let message = `Ваш аккаунт создан. На указанный при регистрации электронный ящик, 
+          вам отправлено письмо. Перейдите по ссылке внутри письма, чтобы завершить 
+          регистрацию и пользоваться сервисом.`;
+          this.msgService.alert(message);
         });
-        alert.present();
+      }, error => {
+        this.msgService.alert(error.message);
       });
     }
   }

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { NavController, AlertController } from 'ionic-angular';
+import { NavController } from 'ionic-angular';
 // import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 
 @Component({
@@ -13,8 +13,7 @@ export class HomePage {
 
   constructor(
     public navCtrl: NavController, 
-    // fire: AngularFire,
-    public alertCtrl: AlertController
+    // fire: AngularFire
     
   ) {
     // this.books = fire.database.list('/books');
@@ -23,40 +22,11 @@ export class HomePage {
   }
 
   presentAlert() {
-    let alert = this.alertCtrl.create({
-      title: 'Вход',
-      subTitle: '10% of battery remaining',
-      message: 'Введител логин и пароль',
-      buttons: ['Dismiss']
-    });
-    alert.present();
+ 
   }
 
   loginP():void {
-    let prompt = this.alertCtrl.create({
-      title: 'Вход',
-
-      inputs: [
-        {
-          name: 'логин',
-          placeholder: 'Введите логин'
-        },
-        {
-          name: 'пароль',
-          placeholder: 'введите пароль',
-          type: 'password'
-        }
-      ]
-      // buttons: [
-      //   {
-      //     text: 'Войти',
-      //     handler: data => {
-      //       console.dir(data);
-      //     }
-      //   }
-      // ] 
-    });
-    prompt.present();
+    
   }
 
 }

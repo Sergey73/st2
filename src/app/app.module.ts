@@ -11,6 +11,7 @@ import { ResetPasswordPage } from '../pages/reset-password/reset-password';
 
 // my servicies
 import { AuthService } from '../providers/auth';
+import { MsgService } from '../providers/msg-service';
 
 // any servicies
 import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
@@ -49,6 +50,6 @@ const myFirebaseAuthConfig = {
     SignupPage,
     ResetPasswordPage
   ],
-  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, AuthService ]
+  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, AuthService, MsgService]
 })
 export class AppModule {}

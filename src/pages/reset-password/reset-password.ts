@@ -1,9 +1,8 @@
-import { 
-  NavController, 
-  AlertController } from 'ionic-angular';
+import { NavController } from 'ionic-angular';
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../providers/auth';
+import { MsgService } from '../../providers/msg-service';
 
 @Component({
   selector: 'page-reset-password',
@@ -19,8 +18,8 @@ export class ResetPasswordPage {
   constructor(
     public authService: AuthService,
     public formBuilder: FormBuilder, 
-    public nav: NavController,
-    public alertCtrl: AlertController
+    public navCtrl: NavController,
+    public msgService: MsgService
   ) {
 
     this.resetPasswordForm = formBuilder.group({
@@ -50,33 +49,12 @@ export class ResetPasswordPage {
       console.log(this.resetPasswordForm.value);
     } else {
       this.authService.resetPassword(this.resetPasswordForm.value.email).then((user) => {
-        let alert = this.alertCtrl.create({
-          message: "We just sent you a reset link to your email",
-          buttons: [
-            {
-              text: "Ok",
-              role: 'cancel',
-              handler: () => {
-                this.nav.pop();
-              }
-            }
-          ]
-        });
-        alert.present();
-
+        let message = "Для сброса пароля зайдите на вашу почту и перейдите по указанной в нем ссылке.";
+        this.msgService.alert(message);
+        this.navCtrl.pop();
       }, (error) => {
-        var errorMessage: string = error.message;
-        let errorAlert = this.alertCtrl.create({
-          message: errorMessage,
-          buttons: [
-            {
-              text: "Ok",
-              role: 'cancel'
-            }
-          ]
-        });
-
-        errorAlert.present();
+        let errorMessage: string = error.message;
+        this.msgService.alert(errorMessage);
       });
     }
   }

@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { 
-  NavController, 
-  AlertController
-} from 'ionic-angular';
+import { NavController } from 'ionic-angular';
 
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../providers/auth';
+import { MsgService } from '../../providers/msg-service';
 
 import { SignupPage } from '../../pages/signup/signup';
 import { HomePage } from '../../pages/home/home';
@@ -28,8 +26,8 @@ export class LoginPage implements OnInit {
   constructor(
     public navCtrl: NavController, 
     public authService: AuthService,
-    public formBuilder: FormBuilder,
-    public alertCtrl: AlertController
+    public msgService: MsgService,
+    public formBuilder: FormBuilder
   ) { 
     this.loginForm = formBuilder.group({
         email: [this.login, Validators.compose([Validators.required])],
@@ -53,18 +51,11 @@ export class LoginPage implements OnInit {
       console.log(this.loginForm.value);
     } else {
       this.authService.login(this.loginForm.value.email, this.loginForm.value.password).then( authData => {
-        this.navCtrl.setRoot(HomePage);
+        authData.auth.emailVerified ?
+          this.navCtrl.setRoot(HomePage) :  
+          this.msgService.alert('Для входа подтвердите аккаунт. Перейдите по ссылке отправленную на ваш електронный ящик.');
       }, error => {
-        let alert = this.alertCtrl.create({
-          message: error.message,
-          buttons: [
-            {
-              text: "Ok",
-              role: 'cancel'
-            }
-          ]
-        });
-        alert.present();
+         this.msgService.alert(error.message);
       });
     }
   }
