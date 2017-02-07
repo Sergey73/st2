@@ -1,29 +1,16 @@
+
 <ion-header>
+
   <ion-navbar>
-    <ion-title>Home</ion-title>
-    <ion-buttons end> 
-      <button ion-button icon-only (click)="loginP()">
-        <ion-icon name="add"></ion-icon>
-      </button>
-    </ion-buttons>
+    <ion-title>Карта</ion-title>
+    <!--<button menuToggle><ion-icon name="menu"></ion-icon></button>
+    <button ion-button (click)="logout()">Выйти</button>-->
   </ion-navbar>
+
 </ion-header>
 
-<ion-content padding>
+<!--<tool-b *ngIf="showAdminTools" [options]="options"></tool-b>-->
 
-  <ion-card>
-    <ion-card-header>
-      Вход
-    </ion-card-header>
-    <ion-card-content>
-      {{ users | async | json }}
-    </ion-card-content>
-  </ion-card>
-  
-  <ion-list>
-    <ion-item *ngFor="let book of books | async">
-      {{book.$key}}
-    </ion-item>
-  </ion-list>
-  <!--директива логина-->
+<ion-content class="map">
+  <div id='map' style="border: 2px solid green;position:absolute; top:0; bottom:0; width:100%;"></div>
 </ion-content>
