@@ -3,11 +3,13 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 
 import { MyApp } from './app.component';
 
-// pages
+// pages 
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { SignupPage } from '../pages/signup/signup';
 import { ResetPasswordPage } from '../pages/reset-password/reset-password';
+
+import { ProfilePage } from '../pages/profile/profile';
 
 // my servicies
 import { AuthService } from '../providers/auth';
@@ -36,7 +38,8 @@ const myFirebaseAuthConfig = {
     HomePage,
     LoginPage,
     SignupPage,
-    ResetPasswordPage
+    ResetPasswordPage,
+    ProfilePage
   ],
   imports: [
     IonicModule.forRoot(MyApp),
@@ -48,7 +51,8 @@ const myFirebaseAuthConfig = {
     HomePage,
     LoginPage,
     SignupPage,
-    ResetPasswordPage
+    ResetPasswordPage,
+    ProfilePage
   ],
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}, AuthService, MsgService]
 })

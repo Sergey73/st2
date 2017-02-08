@@ -19,8 +19,8 @@ export class AuthService {
     return this.authState !== null;
   }
 
-  signOut(): void {
-    this.auth$.logout();
+  logout() {
+    return this.auth$.logout();
   }
   
   // сделать promise
@@ -38,14 +38,6 @@ export class AuthService {
     return auf.sendPasswordResetEmail(email);
   }
 
-  // login(email: string, password: string): Promise<boolean> {
-  //           var creds: any = { email: email, password: password };
-  //           var res: Promise<boolean> = new Promise((resolve, reject) => {
-  //               this.auth.login(creds).then(result => {
-  //                   resolve(result);
-  //               })
-  //           });
-  //           return res;
-  //       }
+
 
 }

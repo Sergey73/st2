@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { NavController } from 'ionic-angular';
+
 import * as L from 'mapbox.js';
 
-import { NavController } from 'ionic-angular';
+import { AuthService } from '../../providers/auth';
+import { LoginPage } from '../../pages/login/login';
+
 // import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
 
 @Component({
@@ -13,7 +17,8 @@ export class HomePage {
   // users: FirebaseObjectObservable<any>;
   map: any;
   constructor(
-    public navCtrl: NavController 
+    public navCtrl: NavController,
+    public authService: AuthService
     // fire: AngularFire
     
   ) {
@@ -37,6 +42,8 @@ export class HomePage {
   }
 
   logout() {
-    console.dir('logout');
+    this.authService.logout().then(response => {
+      this.navCtrl.setRoot(LoginPage);
+    });
   }
 }
