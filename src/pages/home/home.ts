@@ -4,6 +4,7 @@ import { NavController } from 'ionic-angular';
 import * as L from 'mapbox.js';
 
 import { AuthService } from '../../providers/auth';
+import { UserDataProvider } from '../../providers/user-data-provider';
 import { LoginPage } from '../../pages/login/login';
 
 // import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
@@ -18,7 +19,8 @@ export class HomePage {
   map: any;
   constructor(
     public navCtrl: NavController,
-    public authService: AuthService
+    public authService: AuthService,
+    public userDataProvider: UserDataProvider
     // fire: AngularFire
     
   ) {
@@ -29,6 +31,11 @@ export class HomePage {
 
   ngOnInit() { 
     this.initMap();
+    this.getUserData();
+    // setTimeout(data => {
+    //   this.userDataProvider.user
+    //   debugger;
+    // }, 6000);
   }
 
   initMap() {
@@ -45,5 +52,9 @@ export class HomePage {
     this.authService.logout().then(response => {
       this.navCtrl.setRoot(LoginPage);
     });
+  }
+
+  getUserData() {
+    this.userDataProvider.getData();
   }
 }

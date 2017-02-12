@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core';
-import { AuthProviders, AngularFireAuth, FirebaseAuthState, AuthMethods } from 'angularfire2';
+
+import { 
+  AuthProviders, 
+  AngularFireAuth, 
+  FirebaseAuthState, 
+  AuthMethods 
+} from 'angularfire2';
+
+
 import * as firebase from 'firebase';
 
 @Injectable()
@@ -9,10 +17,12 @@ export class AuthService {
   constructor(
     public auth$: AngularFireAuth
   ) {
+
     this.authState = auth$.getAuth();
     auth$.subscribe((state: FirebaseAuthState) => {
       this.authState = state;
     });
+
   }
 
   get authenticated(): boolean {

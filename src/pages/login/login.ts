@@ -4,6 +4,7 @@ import { NavController } from 'ionic-angular';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../providers/auth';
 import { MsgService } from '../../providers/msg-service';
+import { UserDataProvider } from '../../providers/user-data-provider';
 
 import { SignupPage } from '../../pages/signup/signup';
 import { HomePage } from '../../pages/home/home';
@@ -25,14 +26,15 @@ export class LoginPage implements OnInit {
 
   constructor(
     public navCtrl: NavController, 
+    public formBuilder: FormBuilder,
     public authService: AuthService,
     public msgService: MsgService,
-    public formBuilder: FormBuilder
+    public userDataProvider: UserDataProvider
   ) { 
     this.loginForm = formBuilder.group({
-        email: [this.login, Validators.compose([Validators.required])],
-        password: [this.password, Validators.compose([Validators.minLength(6), Validators.required])]
-      });
+      email: [this.login, Validators.compose([Validators.required])],
+      password: [this.password, Validators.compose([Validators.minLength(6), Validators.required])]
+    });
   }
 
   elementChanged(input){
@@ -51,9 +53,14 @@ export class LoginPage implements OnInit {
       console.log(this.loginForm.value);
     } else {
       this.authService.login(this.loginForm.value.email, this.loginForm.value.password).then( authData => {
-        authData.auth.emailVerified ?
-          this.navCtrl.setRoot(HomePage) :  
-          this.msgService.alert('Для входа подтвердите аккаунт. Перейдите по ссылке отправленную на ваш електронный ящик.');
+        if(authData.auth.emailVerified) {
+          this.userDataProvider.userDataAuth['email'] = authData.auth.email;
+          this.userDataProvider.userDataAuth['uid'] = authData.auth.uid;
+          this.navCtrl.setRoot(HomePage);
+        } else {
+          let msg = `Для входа подтвердите аккаунт.Перейдите по ссылке отправленную на ваш електронный ящик.`
+          this.msgService.alert(msg);
+        }
       }, error => {
          this.msgService.alert(error.message);
       });

@@ -1,11 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
-import { Nav  } from 'ionic-angular';
+import { Nav } from 'ionic-angular';
 // import { StatusBar, Splashscreen } from 'ionic-native';
 
 
 import { AuthService } from '../providers/auth';
 
-import { HomePage } from '../pages/home/home';
+// import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { ProfilePage } from '../pages/profile/profile';
 
@@ -29,11 +29,11 @@ export class MyApp {
   }
 
   initializeApp() {
-    if (this.authService.authenticated) {
-      this.rootPage = HomePage;
-    } else {
+    // if (this.authService.authenticated) {
+    //   this.rootPage = HomePage;
+    // } else {
       this.rootPage = LoginPage;
-    }
+    // }
   }
 
   openPage(page) {
