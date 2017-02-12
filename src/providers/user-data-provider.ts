@@ -21,11 +21,24 @@ export class UserDataProvider {
   }
 
   getData() {
-    // this.user = this.fire.database.object('/users/');
     this.user = this.fire.database.object('/users/' + this.userDataAuth.uid);
-    this.user.subscribe(x => {
-      x;
-      debugger
+    this.user.subscribe(userData => {
+      if (userData.$value === null) {
+        // если нет юзер создаем его
+        this.saveUser();
+      } else {
+        this.userDataAuth.name = userData.publicData.name;
+      }
+    });
+  }
+
+  private saveUser() {
+    this.user.set({
+      email: this.userDataAuth.email,
+      publicData: {
+        name: 'user',
+      },
+      role: 1
     });
   }
 

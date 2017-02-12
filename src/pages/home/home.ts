@@ -17,6 +17,8 @@ export class HomePage {
   // books: FirebaseListObservable<any>;
   // users: FirebaseObjectObservable<any>;
   map: any;
+  userA: any;
+
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
@@ -24,6 +26,7 @@ export class HomePage {
     // fire: AngularFire
     
   ) {
+    
     // this.books = fire.database.list('/books');
     // this.users = fire.database.object('/users');
     
@@ -56,5 +59,6 @@ export class HomePage {
 
   getUserData() {
     this.userDataProvider.getData();
+    this.userA = this.userDataProvider.userDataAuth;
   }
 }
