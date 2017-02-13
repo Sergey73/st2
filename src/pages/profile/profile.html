@@ -8,5 +8,27 @@
 
 
 <ion-content padding>
-  <h1> Ваше имя</h1>
+
+   <form [formGroup]="profileForm" (submit)="saveProfile()" novalidate>
+    <ion-item>
+      <ion-label color="primary" stacked>Изменить имя</ion-label>
+      <ion-input 
+        #name 
+        formControlName="name" 
+        type="text" 
+        (change)="elementChanged(name)"
+        placeholder="Введите новое имя"
+        [class.invalid]="!profileForm.controls.name.valid && (emailChanged || submitAttempt)"
+        clearInput
+      ></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!profileForm.controls.name.valid  && (nameChanged || submitAttempt)">
+      <p>Длина пароля должна быть больше 6 символов</p>
+    </ion-item>
+
+    <button ion-button block type="submit">
+      Сохранить
+    </button>
+  </form>
+
 </ion-content>

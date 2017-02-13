@@ -17,7 +17,6 @@ export class HomePage {
   // books: FirebaseListObservable<any>;
   // users: FirebaseObjectObservable<any>;
   map: any;
-  userA: any;
 
   constructor(
     public navCtrl: NavController,
@@ -35,10 +34,6 @@ export class HomePage {
   ngOnInit() { 
     this.initMap();
     this.getUserData();
-    // setTimeout(data => {
-    //   this.userDataProvider.user
-    //   debugger;
-    // }, 6000);
   }
 
   initMap() {
@@ -59,6 +54,5 @@ export class HomePage {
 
   getUserData() {
     this.userDataProvider.getData();
-    this.userA = this.userDataProvider.userDataAuth;
   }
 }

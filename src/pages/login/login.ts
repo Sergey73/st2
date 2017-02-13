@@ -54,8 +54,8 @@ export class LoginPage implements OnInit {
     } else {
       this.authService.login(this.loginForm.value.email, this.loginForm.value.password).then( authData => {
         if(authData.auth.emailVerified) {
-          this.userDataProvider.userDataAuth['email'] = authData.auth.email;
-          this.userDataProvider.userDataAuth['uid'] = authData.auth.uid;
+          this.userDataProvider.userData['email'] = authData.auth.email;
+          this.userDataProvider.userData['uid'] = authData.auth.uid;
           this.navCtrl.setRoot(HomePage);
         } else {
           let msg = `Для входа подтвердите аккаунт.Перейдите по ссылке отправленную на ваш електронный ящик.`
