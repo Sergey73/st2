@@ -42,7 +42,6 @@ export class UserDataProvider {
   }
 
   public updateData (obj: Object) {
-    debugger;
     return this.userDb.update(obj);
   }
 
@@ -57,10 +56,8 @@ export class UserDataProvider {
   }
 
   private getUserData(data: any) {
-    debugger
     this.userData.name = data.publicData.name;
     this.userData.role = data.role;
   }
-  
 
 }

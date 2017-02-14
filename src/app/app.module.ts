@@ -15,6 +15,7 @@ import { ProfilePage } from '../pages/profile/profile';
 import { AuthService } from '../providers/auth';
 import { MsgService } from '../providers/msg-service';
 import { UserDataProvider } from '../providers/user-data-provider';
+import { TrackProvider } from '../providers/track-provider';
 
 // any servicies
 import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
@@ -59,7 +60,8 @@ const myFirebaseAuthConfig = {
     {provide: ErrorHandler, useClass: IonicErrorHandler}, 
     AuthService, 
     MsgService, 
-    UserDataProvider
+    UserDataProvider,
+    TrackProvider
   ]
 })
 export class AppModule {}

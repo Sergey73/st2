@@ -35,6 +35,9 @@ export class LoginPage implements OnInit {
       email: [this.login, Validators.compose([Validators.required])],
       password: [this.password, Validators.compose([Validators.minLength(6), Validators.required])]
     });
+
+    // временно для разработки
+    this.loginUser();
   }
 
   elementChanged(input){
@@ -59,10 +62,10 @@ export class LoginPage implements OnInit {
           this.navCtrl.setRoot(HomePage);
         } else {
           let msg = `Для входа подтвердите аккаунт.Перейдите по ссылке отправленную на ваш електронный ящик.`
-          this.msgService.alert(msg);
+          this.msgService.alert(msg, null);
         }
       }, error => {
-         this.msgService.alert(error.message);
+         this.msgService.alert(error.message, null);
       });
     }
   }

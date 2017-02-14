@@ -38,10 +38,13 @@ export class ProfilePage {
       console.log(this.profileForm.value);
     } else {
       this.userDataProvider.updateData( {publicData: this.profileForm.value} ).then( authData => {
-        let msg = `Имя профиля успешно изменено.`
-        this.msgService.alert(msg);
+        let msg = `Профиль успешно изменен.`
+        let callback = () => {
+          this.navCtrl.pop();
+        }
+        this.msgService.alert(msg, callback);
       }, error => {
-         this.msgService.alert(error.message);
+         this.msgService.alert(error.message, null);
       });
     }
   }

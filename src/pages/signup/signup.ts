@@ -28,20 +28,11 @@ export class SignupPage {
     })
   }
 
-  /**
-   * Receives an input field and sets the corresponding fieldChanged property to 'true' to help with the styles.
-   */
   elementChanged(input){
     let field = input.inputControl.name;
     this[field + "Changed"] = true;
   }
 
-  /**
-   * If the form is valid it will call the AuthData service to sign the user up password displaying a loading
-   *  component while the user waits.
-   *
-   * If the form is invalid it will just log the form value, feel free to handle that as you like.
-   */
   signupUser(){
     this.submitAttempt = true;
 
@@ -55,10 +46,10 @@ export class SignupPage {
           let message = `Ваш аккаунт создан. На указанный при регистрации электронный ящик, 
           вам отправлено письмо. Перейдите по ссылке внутри письма, чтобы завершить 
           регистрацию и пользоваться сервисом.`;
-          this.msgService.alert(message);
+          this.msgService.alert(message, null);
         });
       }, error => {
-        this.msgService.alert(error.message);
+        this.msgService.alert(error.message, null);
       });
     }
   }

@@ -4,6 +4,7 @@ import { NavController } from 'ionic-angular';
 import * as L from 'mapbox.js';
 
 import { AuthService } from '../../providers/auth';
+import { TrackProvider } from '../../providers/track-provider';
 import { UserDataProvider } from '../../providers/user-data-provider';
 import { LoginPage } from '../../pages/login/login';
 
@@ -14,29 +15,31 @@ import { LoginPage } from '../../pages/login/login';
   templateUrl: 'home.html',
 })
 export class HomePage {
-  // books: FirebaseListObservable<any>;
-  // users: FirebaseObjectObservable<any>;
-  map: any;
+  public map: any;
+  public myMarker: any;
+
+  public allTracks: any;
+  public selectdeTrack: any;
+
 
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
+    public trackProvider: TrackProvider,
     public userDataProvider: UserDataProvider
-    // fire: AngularFire
-    
   ) {
     
-    // this.books = fire.database.list('/books');
-    // this.users = fire.database.object('/users');
-    
+    this.allTracks = {a:1, b:2}
   }
 
   ngOnInit() { 
     this.initMap();
     this.getUserData();
+    this.createAddMarker();
+    this.getTracks();
   }
 
-  initMap() {
+  private initMap() {
     // вынести в константу
     L.mapbox.accessToken = 'pk.eyJ1Ijoic2VyZ2V5NzMiLCJhIjoiY2lyM3JhYnAxMDAyeGh5bnFmczh3cTRseiJ9.KVe54Q2NCigy3J0j3didAA';
     this.map = L.mapbox.map('map', 'mapbox.streets', {
@@ -52,7 +55,20 @@ export class HomePage {
     });
   }
 
-  getUserData() {
+  private getUserData() {
     this.userDataProvider.getData();
   }
+
+  private createAddMarker() {
+    this.myMarker = L.marker([54.4151707, 48.3257941], { draggable: true });
+    this.myMarker.addTo(this.map);
+  }
+
+  // когда разрастется перенести в отделный провайдер
+  // track
+  private getTracks() {
+
+    // this.allTracks = this.trackProvider.getAllTracks();
+  }
+  // end track
 }

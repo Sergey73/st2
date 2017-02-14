@@ -7,13 +7,15 @@ export class MsgService {
 
   }
 
-  alert(message) {
+  alert(message, callback) {
     let alert = this.alertCtrl.create({
       message: message,
       buttons: [
         {
           text: "Ok",
-          role: 'cancel'
+          handler: () => {
+            callback();
+          }
         }
       ]
     });

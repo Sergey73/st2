@@ -6,7 +6,18 @@
     </button>
     
     <ion-title>Карта</ion-title>
+    
+    <ion-buttons end>
 
+      <ion-item>
+        <ion-label>Номер маршрута</ion-label>
+        <ion-select [(ngModel)]="selectdeTrack">
+
+          <ion-option *ngFor="let item of allTracks; let i = index" value="{{i}}">{{item}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </ion-buttons>
+    
     <ion-buttons end>
       <button ion-button block type="submit" (click)="logout()">Выйти</button>
     </ion-buttons>
