@@ -11,9 +11,11 @@
 
       <ion-item>
         <ion-label>Номер маршрута</ion-label>
-        <ion-select [(ngModel)]="selectdeTrack">
-
-          <ion-option *ngFor="let item of allTracks; let i = index" value="{{i}}">{{item}}</ion-option>
+        <ion-select [(ngModel)]="selectedIndexTrack" (ionChange)="selectTrack()">
+          <ion-option 
+            *ngFor="let track of allTracks | async; let i = index" 
+            value="{{i}}"
+          >{{track.number}}</ion-option>
         </ion-select>
       </ion-item>
     </ion-buttons>

@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 
 import { 
   AngularFire, 
-  FirebaseObjectObservable
-  // FirebaseListObservable
+  // FirebaseObjectObservable
+  FirebaseListObservable
 } from 'angularfire2';
 
 
 @Injectable()
 export class TrackProvider {
-  private tracksDb: FirebaseObjectObservable<any>;
+  private tracksDb: FirebaseListObservable<any>;
   
   constructor(public fire: AngularFire) {
 
@@ -17,7 +17,7 @@ export class TrackProvider {
 
 
   getAllTracks() {
-   return this.tracksDb = this.fire.database.object('/tracks/');
+   return this.tracksDb = this.fire.database.list('/tracks/');
   }
 
     // this.tracksDb = this.fire.database.object('/users/' + this.userData.uid);
