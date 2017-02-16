@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavController } from 'ionic-angular';
 
 import * as L from 'mapbox.js';
+import * as leafletDraw from 'leaflet-draw';
 
 import { AuthService } from '../../providers/auth';
 import { TrackProvider } from '../../providers/track-provider';
@@ -21,15 +22,18 @@ export class HomePage {
 
   public allTracks: any;
   public selectedIndexTrack: any = [{number:'', path: ''}];
+  public featureGroup: any;
 
 
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
     public trackProvider: TrackProvider,
-    public userDataProvider: UserDataProvider
+    public userDataProvider: UserDataProvider,
   ) {
-    
+    leafletDraw
+    debugger;
+
   }
 
   ngOnInit() { 
@@ -44,7 +48,6 @@ export class HomePage {
     // вынести в константу
     L.mapbox.accessToken = 'pk.eyJ1Ijoic2VyZ2V5NzMiLCJhIjoiY2lyM3JhYnAxMDAyeGh5bnFmczh3cTRseiJ9.KVe54Q2NCigy3J0j3didAA';
     this.map = L.mapbox.map('map', 'mapbox.streets', {
-      drawControl: true,
       minZoom: 9,
       // maxBounds: [[54.46605, 48.08372], [53.86225, 50.21576]]
     }).setView([54.33414, 48.42499], 9);
@@ -71,8 +74,11 @@ export class HomePage {
   }
 
 
+
+
+
   // когда разрастется перенести в отделный провайдер
-  // track
+  /////////////////// track ////////////////////////
   private getTracks() {
     this.allTracks = this.trackProvider.getAllTracks();
   }
@@ -90,5 +96,7 @@ export class HomePage {
   private showTrack(path) {
     this.trackLayer.setGeoJSON(path);
   }
+
+ 
   // end track
 }
