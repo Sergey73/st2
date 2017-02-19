@@ -8,6 +8,7 @@ import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { SignupPage } from '../pages/signup/signup';
 import { ResetPasswordPage } from '../pages/reset-password/reset-password';
+import { ToolTrackPagePage } from '../pages/tool-track-page/tool-track-page';
 
 import { ProfilePage } from '../pages/profile/profile';
 
@@ -41,7 +42,8 @@ const myFirebaseAuthConfig = {
     LoginPage,
     SignupPage,
     ResetPasswordPage,
-    ProfilePage
+    ProfilePage,
+    ToolTrackPagePage
   ],
   imports: [
     IonicModule.forRoot(MyApp),
@@ -54,7 +56,8 @@ const myFirebaseAuthConfig = {
     LoginPage,
     SignupPage,
     ResetPasswordPage,
-    ProfilePage
+    ProfilePage,
+    ToolTrackPagePage
   ],
   providers: [
     {provide: ErrorHandler, useClass: IonicErrorHandler}, 

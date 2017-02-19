@@ -1,7 +1,13 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 
-// import * as leafletDraw from 'leaflet-draw';
+import { FormBuilder, Validators } from '@angular/forms';
+
+import * as L from 'mapbox.js';
+import * as leafletDraw from 'leaflet-draw';
+
+import { TrackProvider } from '../../providers/track-provider';
+import { MsgService } from '../../providers/msg-service';
 
 @Component({
 
@@ -10,47 +16,96 @@ import { NavController, NavParams } from 'ionic-angular';
   inputs: ['map']
 })
 export class ToolTrackPagePage {
+  // карта создается в home.ts и передается сюда как параметр
+  map: any;
+  featureGroup: any;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  // форма
+  public toolTrackForm: any;
+  public trackData: {number: any, path: string} = {number: '', path: ''};
+  public submitAttempt: boolean = false;
+  // end форма
+
+  constructor(
+    public navCtrl: NavController, 
+    public navParams: NavParams,
+    public formBuilder: FormBuilder,
+    public trackProvider: TrackProvider,
+    public msgService: MsgService,
+  ) {
+    // нужен сдесь иначе модуль не работает.
+    leafletDraw
+
+    this.toolTrackForm = formBuilder.group({
+      trackNumber: [this.trackData.number, Validators.compose([ Validators.required ])]
+    });
+  }
+
+  // для формы 
+  elementChanged(input){
+    let field = input.inputControl.name;
+    this[field + "Changed"] = true;
+  }
+  // end для формы
+
+  ngOnInit() {
+    this.createDrawControl();
+    this.ceateTrackEvent();
+  }
+
+  private createDrawControl () {
+    this.featureGroup = L.featureGroup().addTo(this.map);
+
+    new L.Control.Draw({
+      edit: {
+        featureGroup: this.featureGroup
+      },
+      draw: {
+        polygon: true,
+        polyline: false,
+        rectangle: false,
+        circle: false,
+        marker: false
+      }
+    }).addTo(this.map);
 
   }
 
-  //  private drawControl () {
-  //   this.featureGroup = L.featureGroup().addTo(this.map);
+  private ceateTrackEvent() {
+    this.map.on('draw:created', (e) => { 
+      let layerType = e.layerType;
+      let layer = e.layer;
+      let shape = layer.toGeoJSON();
+      let shapeForDb = JSON.stringify(shape);
+      this.trackData.path = shapeForDb;
 
-  //   new L.Control.Draw({
-  //     edit: {
-  //       featureGroup: this.featureGroup
-  //     },
-  //     draw: {
-  //       polygon: true,
-  //       polyline: false,
-  //       rectangle: false,
-  //       circle: false,
-  //       marker: false
-  //     }
-  //   }).addTo(this.map);
+      this.showPolygonArea(e); 
+    });
+  }
 
-  //   this.map.on('draw:created', (e) => { 
-  //     this.showPolygonArea(e); 
-  //     this.options.track = e;
+  public saveTrackInDb() {
+    this.submitAttempt = true;
+    this.toolTrackForm.pristine
+    if (!this.toolTrackForm.valid){
+      console.log(this.toolTrackForm.value);
+    } else {
+      if(!this.trackData.path) {
+        let message = 'Постройте маршрут!';
+        this.msgService.alert(message, null);
+        return;
+      }
+      this.trackData.number = +this.toolTrackForm.value.trackNumber;
+      this.trackProvider.createTrack(this.trackData).then((data) => {
 
-  //     // сохранение полигона
-  //     var type = e.layerType;
-  //     var layer = e.layer;
-
-  //     var shape = layer.toGeoJSON();
-  //     var shapeForDb = JSON.stringify(shape);
-  //     this.options.trackPath = shapeForDb;
-  //     console.dir(`track создан!`);
-  //     // var dataTrack = {
-  //     //   number: 50,
-  //     //   path: shapeForDb
-  //     // };
-  //     // this.fire.saveTrack(dataTrack);
-
-  //     // end сохранение полигона
-  //   });
+        let message = `Маршрут №${this.trackData.number} успешно создан.`;
+        this.msgService.alert(message, null);
+        this.featureGroup.clearLayers();
+        this.clearTrackData();
+      }).catch((error) => {
+        console.dir(error);
+      });
+    }
+  }
 
   //   // this.map.on('draw:edited', (e) => {
   //   //   this.showPolygonAreaEdited(e);
@@ -62,13 +117,25 @@ export class ToolTrackPagePage {
   //   //   this.options.track = e;
   //   // });
 
-  // }
+  
 
-  // private showPolygonArea(e) {
-  //   this.featureGroup.clearLayers();
-  //   this.featureGroup.addLayer(e.layer);
-  //   // e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
-  //   e.layer.openPopup();
-  // }
+  private showPolygonArea(e) {
+    this.featureGroup.clearLayers();
+    this.featureGroup.addLayer(e.layer);
+    // e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
+    e.layer.openPopup();
+  }
 
+  // ! узнать как нормально сбрасывать данные формы
+  // очищаем объект в котором хранятся данные  и поле значение формы
+  private clearTrackData() {
+    this.trackData.number = '';
+    this.trackData.path = '';
+    // сбарсываем данные фомы
+    this.toolTrackForm.reset();
+    
+    // сбарсываем занчения для валидации
+    this.submitAttempt = false;
+    this['trackNumberChanged'] = false;
+  }
 }

@@ -18,7 +18,7 @@
         type="text" 
         (change)="elementChanged(name)"
         placeholder="Введите новое имя"
-        [class.invalid]="!profileForm.controls.name.valid && (emailChanged || submitAttempt)"
+        [class.invalid]="!profileForm.controls.name.valid && (nameChanged || submitAttempt)"
         clearInput
       ></ion-input>
     </ion-item>

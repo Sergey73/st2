@@ -1,12 +1,33 @@
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>toolTrackPage</ion-title>
+  <ion-navbar class="head">
+    <ion-title>Параметры маршрута</ion-title>
   </ion-navbar>
 
 </ion-header>
 
-
-<ion-content padding>
-  <div> tool</div>
+<ion-content padding class="body">
+   <form [formGroup]="toolTrackForm" (submit)="saveTrackInDb()" novalidate>
+    <ion-item>
+      <ion-label color="primary" stacked>Номер маршрута</ion-label>
+      <ion-input 
+        #trackNumber 
+        formControlName="trackNumber" 
+        type="number"
+        (change)="elementChanged(trackNumber)"
+        placeholder="Введите номер маршрута"
+        [class.invalid]="!toolTrackForm.controls.trackNumber.valid"
+      ></ion-input>
+    </ion-item>
+    <ion-item 
+      class="error-message" 
+      *ngIf="!toolTrackForm.controls.trackNumber.valid  && (trackNumberChanged || submitAttempt)"
+    >
+      <p>Поле не должно быть пустым</p>
+    </ion-item>
+ 
+    <button ion-button block type="submit">
+      Сохранить
+    </button>
+  </form>
 </ion-content>

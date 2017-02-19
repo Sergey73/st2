@@ -15,11 +15,20 @@ export class TrackProvider {
 
   }
 
-
   getAllTracks() {
-   return this.tracksDb = this.fire.database.list('/tracks/');
+    return this.tracksDb = this.fire.database.list(
+      '/tracks/', 
+      {
+        query: {
+          orderByChild: 'number'
+        }
+      }
+    );
   }
 
+  createTrack(trackData) {
+    return this.tracksDb.push(trackData);
+  }
     // this.tracksDb = this.fire.database.object('/users/' + this.userData.uid);
 
     // this.userDb.subscribe(data => {

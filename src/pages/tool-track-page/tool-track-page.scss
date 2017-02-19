@@ -1,3 +1,14 @@
 page-tool-track-page {
-
+  position: absolute;
+  border: 1px solid green;
+  width: 270px;
+  height: 300px;
+  z-index: 11;
+  top: 70px;
+  right: 10px;
+  .toolbar-title-md {
+    font-size: 18px;
+  }
+  .body {
+  }
 }

@@ -8,6 +8,7 @@ export class MsgService {
   }
 
   alert(message, callback) {
+    if(!callback) callback = () => {};
     let alert = this.alertCtrl.create({
       message: message,
       buttons: [
