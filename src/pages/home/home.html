@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header >
 
   <ion-toolbar>
     <button ion-button menuToggle>
@@ -8,7 +8,10 @@
     <ion-title>Карта</ion-title>
     
     <ion-buttons end>
+      <button *ngIf="showBtnStart" ion-button block type="submit" (click)="showAllDrivers()">Поехали</button>
+    </ion-buttons>
 
+    <ion-buttons [hidden]="loadDataUser" end>
       <ion-item>
         <ion-label>Номер маршрута</ion-label>
         <ion-select [(ngModel)]="selectedIndexTrack" (ionChange)="selectTrack()">
@@ -28,7 +31,6 @@
 
 </ion-header>
 
-<!--<tool-b *ngIf="showAdminTools" [options]="options"></tool-b>-->
 <page-tool-track-page [map]="map"></page-tool-track-page>
 <ion-content class="map">
   <div class="map__container" id='map'></div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, Events } from 'ionic-angular';
 
 import * as L from 'mapbox.js';
 
@@ -18,10 +18,12 @@ export class HomePage {
   public map: any;
   public myMarker: any;
   public trackLayer: any;
+  public loadDataUser: boolean = true;
 
   public allTracks: any;
-  public selectedIndexTrack: any = [{number:'', path: ''}];
+  public selectedIndexTrack: any = '';
   public featureGroup: any;
+  public showBtnStart: boolean = false;
 
 
   constructor(
@@ -29,11 +31,17 @@ export class HomePage {
     public authService: AuthService,
     public trackProvider: TrackProvider,
     public userDataProvider: UserDataProvider,
+    public events: Events
   ) {
 
   }
 
   ngOnInit() { 
+    // как только данные юзера придут происходит событие
+    this.events.subscribe('userData: finish', (data) => {
+      this.loadDataUser = false;
+    });
+
     this.initMap();
     this.initTrack();
     this.getUserData();
@@ -71,6 +79,19 @@ export class HomePage {
     this.myMarker.addTo(this.map);
   }
 
+  public showAllDrivers() {
+
+  }
+
+  /////////////////// user ////////////////////////
+  setUserTrack (number) {
+   this.userDataProvider.updateData( { publicData: { trackNumber: number } } ).then( authData => {
+      this.showBtnStart;
+    }, error => {
+      console.dir(error);
+    });
+  }
+  /////////////////// end user ////////////////////////
 
 
   /////////////////// track ////////////////////////
@@ -85,6 +106,7 @@ export class HomePage {
     this.allTracks.forEach((arr) => {
       let path = JSON.parse(arr[index].path)
       this.showTrack(path);
+      this.setUserTrack(arr[index].number);
     });
   }
 

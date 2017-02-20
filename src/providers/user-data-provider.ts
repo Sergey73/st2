@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-
+import { Events } from 'ionic-angular';
 
 import { 
   AngularFire, 
@@ -24,20 +24,23 @@ export class UserDataProvider {
   };
 
   constructor(
-    public fire: AngularFire
+    public fire: AngularFire,
+    public events: Events
   ) {
 
   }
 
   getData() {
     this.userDb = this.fire.database.object('/users/' + this.userData.uid);
-    this.userDb.subscribe(data => {
+
+    this.userDb.forEach(data => {
       if (data.$value === null) {
         // если нет юзера создаем его
         this.createUserData();
       } else {
         this.getUserData(data);
       }
+      this.events.publish('userData: finish');
     });
   }
 
@@ -50,6 +53,7 @@ export class UserDataProvider {
       email: this.userData.email,
       publicData: {
         name: '',
+        trackNumber: ''
       },
       role: 1
     });
@@ -59,5 +63,6 @@ export class UserDataProvider {
     this.userData.name = data.publicData.name;
     this.userData.role = data.role;
   }
+
 
 }
