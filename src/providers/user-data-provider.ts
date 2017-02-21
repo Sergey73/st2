@@ -10,6 +10,7 @@ import {
 @Injectable()
 export class UserDataProvider {
   private userDb: FirebaseObjectObservable<any>;
+  private userPublicDataDb: FirebaseObjectObservable<any>;
 
   userData: {
     uid: string, 
@@ -32,6 +33,8 @@ export class UserDataProvider {
 
   getData() {
     this.userDb = this.fire.database.object('/users/' + this.userData.uid);
+    // научиться забирать от userDb
+    this.userPublicDataDb = this.fire.database.object('/users/' + this.userData.uid +'/publicData');
 
     this.userDb.forEach(data => {
       if (data.$value === null) {
@@ -46,6 +49,10 @@ export class UserDataProvider {
 
   public updateData (obj: Object) {
     return this.userDb.update(obj);
+  }
+
+   public updatePublicData ( obj: Object) {
+    return this.userPublicDataDb.update(obj);
   }
 
   private createUserData() {

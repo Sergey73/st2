@@ -85,7 +85,8 @@ export class HomePage {
 
   /////////////////// user ////////////////////////
   setUserTrack (number) {
-   this.userDataProvider.updateData( { publicData: { trackNumber: number } } ).then( authData => {
+   this.userDataProvider.updatePublicData(  { trackNumber: number }  ).then( authData => {
+      debugger;
       this.showBtnStart;
     }, error => {
       console.dir(error);
