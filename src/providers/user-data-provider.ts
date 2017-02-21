@@ -10,7 +10,6 @@ import {
 @Injectable()
 export class UserDataProvider {
   private userDb: FirebaseObjectObservable<any>;
-  private userPublicDataDb: FirebaseObjectObservable<any>;
 
   userData: {
     uid: string, 
@@ -31,10 +30,8 @@ export class UserDataProvider {
 
   }
 
-  getData() {
+  public getData() {
     this.userDb = this.fire.database.object('/users/' + this.userData.uid);
-    // научиться забирать от userDb
-    this.userPublicDataDb = this.fire.database.object('/users/' + this.userData.uid +'/publicData');
 
     this.userDb.forEach(data => {
       if (data.$value === null) {
@@ -47,12 +44,8 @@ export class UserDataProvider {
     });
   }
 
-  public updateData (obj: Object) {
+  public updateData(obj: Object) {
     return this.userDb.update(obj);
-  }
-
-   public updatePublicData ( obj: Object) {
-    return this.userPublicDataDb.update(obj);
   }
 
   private createUserData() {
@@ -60,7 +53,9 @@ export class UserDataProvider {
       email: this.userData.email,
       publicData: {
         name: '',
-        trackNumber: ''
+        trackNumber: '',
+        latitude: 54.30871225899285,   // широта
+        longitude: 48.39597702026368 // долгота
       },
       role: 1
     });
@@ -70,6 +65,5 @@ export class UserDataProvider {
     this.userData.name = data.publicData.name;
     this.userData.role = data.role;
   }
-
 
 }

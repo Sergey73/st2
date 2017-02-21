@@ -70,6 +70,43 @@ export class HomePage {
     });
   }
 
+  // for develop
+  moveMarker() {
+    var lat: any = 54.30801120099681;
+    var lng: any = 48.39649200439454;
+    var left = true;
+    var up = true;
+    var val: any;
+
+    var d: any = 1000;
+    var l: any = 3;
+    var interval = setInterval(() => {
+
+      if (lng > 48.24920654296876 && left) {
+        up = true;
+        val = (lng.toFixed(l)-0) * d;
+        lng = (val - 1)/d;
+      } else if (lat < 54.36935859782679 && up) {
+        left = false;
+        val = (lat.toFixed(l)-0) * d;
+        lat = (val + 1)/d;
+      } else if (lng <  48.380355834960945 && !left) {
+        up = false;
+        val = (lng.toFixed(l)-0) * d;
+        lng = (val + 1)/d;
+      } else if (lat > 54.30801120099681 && !up) {
+        
+        val = (lat.toFixed(l)-0) * d;
+        lat = (val - 1)/d;
+      } else {
+        left = true;
+      }
+      this.myMarker.setLatLng([lat, lng]);
+    },100);
+
+  }
+
+  // end for develop
   private getUserData() {
     this.userDataProvider.getData();
   }
@@ -80,14 +117,31 @@ export class HomePage {
   }
 
   public showAllDrivers() {
+    this.moveMarker();
+    // let lng = 1;
+    // let lat = 3;
 
+    // let obj = {
+    //   'publicData/latitude': lat,
+    //   'publicData/longitude': lng 
+    // };
+
+    // this.userDataProvider.updateData(obj).then( authData => {
+    //   // показываем кнопку старта
+    //   this.showBtnStart = true;
+    // }, error => {
+    //   console.dir(error);
+    // });
   }
 
+
   /////////////////// user ////////////////////////
-  setUserTrack (number) {
-   this.userDataProvider.updatePublicData(  { trackNumber: number }  ).then( authData => {
-      debugger;
-      this.showBtnStart;
+  // выбираем маршрут по которому поедеь
+  setUserTrack(number) {
+    let obj = {'publicData/trackNumber': number};
+    this.userDataProvider.updateData(obj).then( authData => {
+      // показываем кнопку старта
+      this.showBtnStart = true;
     }, error => {
       console.dir(error);
     });

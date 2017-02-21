@@ -19,6 +19,9 @@ export class ToolTrackPagePage {
   // карта создается в home.ts и передается сюда как параметр
   map: any;
   featureGroup: any;
+  lat: Number;
+  lng: Number;
+  latLng: String;
 
   // форма
   public toolTrackForm: any;
@@ -51,6 +54,20 @@ export class ToolTrackPagePage {
   ngOnInit() {
     this.createDrawControl();
     this.ceateTrackEvent();
+    this.moveMarker();
+  }
+
+
+  private moveMarker() {
+     this.map.on('click', (e) => {
+      this.latLng = `lat: ${e.latlng.lat}, lng: ${e.latlng.lng}`;
+     });
+
+     // показываем долготу широту 
+     this.map.on('mousemove', (e) => {
+       this.lat = e.latlng.lat;
+       this.lng = e.latlng.lng;
+    });
   }
 
   private createDrawControl () {

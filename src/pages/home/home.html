@@ -8,7 +8,12 @@
     <ion-title>Карта</ion-title>
     
     <ion-buttons end>
-      <button *ngIf="showBtnStart" ion-button block type="submit" (click)="showAllDrivers()">Поехали</button>
+      <button 
+        *ngIf="showBtnStart" 
+        ion-button block 
+        type="submit" 
+        (click)="showAllDrivers()"
+      >Поехали</button>
     </ion-buttons>
 
     <ion-buttons [hidden]="loadDataUser" end>
