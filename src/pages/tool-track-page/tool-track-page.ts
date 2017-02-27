@@ -60,7 +60,10 @@ export class ToolTrackPagePage {
 
   private moveMarker() {
      this.map.on('click', (e) => {
-      this.latLng = `lat: ${e.latlng.lat}, lng: ${e.latlng.lng}`;
+      this.latLng = `
+        lat: ${e.latlng.lat},
+        lng: ${e.latlng.lng}
+      `;
      });
 
      // показываем долготу широту 

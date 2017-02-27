@@ -18,13 +18,23 @@ export class HomePage {
   public map: any;
   public myMarker: any;
   public trackLayer: any;
+  // флаг для отображения селекта выбора номера маршрута
+  // если не ставить селект появляется с пустым значением 
+  // тк данные еще не загружены
   public loadDataUser: boolean = true;
-
   public allTracks: any;
+  // выбранный маршрут 
   public selectedIndexTrack: any = '';
-  public featureGroup: any;
   public showBtnStart: boolean = false;
+  public showBtnStop: boolean = false;
+  // если false другие водители не будут получать координаты этого водителя
+  private inMove: boolean = false;
 
+  // 
+  private updateCoordsInterval: any;
+
+  private myLatitude: any;
+  private myLongitude: any;
 
   constructor(
     public navCtrl: NavController,
@@ -53,10 +63,10 @@ export class HomePage {
     // вынести в константу
     L.mapbox.accessToken = 'pk.eyJ1Ijoic2VyZ2V5NzMiLCJhIjoiY2lyM3JhYnAxMDAyeGh5bnFmczh3cTRseiJ9.KVe54Q2NCigy3J0j3didAA';
     this.map = L.mapbox.map('map', 'mapbox.streets', {
-      minZoom: 9,
+      minZoom: 10,
       // drawControl: true
       // maxBounds: [[54.46605, 48.08372], [53.86225, 50.21576]]
-    }).setView([54.33414, 48.42499], 9);
+    }).setView([54.33414, 48.42499], 10);
   }
 
   private initTrack() {
@@ -71,42 +81,55 @@ export class HomePage {
   }
 
   // for develop
+  // функция эмитации поездки по квадрату в реале функция
+  // определения координат текущего водителя
   moveMarker() {
-    var lat: any = 54.30801120099681;
-    var lng: any = 48.39649200439454;
+    this.myLatitude = 54.30801120099681;
+    this.myLongitude = 48.39649200439454;
+    
+    // разрешает/запрешает движение маркера влево
     var left = true;
+
+    // разрешает/запрешает движение маркера вверх
     var up = true;
+    
+    // для каждого val
+    // для правильного подсчета делаем целое число из дробного,
+    // выполняем вычитание и снова делаем его дробным
     var val: any;
 
-    var d: any = 1000;
-    var l: any = 3;
-    var interval = setInterval(() => {
+    // округляем до этого значения знаков после запятой
+    var num: any = 3;
+    
+    // для того чтобы вернуть дробное значение из целого
+    var d: any = Math.pow(10, num);
 
-      if (lng > 48.24920654296876 && left) {
+    var interval = setInterval(() => {
+      if (this.myLongitude > 48.24920654296876 && left) {
         up = true;
-        val = (lng.toFixed(l)-0) * d;
-        lng = (val - 1)/d;
-      } else if (lat < 54.36935859782679 && up) {
+        val = (this.myLongitude.toFixed(num)-0) * d;
+        this.myLongitude = (val - 1)/d;
+      } else if (this.myLatitude < 54.36935859782679 && up) {
         left = false;
-        val = (lat.toFixed(l)-0) * d;
-        lat = (val + 1)/d;
-      } else if (lng <  48.380355834960945 && !left) {
+        val = (this.myLatitude.toFixed(num)-0) * d;
+        this.myLatitude = (val + 1)/d;
+      } else if (this.myLongitude <  48.380355834960945 && !left) {
         up = false;
-        val = (lng.toFixed(l)-0) * d;
-        lng = (val + 1)/d;
-      } else if (lat > 54.30801120099681 && !up) {
-        
-        val = (lat.toFixed(l)-0) * d;
-        lat = (val - 1)/d;
+        val = (this.myLongitude.toFixed(num)-0) * d;
+        this.myLongitude = (val + 1)/d;
+      } else if (this.myLatitude > 54.30801120099681 && !up) {
+        val = (this.myLatitude.toFixed(num)-0) * d;
+        this.myLatitude = (val - 1)/d;
       } else {
         left = true;
       }
-      this.myMarker.setLatLng([lat, lng]);
+
+      this.myMarker.setLatLng([this.myLatitude, this.myLongitude]);
     },100);
 
   }
-
   // end for develop
+
   private getUserData() {
     this.userDataProvider.getData();
   }
@@ -117,34 +140,122 @@ export class HomePage {
   }
 
   public showAllDrivers() {
-    this.moveMarker();
-    // let lng = 1;
-    // let lat = 3;
+    this.showBtnStop = true;
+    this.showBtnStart = false;
+    this.setUserCoords();
 
-    // let obj = {
-    //   'publicData/latitude': lat,
-    //   'publicData/longitude': lng 
-    // };
-
-    // this.userDataProvider.updateData(obj).then( authData => {
-    //   // показываем кнопку старта
-    //   this.showBtnStart = true;
-    // }, error => {
-    //   console.dir(error);
-    // });
+  }
+  public hideAllDrivers() {
+    this.showBtnStart = true;
+    this.showBtnStop = false;
+    this.stopSetUserCoords();
   }
 
 
   /////////////////// user ////////////////////////
-  // выбираем маршрут по которому поедеь
-  setUserTrack(number) {
+  // выбираем маршрут по которому поедем
+  private setUserTrack(number) {
     let obj = {'publicData/trackNumber': number};
+    // сохраняем маршрут в БД
     this.userDataProvider.updateData(obj).then( authData => {
       // показываем кнопку старта
       this.showBtnStart = true;
+      
+      // функция имитирует передвижение текущего водителя
+      // удалить после разработки !!! 
+      this.moveMarker();
     }, error => {
       console.dir(error);
     });
+  }
+
+  // останавливаем обновление координат текущего водителя в БД 
+  private stopSetUserCoords() {
+    // останавливаем обновление координат
+    clearInterval(this.updateCoordsInterval);
+
+    // говорим что другие водители не будут учитывать координаты этого водителя
+    this.inMove = false;
+    let obj = {
+      'publicData/inMove': this.inMove
+    };
+
+    // обновляем данные
+    this.userDataProvider.updateData(obj).then( authData => {
+
+    }, error => {
+      console.dir(error);
+    });
+  }
+
+  // сохраняем свои координаты в БД
+  private setUserCoords() {
+    // частота обновления координат в милисекундах
+    let intervalUpdateCoords = 2000;
+
+    // предидущие значения координат
+    let oldValue = {
+      latitude: null,
+      longitude: null
+    } 
+
+    // счетчик котрый учитывает время когда координаты текущего 
+    // водителя не меняются
+    let coutnEqualCoords = 0;
+
+    this.updateCoordsInterval = setInterval(() => {
+      // если предыдущие значения координат не равны текущим,
+      //  записываем их в БД
+      if (oldValue.latitude !== this.myLatitude || oldValue.longitude !== this.myLongitude) {
+        // говорим что другие водители будут учитывать координаты этого водителя
+        this.inMove = true;
+
+        let obj = {
+          'publicData/latitude': this.myLatitude,
+          'publicData/longitude': this.myLongitude,
+          'publicData/inMove': this.inMove
+        };
+        oldValue.latitude = this.myLatitude;
+        oldValue.longitude = this.myLongitude;
+       
+        // обнуляем счетчик
+        coutnEqualCoords = 0;
+
+        // обновляем данные
+        this.userDataProvider.updateData(obj).then( authData => {
+
+        }, error => {
+          console.dir(error);
+        });
+      } else if (coutnEqualCoords > intervalUpdateCoords * 2 ) {
+        this.stopSetUserCoords();
+        // // если в течении 10 секунд координаты не меняются останавливаем обновление 
+        // // координат текущего водителя в БД 
+        // clearInterval(updateCoords);
+
+        // // говорим что другие водители не будут учитывать координаты этого водителя
+        // this.inMove = false;
+        // let obj = {
+        //   'publicData/inMove': this.inMove
+        // };
+
+        // // обновляем данные
+        // this.userDataProvider.updateData(obj).then( authData => {
+
+        // }, error => {
+        //   console.dir(error);
+        // });
+
+
+        // // обнуляем счетчик котрый учитывает время когда координаты текущего водителя 
+        // // не меняются
+        // coutnEqualCoords = 0;
+      } else {
+        // если координаты не обновляются увеличиваем счетчик на время через которое 
+        // обновляются координаты
+        coutnEqualCoords += intervalUpdateCoords; 
+      }
+    }, intervalUpdateCoords);
   }
   /////////////////// end user ////////////////////////
 

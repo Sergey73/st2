@@ -16,6 +16,15 @@
       >Поехали</button>
     </ion-buttons>
 
+    <ion-buttons end>
+      <button 
+        *ngIf="showBtnStop" 
+        ion-button block 
+        type="submit" 
+        (click)="hideAllDrivers()"
+      >Стоп</button>
+    </ion-buttons>
+
     <ion-buttons [hidden]="loadDataUser" end>
       <ion-item>
         <ion-label>Номер маршрута</ion-label>

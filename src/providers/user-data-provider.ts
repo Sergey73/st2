@@ -55,7 +55,8 @@ export class UserDataProvider {
         name: '',
         trackNumber: '',
         latitude: 54.30871225899285,   // широта
-        longitude: 48.39597702026368 // долгота
+        longitude: 48.39597702026368, // долгота
+        inMove: false
       },
       role: 1
     });
