@@ -37,7 +37,8 @@ export class ProfilePage {
     if (!this.profileForm.valid){
       console.log(this.profileForm.value);
     } else {
-      this.userDataProvider.updateData( {publicData: this.profileForm.value} ).then( authData => {
+      let obj = {'publicData/name': this.profileForm.value.name};
+      this.userDataProvider.updateData( obj ).then( authData => {
         let msg = `Профиль успешно изменен.`
         let callback = () => {
           this.navCtrl.pop();

@@ -21,7 +21,7 @@ export class LoginPage implements OnInit {
   passwordChanged: boolean = false;
   submitAttempt: boolean = false;
 
-  login: string = 'streetCity73@gmail.com';
+  login: string = '';
   password: string = '671310';
 
   constructor(
@@ -31,6 +31,10 @@ export class LoginPage implements OnInit {
     public msgService: MsgService,
     public userDataProvider: UserDataProvider
   ) { 
+    // если браузер не хром ставим другой логин
+    let str = window.navigator.userAgent;
+    this.login = str.indexOf('Chrome') == -1 ? 'hripchenkosergey@rambler.ru' : 'streetCity73@gmail.com';
+    
     this.loginForm = formBuilder.group({
       email: [this.login, Validators.compose([Validators.required])],
       password: [this.password, Validators.compose([Validators.minLength(6), Validators.required])]
@@ -38,6 +42,7 @@ export class LoginPage implements OnInit {
 
     // временно для разработки
     this.loginUser();
+    // end временно для разработки
   }
 
   elementChanged(input){

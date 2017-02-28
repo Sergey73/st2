@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { 
   AngularFire, 
-  // FirebaseObjectObservable
+  FirebaseObjectObservable,
   FirebaseListObservable
 } from 'angularfire2';
 
@@ -10,6 +10,7 @@ import {
 @Injectable()
 export class TrackProvider {
   private tracksDb: FirebaseListObservable<any>;
+  private activeTracksDb: FirebaseObjectObservable<any>;
   
   constructor(public fire: AngularFire) {
 
@@ -40,4 +41,10 @@ export class TrackProvider {
     //   }
     // });
 
+    // active track
+    setActiveTrack(trackNumber: any) {
+      this.activeTracksDb = this.fire.database.object('/activeTrack/' + trackNumber);
+      this.activeTracksDb.set( [{x:1}] );
+    }
+    // end active track
 }
