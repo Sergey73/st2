@@ -30,21 +30,11 @@ export class TrackProvider {
   createTrack(trackData) {
     return this.tracksDb.push(trackData);
   }
-    // this.tracksDb = this.fire.database.object('/users/' + this.userData.uid);
 
-    // this.userDb.subscribe(data => {
-    //   if (data.$value === null) {
-    //     // если нет юзера создаем его
-    //     this.createUserData();
-    //   } else {
-    //     this.getUserData(data);
-    //   }
-    // });
-
-    // active track
-    setActiveTrack(trackNumber: any) {
-      this.activeTracksDb = this.fire.database.object('/activeTrack/' + trackNumber);
-      this.activeTracksDb.set( [{x:1}] );
-    }
-    // end active track
+  // active track
+  setActiveTrack(trackNumber: any) {
+    this.activeTracksDb = this.fire.database.object('/activeTrack/' + trackNumber);
+    this.activeTracksDb.set( [{x:1}] );
+  }
+  // end active track
 }

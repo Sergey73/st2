@@ -8,8 +8,6 @@ import { TrackProvider } from '../../providers/track-provider';
 import { UserDataProvider } from '../../providers/user-data-provider';
 import { LoginPage } from '../../pages/login/login';
 
-// import { AngularFire, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2';
-
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
@@ -229,27 +227,6 @@ export class HomePage {
         });
       } else if (coutnEqualCoords > intervalUpdateCoords * 2 ) {
         this.stopSetUserCoords();
-        // // если в течении 10 секунд координаты не меняются останавливаем обновление 
-        // // координат текущего водителя в БД 
-        // clearInterval(updateCoords);
-
-        // // говорим что другие водители не будут учитывать координаты этого водителя
-        // this.inMove = false;
-        // let obj = {
-        //   'publicData/inMove': this.inMove
-        // };
-
-        // // обновляем данные
-        // this.userDataProvider.updateData(obj).then( authData => {
-
-        // }, error => {
-        //   console.dir(error);
-        // });
-
-
-        // // обнуляем счетчик котрый учитывает время когда координаты текущего водителя 
-        // // не меняются
-        // coutnEqualCoords = 0;
       } else {
         // если координаты не обновляются увеличиваем счетчик на время через которое 
         // обновляются координаты
@@ -267,7 +244,6 @@ export class HomePage {
 
   selectTrack() {
     var index = this.selectedIndexTrack;
-    // this.allTracks.push({"number": 4, "path": "path test"})
     // forEach возвращает массив данных
     this.allTracks.forEach((arr) => {
       let path = JSON.parse(arr[index].path)

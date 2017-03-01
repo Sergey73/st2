@@ -3,24 +3,27 @@ import { Events } from 'ionic-angular';
 
 import { 
   AngularFire, 
-  FirebaseObjectObservable
-  // FirebaseListObservable
+  // FirebaseObjectObservable
+  FirebaseListObservable
 } from 'angularfire2';
 
 @Injectable()
 export class UserDataProvider {
-  private userDb: FirebaseObjectObservable<any>;
+  // private userDb: FirebaseObjectObservable<any>;
+  private userDb: FirebaseListObservable<any>;
 
   userData: {
     uid: string, 
     email: string,
     name: string,
-    role: string
+    role: string,
+    key: string
   } = {
     uid: '', 
     email: '',
     name: '',
-    role: ''
+    role: '',
+    key: ''
   };
 
   constructor(
@@ -31,25 +34,33 @@ export class UserDataProvider {
   }
 
   public getData() {
-    this.userDb = this.fire.database.object('/users/' + this.userData.uid);
+    let value = this.userData.uid ? this.userData.uid : ''
+    this.userDb = this.fire.database.list('/users', {
+      query: {
+        orderByChild: 'uid',
+        equalTo: value
+        // equalTo:  this.userData.uid
+      }
+    });
 
-    this.userDb.forEach(data => {
-      if (data.$value === null) {
+    this.userDb.subscribe(data => {
+      if (!data.length) {
         // если нет юзера создаем его
         this.createUserData();
       } else {
-        this.getUserData(data);
+        this.getUserData(data[0]);
       }
       this.events.publish('userData: finish');
     });
   }
 
   public updateData(obj: Object) {
-    return this.userDb.update(obj);
+    return this.userDb.update(this.userData.key, obj);
   }
 
   private createUserData() {
-    this.userDb.set({
+    this.userDb.push({
+      uid: this.userData.uid,
       email: this.userData.email,
       publicData: {
         name: '',
@@ -59,12 +70,15 @@ export class UserDataProvider {
         inMove: false
       },
       role: 1
+    }).then(data => {
+      this.userData.key = data.key;
     });
   }
 
   private getUserData(data: any) {
     this.userData.name = data.publicData.name;
     this.userData.role = data.role;
+    this.userData.key = data.$key;
   }
 
 }
