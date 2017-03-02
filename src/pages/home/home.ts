@@ -14,8 +14,11 @@ import { LoginPage } from '../../pages/login/login';
 })
 export class HomePage {
   public map: any;
-  public myMarker: any;
   public trackLayer: any;
+  
+  // выбранный маршрут
+  public selectedTrack: number;
+
   // флаг для отображения селекта выбора номера маршрута
   // если не ставить селект появляется с пустым значением 
   // тк данные еще не загружены
@@ -34,6 +37,8 @@ export class HomePage {
   private myLatitude: any;
   private myLongitude: any;
 
+  private arr: Object = {};
+
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
@@ -50,10 +55,20 @@ export class HomePage {
       this.loadDataUser = false;
     });
 
+    // слушает когда придут данные других водителей
+    this.events.subscribe('usersByTrackData: finish', () => {
+      this.userDataProvider.userData.usersByTrack.forEach(item => {
+        if (!this.arr[item.$key] ) {
+          let marker = this.createAddMarker();
+          this.arr[item.$key] = marker;
+        }
+        this.arr[item.$key].setLatLng([item.publicData.latitude, item.publicData.longitude]);
+      });
+    });
+
     this.initMap();
     this.initTrack();
     this.getUserData();
-    this.createAddMarker();
     this.getTracks();
   }
 
@@ -86,23 +101,26 @@ export class HomePage {
     this.myLongitude = 48.39649200439454;
     
     // разрешает/запрешает движение маркера влево
-    var left = true;
+    let left = true;
 
     // разрешает/запрешает движение маркера вверх
-    var up = true;
+    let up = true;
     
     // для каждого val
     // для правильного подсчета делаем целое число из дробного,
     // выполняем вычитание и снова делаем его дробным
-    var val: any;
+    let val: any;
 
     // округляем до этого значения знаков после запятой
-    var num: any = 3;
+    let num: any = 3;
     
     // для того чтобы вернуть дробное значение из целого
-    var d: any = Math.pow(10, num);
+    let d: any = Math.pow(10, num);
+    
+    // создаем маркер
+    let marker = this.createAddMarker();
 
-    var interval = setInterval(() => {
+    let interval = setInterval(() => {
       if (this.myLongitude > 48.24920654296876 && left) {
         up = true;
         val = (this.myLongitude.toFixed(num)-0) * d;
@@ -122,7 +140,7 @@ export class HomePage {
         left = true;
       }
 
-      this.myMarker.setLatLng([this.myLatitude, this.myLongitude]);
+      marker.setLatLng([this.myLatitude, this.myLongitude]);
     },100);
 
   }
@@ -133,26 +151,29 @@ export class HomePage {
   }
 
   private createAddMarker() {
-    this.myMarker = L.marker([54.4151707, 48.3257941], { draggable: true });
-    this.myMarker.addTo(this.map);
+    let marker = L.marker([54.4151707, 48.3257941], { draggable: true });
+    marker.addTo(this.map);
+    return marker;
   }
 
   public showAllDrivers() {
     this.showBtnStop = true;
     this.showBtnStart = false;
     this.setUserCoords();
+    this.getUsersDataByTrack();
 
   }
+
   public hideAllDrivers() {
     this.showBtnStart = true;
     this.showBtnStop = false;
     this.stopSetUserCoords();
   }
 
-
   /////////////////// user ////////////////////////
   // выбираем маршрут по которому поедем
-  private setUserTrack(number) {
+  private setUserTrack() {
+    let number = this.userDataProvider.userData.trackNumber;
     let obj = {'publicData/trackNumber': number};
     // сохраняем маршрут в БД
     this.userDataProvider.updateData(obj).then( authData => {
@@ -189,7 +210,7 @@ export class HomePage {
   // сохраняем свои координаты в БД
   private setUserCoords() {
     // частота обновления координат в милисекундах
-    let intervalUpdateCoords = 2000;
+    let intervalUpdateCoords = 100;
 
     // предидущие значения координат
     let oldValue = {
@@ -234,6 +255,12 @@ export class HomePage {
       }
     }, intervalUpdateCoords);
   }
+
+  getUsersDataByTrack() {
+    setInterval(() => {
+      this.userDataProvider.getUsersByTrack();
+    }, 100);
+  }
   /////////////////// end user ////////////////////////
 
 
@@ -246,10 +273,14 @@ export class HomePage {
     var index = this.selectedIndexTrack;
     // forEach возвращает массив данных
     this.allTracks.forEach((arr) => {
-      let path = JSON.parse(arr[index].path)
+      this.selectedTrack = arr[index].number;
+      let path = JSON.parse(arr[index].path);
+      
       this.showTrack(path);
-      this.setUserTrack(arr[index].number);
-      this.trackProvider.setActiveTrack(arr[index].number);
+      // сохраняем выбранный маршрут который будем отслеживать
+      this.userDataProvider.userData.trackNumber = arr[index].number;
+      this.setUserTrack();
+      this.trackProvider.setSelectedTrack(this.selectedTrack);
     });
   }
 

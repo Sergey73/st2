@@ -32,7 +32,7 @@ export class TrackProvider {
   }
 
   // active track
-  setActiveTrack(trackNumber: any) {
+  setSelectedTrack(trackNumber: any) {
     this.activeTracksDb = this.fire.database.object('/activeTrack/' + trackNumber);
     this.activeTracksDb.set( [{x:1}] );
   }
