@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Events } from 'ionic-angular';
+import "rxjs/add/operator/take";
 
 import { 
   AngularFire, 
@@ -11,13 +13,17 @@ import {
 export class TrackProvider {
   private tracksDb: FirebaseListObservable<any>;
   private activeTracksDb: FirebaseObjectObservable<any>;
-  
-  constructor(public fire: AngularFire) {
+  public tracksData: Array<any>;
+
+  constructor(
+    public fire: AngularFire,
+    public events: Events
+    ) {
 
   }
 
   getAllTracks() {
-    return this.tracksDb = this.fire.database.list(
+    this.tracksDb = this.fire.database.list(
       '/tracks/', 
       {
         query: {
@@ -25,16 +31,21 @@ export class TrackProvider {
         }
       }
     );
+
+    this.tracksDb.take(1).subscribe(data => {
+      // if (!data.length) {
+      //   // если нет юзера создаем его
+      //   this.createUserData();
+      // } else {
+      //   this.getUserData(data[0]);
+      // }
+      this.tracksData = data;
+      this.events.publish('tracksData: finish');
+    });
   }
 
   createTrack(trackData) {
     return this.tracksDb.push(trackData);
   }
 
-  // active track
-  setSelectedTrack(trackNumber: any) {
-    this.activeTracksDb = this.fire.database.object('/activeTrack/' + trackNumber);
-    this.activeTracksDb.set( [{x:1}] );
-  }
-  // end active track
 }

@@ -14,7 +14,6 @@ export class UserDataProvider {
   // private userDb: FirebaseObjectObservable<any>;
   private userDb: FirebaseListObservable<any>;
   private usersDb: FirebaseListObservable<any>;
-
   userData: {
     uid: string, 
     email: string,

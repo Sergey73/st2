@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, Events } from 'ionic-angular';
 
 import * as L from 'mapbox.js';
+import * as leafletLabel from 'leaflet.label';
 
 import { AuthService } from '../../providers/auth';
 import { TrackProvider } from '../../providers/track-provider';
@@ -23,7 +24,8 @@ export class HomePage {
   // если не ставить селект появляется с пустым значением 
   // тк данные еще не загружены
   public loadDataUser: boolean = true;
-  public allTracks: any;
+  public loadDataAllTracks: boolean = true;
+  public allTracks: Array<any>;
   // выбранный маршрут 
   public selectedIndexTrack: any = '';
   public showBtnStart: boolean = false;
@@ -36,8 +38,13 @@ export class HomePage {
 
   private myLatitude: any;
   private myLongitude: any;
+  
+  // маркер своего местоположения 
+  private selfMarker: any;
 
-  private arr: Object = {};
+  // в объект сохраним водителей, 
+  // которые находятся на выбранном маршруте
+  private arrTrackDriver: Object = {};
 
   constructor(
     public navCtrl: NavController,
@@ -46,23 +53,32 @@ export class HomePage {
     public userDataProvider: UserDataProvider,
     public events: Events
   ) {
+    // нужен сдесь иначе модуль не работает.
+    leafletLabel;
 
   }
 
   ngOnInit() { 
     // как только данные юзера придут происходит событие
-    this.events.subscribe('userData: finish', (data) => {
+    this.events.subscribe('userData: finish', () => {
       this.loadDataUser = false;
+    });
+
+    // данные маршрутов 
+    this.events.subscribe('tracksData: finish', () => {
+      this.allTracks = this.trackProvider.tracksData;
+      this.loadDataAllTracks = false;
     });
 
     // слушает когда придут данные других водителей
     this.events.subscribe('usersByTrackData: finish', () => {
       this.userDataProvider.userData.usersByTrack.forEach(item => {
-        if (!this.arr[item.$key] ) {
-          let marker = this.createAddMarker();
-          this.arr[item.$key] = marker;
+        if (!this.arrTrackDriver[item.$key] ) {
+          let name: string = item.publicData.name;
+          let marker = this.createAddMarker(name);
+          this.arrTrackDriver[item.$key] = marker;
         }
-        this.arr[item.$key].setLatLng([item.publicData.latitude, item.publicData.longitude]);
+        this.arrTrackDriver[item.$key].setLatLng([item.publicData.latitude, item.publicData.longitude]);
       });
     });
 
@@ -88,6 +104,8 @@ export class HomePage {
   }
 
   logout() {
+    // прекращаем запись в БД
+    this.stopSetUserCoords();
     this.authService.logout().then(response => {
       this.navCtrl.setRoot(LoginPage);
     });
@@ -117,8 +135,10 @@ export class HomePage {
     // для того чтобы вернуть дробное значение из целого
     let d: any = Math.pow(10, num);
     
-    // создаем маркер
-    let marker = this.createAddMarker();
+    // имя водителя
+    let name: string = this.userDataProvider.userData.name;
+    // если маркер не создан, создаем маркер
+    if (!this.selfMarker) this.selfMarker = this.createAddMarker(name);
 
     let interval = setInterval(() => {
       if (this.myLongitude > 48.24920654296876 && left) {
@@ -140,7 +160,7 @@ export class HomePage {
         left = true;
       }
 
-      marker.setLatLng([this.myLatitude, this.myLongitude]);
+      this.selfMarker.setLatLng([this.myLatitude, this.myLongitude]);
     },100);
 
   }
@@ -150,9 +170,21 @@ export class HomePage {
     this.userDataProvider.getData();
   }
 
-  private createAddMarker() {
-    let marker = L.marker([54.4151707, 48.3257941], { draggable: true });
+  private createAddMarker(label:string = 'Введите имя') {
+    let marker = L.marker([54.4151707, 48.3257941]
+      // icon: new L.DivIcon({
+      //   // className: 'label',
+      //   html: '<span>' + label + '</span>'
+      //   // iconSize: [100, 40]
+      // })
+    );
+
+    // let circle = L.circleMarker([54.4151707, 48.3257941])
+    marker.bindLabel(label);
+
+
     marker.addTo(this.map);
+
     return marker;
   }
 
@@ -192,6 +224,9 @@ export class HomePage {
   private stopSetUserCoords() {
     // останавливаем обновление координат
     clearInterval(this.updateCoordsInterval);
+
+    // удаляем слой со всеми чужими маркерами
+
 
     // говорим что другие водители не будут учитывать координаты этого водителя
     this.inMove = false;
@@ -266,22 +301,19 @@ export class HomePage {
 
   /////////////////// track ////////////////////////
   private getTracks() {
-    this.allTracks = this.trackProvider.getAllTracks();
+    this.trackProvider.getAllTracks();
   }
 
   selectTrack() {
-    var index = this.selectedIndexTrack;
-    // forEach возвращает массив данных
-    this.allTracks.forEach((arr) => {
-      this.selectedTrack = arr[index].number;
-      let path = JSON.parse(arr[index].path);
-      
-      this.showTrack(path);
-      // сохраняем выбранный маршрут который будем отслеживать
-      this.userDataProvider.userData.trackNumber = arr[index].number;
-      this.setUserTrack();
-      this.trackProvider.setSelectedTrack(this.selectedTrack);
-    });
+    let index = this.selectedIndexTrack;
+    let arr = this.allTracks;
+    let path = JSON.parse(arr[index].path);
+    this.selectedTrack = arr[index].number;
+    
+    this.showTrack(path);
+    // сохраняем выбранный маршрут который будем отслеживать
+    this.userDataProvider.userData.trackNumber = arr[index].number;
+    this.setUserTrack();
   }
 
   private showTrack(path) {

@@ -25,12 +25,14 @@
       >Стоп</button>
     </ion-buttons>
 
-    <ion-buttons [hidden]="loadDataUser" end>
+    <ion-buttons 
+      [hidden]="loadDataUser && loadDataAllTracks ||  !showBtnStart && showBtnStop" 
+      end>
       <ion-item>
         <ion-label>Номер маршрута</ion-label>
         <ion-select [(ngModel)]="selectedIndexTrack" (ionChange)="selectTrack()">
           <ion-option 
-            *ngFor="let track of allTracks | async; let i = index" 
+            *ngFor="let track of allTracks; let i = index" 
             value="{{i}}"
           >{{track.number}}</ion-option>
         </ion-select>
