@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { NavController, Events } from 'ionic-angular';
 
 import * as L from 'mapbox.js';
-import * as leafletLabel from 'leaflet.label';
 
 import { AuthService } from '../../providers/auth';
 import { TrackProvider } from '../../providers/track-provider';
@@ -53,8 +52,6 @@ export class HomePage {
     public userDataProvider: UserDataProvider,
     public events: Events
   ) {
-    // нужен сдесь иначе модуль не работает.
-    leafletLabel;
 
   }
 
@@ -130,7 +127,7 @@ export class HomePage {
     let val: any;
 
     // округляем до этого значения знаков после запятой
-    let num: any = 3;
+    let num: any = 5;
     
     // для того чтобы вернуть дробное значение из целого
     let d: any = Math.pow(10, num);
@@ -170,19 +167,29 @@ export class HomePage {
     this.userDataProvider.getData();
   }
 
-  private createAddMarker(label:string = 'Введите имя') {
-    let marker = L.marker([54.4151707, 48.3257941]
-      // icon: new L.DivIcon({
-      //   // className: 'label',
-      //   html: '<span>' + label + '</span>'
-      //   // iconSize: [100, 40]
-      // })
-    );
+  private createAddMarker(label:string = 'Введите имя') {    
+    let svgMarker = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>' +
+      '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height = "15px"  width = "135px">' +
+        '<g>' + 
+          '<text x="15" y="10" fill="red">' + label + '</text>' +
+          '<circle cx="6" cy="6" r="5" stroke="black" stroke-width="2" fill="red" />' +
+        '</g>' +
+      '</svg>'+
+      '<style>svg { -webkit-background-clip: text; }</style>';
 
-    // let circle = L.circleMarker([54.4151707, 48.3257941])
-    marker.bindLabel(label);
+    let marker = L.marker([54.4151707, 48.3257941], {
+      icon: new L.DivIcon({
+        // className: 'label',
+        html: svgMarker,
+        iconSize: [0, 0 ]
+      })
+    });
 
-
+    // let circle = L.circleMarker([54.4151707, 48.3257941], {
+    //   radius: 5,
+    //   color: '#d01111',
+    //   weight: 1
+    // })
     marker.addTo(this.map);
 
     return marker;
