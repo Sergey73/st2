@@ -43,7 +43,7 @@ export class UserDataProvider {
     let uidValue = this.userData.uid ? this.userData.uid : '';
     this.userDb = this.fire.database.list('/users', {
       query: {
-        orderByChild: 'uid',
+        orderByChild: 'publicData/uid',
         equalTo: uidValue
       }
     });
@@ -59,20 +59,24 @@ export class UserDataProvider {
     });
   }
 
+  public updateUsersByTrack(userKey: string, obj: Object) {
+    return this.usersDb.update(userKey, obj);
+  }
+  
   public updateData(obj: Object) {
     return this.userDb.update(this.userData.key, obj);
   }
 
   private createUserData() {
     this.userDb.push({
-      uid: this.userData.uid,
       email: this.userData.email,
       publicData: {
         name: '',
         trackNumber: '',
         latitude: 54.30871225899285,   // широта
         longitude: 48.39597702026368, // долгота
-        inMove: false
+        inMove: false,
+        uid: this.userData.uid
       },
       role: 1
     }).then(data => {
@@ -99,7 +103,8 @@ export class UserDataProvider {
     this.usersDb.take(1).subscribe(data => {
       if (data.length) {
         this.userData.usersByTrack = data.filter(item => {
-          if (item.publicData.inMove && this.userData.uid != item.uid) return item; 
+          // получаем все данные водителей у которых inMove = true, исключая текущего юзера
+          if (item.publicData.inMove && this.userData.uid != item.publicData.uid) return item; 
         })
       }
       this.events.publish('usersByTrackData: finish');

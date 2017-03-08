@@ -43,7 +43,20 @@ export class HomePage {
 
   // в объект сохраним водителей, 
   // которые находятся на выбранном маршруте
+
+  // { id: {
+  // маркер
+  //   marker: '',  
+  // предыдущие координаты для срванения с настоящими. Если координаты не обновляются
+  // следовательно водитель стоит на месте, либо вышел из приложения
+  //   prevCoords: '',  
+  // счетчик в котором записано сколько раз предидущие координаты совпали с настоящими 
+  //   coutn: ''
+  // }
   private arrTrackDriver: Object = {};
+
+      // частота обновления координат в милисекундах других водителей
+  private intervalUpdateCoords: number = 100;
 
   constructor(
     public navCtrl: NavController,
@@ -70,12 +83,63 @@ export class HomePage {
     // слушает когда придут данные других водителей
     this.events.subscribe('usersByTrackData: finish', () => {
       this.userDataProvider.userData.usersByTrack.forEach(item => {
-        if (!this.arrTrackDriver[item.$key] ) {
-          let name: string = item.publicData.name;
-          let marker = this.createAddMarker(name);
-          this.arrTrackDriver[item.$key] = marker;
+        let newLat = item.publicData.latitude;
+        let newLon = item.publicData.longitude;
+        let key = item.$key;
+        
+        if (!this.arrTrackDriver[key] ) {
+          this.arrTrackDriver[key] = {
+            marker: '',
+            prevCoords: {latitude: null, longitude: null},
+            count: 0
+          };
+
+          let driversName: string = item.publicData.name;
+          // создаем маркер
+          let marker = this.createAddMarker(driversName);
+          // сохраняем маркер в объект
+          this.arrTrackDriver[key].marker = marker;
         }
-        this.arrTrackDriver[item.$key].setLatLng([item.publicData.latitude, item.publicData.longitude]);
+
+        let prevLat = this.arrTrackDriver[key].prevCoords.latitude;
+        let prevLon = this.arrTrackDriver[key].prevCoords.longitude;
+
+        // узнаем изменились ли текущие координаты от предидущих.
+        // Если нет  прибавляем к переменной count единицу
+        if (prevLat == newLat && prevLon == newLon) {
+
+          ++this.arrTrackDriver[key].count;
+          // если координаты какого-либо водителя повторялись 3 раза 
+          // (вероятно что-то случилось с его приложением) ставим его статус inMove = false
+          if (this.arrTrackDriver[key].count == 3) {
+            this.inMove = false;
+            let obj = {
+              'publicData/inMove': this.inMove
+            };
+
+            // устанавливаем статус водителя у которого не обновляются данные  inMove = false
+            this.userDataProvider.updateUsersByTrack(key ,obj).then( authData => {
+            }, error => {
+              console.dir(error);
+            });
+            // если изменились обнуляем счетчик
+            this.arrTrackDriver[key].count = 0;
+            
+            // удаляем маркер с карты
+            let markerForRemove = this.arrTrackDriver[key].marker;
+            this.removeMarker(markerForRemove);
+          } 
+        } else {
+          // если изменились обнуляем счетчик
+          this.arrTrackDriver[key].count = 0;
+        }
+
+        // записываем координаты в объект для того чтобы при следующем запросе знать изменились они или нет
+        this.arrTrackDriver[key].prevCoords.latitude = newLat;
+        this.arrTrackDriver[key].prevCoords.longitude = newLon;
+        // устанавливаем новое положение маркеру
+        this.arrTrackDriver[key].marker.setLatLng([newLat, newLon]);
+        
       });
     });
 
@@ -195,6 +259,10 @@ export class HomePage {
     return marker;
   }
 
+  private removeMarker(marker: any) {
+    marker.remove();
+  }
+
   public showAllDrivers() {
     this.showBtnStop = true;
     this.showBtnStart = false;
@@ -251,8 +319,6 @@ export class HomePage {
 
   // сохраняем свои координаты в БД
   private setUserCoords() {
-    // частота обновления координат в милисекундах
-    let intervalUpdateCoords = 100;
 
     // предидущие значения координат
     let oldValue = {
@@ -288,20 +354,20 @@ export class HomePage {
         }, error => {
           console.dir(error);
         });
-      } else if (coutnEqualCoords > intervalUpdateCoords * 2 ) {
+      } else if (coutnEqualCoords > this.intervalUpdateCoords * 2 ) {
         this.stopSetUserCoords();
       } else {
         // если координаты не обновляются увеличиваем счетчик на время через которое 
         // обновляются координаты
-        coutnEqualCoords += intervalUpdateCoords; 
+        coutnEqualCoords += this.intervalUpdateCoords; 
       }
-    }, intervalUpdateCoords);
+    }, this.intervalUpdateCoords);
   }
 
   getUsersDataByTrack() {
     setInterval(() => {
       this.userDataProvider.getUsersByTrack();
-    }, 100);
+    }, 1000);
   }
   /////////////////// end user ////////////////////////
 
