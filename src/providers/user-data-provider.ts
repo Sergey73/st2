@@ -3,7 +3,7 @@ import { Events } from 'ionic-angular';
 
 import { 
   AngularFire, 
-  // FirebaseObjectObservable
+  FirebaseObjectObservable,
   FirebaseListObservable
 } from 'angularfire2';
 
@@ -11,7 +11,7 @@ import "rxjs/add/operator/take";
 
 @Injectable()
 export class UserDataProvider {
-  // private userDb: FirebaseObjectObservable<any>;
+  public needUpdateUsersDb: FirebaseObjectObservable<any>;
   private userDb: FirebaseListObservable<any>;
   private usersDb: FirebaseListObservable<any>;
   userData: {
@@ -37,6 +37,17 @@ export class UserDataProvider {
     public events: Events
   ) {
 
+  }
+
+  // функция будет вызывать подписку и говорить о том что нужно обновить 
+  // список водителей
+  public listenNeedUpdateUsersData() {
+    this.needUpdateUsersDb = this.fire.database.object('/needUpdateUsersData');
+
+    this.needUpdateUsersDb.subscribe(data => {
+      if (data.userKey === 'null') return;
+      this.events.publish('needUpdateUsersData: true', data);
+    });
   }
 
   public getData() {
@@ -88,6 +99,12 @@ export class UserDataProvider {
     this.userData.name = data.publicData.name;
     this.userData.role = data.role;
     this.userData.key = data.$key;
+  }
+
+  // обновляем значение в БД тем самым сработает подписка на событие в других приложения 
+  // и юзер с данным ключем будет удален с карты
+  public needUpdateAllUsersData(key: string) {
+    return this.needUpdateUsersDb.update({'userKey': key});
   }
 
   public getUsersByTrack() {

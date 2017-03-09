@@ -55,8 +55,12 @@ export class HomePage {
   // }
   private arrTrackDriver: Object = {};
 
-      // частота обновления координат в милисекундах других водителей
-  private intervalUpdateCoords: number = 100;
+  // частота обновления координат в милисекундах других водителей
+  private intervalUpdateCoords: number = 1000;
+
+  // ключ водителя который отключился
+  private offlineUserKeyOld: string = '';
+
 
   constructor(
     public navCtrl: NavController,
@@ -69,6 +73,7 @@ export class HomePage {
   }
 
   ngOnInit() { 
+
     // как только данные юзера придут происходит событие
     this.events.subscribe('userData: finish', () => {
       this.loadDataUser = false;
@@ -80,6 +85,27 @@ export class HomePage {
       this.loadDataAllTracks = false;
     });
 
+    // подписались на событие, которое говорит что нужно
+    // обновить список водителй
+    this.events.subscribe('needUpdateUsersData: true', (data) => {
+      let key =  data.userKey;
+
+      // обновляем данные о водителях если мы этого не делали
+      if (this.offlineUserKeyOld !== key) {
+        // обновляем данные водителей
+        this.userDataProvider.getUsersByTrack();
+        // записываем в переменную ключ отключаемого юзера
+        this.offlineUserKeyOld = key
+
+        // удаляем маркер с карты
+        let markerForRemove = this.arrTrackDriver[key].marker;
+        this.removeMarker(markerForRemove);
+
+        // удаляем объект из временного хранилища 
+        delete this.arrTrackDriver[key];
+      }
+    });
+    
     // слушает когда придут данные других водителей
     this.events.subscribe('usersByTrackData: finish', () => {
       this.userDataProvider.userData.usersByTrack.forEach(item => {
@@ -87,6 +113,7 @@ export class HomePage {
         let newLon = item.publicData.longitude;
         let key = item.$key;
         
+        // если данных водителя нет в переменной создаем их
         if (!this.arrTrackDriver[key] ) {
           this.arrTrackDriver[key] = {
             marker: '',
@@ -119,15 +146,23 @@ export class HomePage {
 
             // устанавливаем статус водителя у которого не обновляются данные  inMove = false
             this.userDataProvider.updateUsersByTrack(key ,obj).then( authData => {
+              // если изменились обнуляем счетчик
+              this.arrTrackDriver[key].count = 0;
+              
+              // удаляем маркер с карты
+              let markerForRemove = this.arrTrackDriver[key].marker;
+              this.removeMarker(markerForRemove);
+
+
+              // удаляем объект из временного хранилища 
+              delete this.arrTrackDriver[key];
+
+              // сообщаем другим приложениям что нужно обновить список водителей 
+              this.offlineUserKeyOld = key;
+              this.userDataProvider.needUpdateAllUsersData(this.offlineUserKeyOld);
             }, error => {
               console.dir(error);
             });
-            // если изменились обнуляем счетчик
-            this.arrTrackDriver[key].count = 0;
-            
-            // удаляем маркер с карты
-            let markerForRemove = this.arrTrackDriver[key].marker;
-            this.removeMarker(markerForRemove);
           } 
         } else {
           // если изменились обнуляем счетчик
@@ -147,6 +182,13 @@ export class HomePage {
     this.initTrack();
     this.getUserData();
     this.getTracks();
+    this.subscribeOnUpdateUsers();
+  }
+
+  // выполняем функцию которая будет следить за обновлениями объекта
+  // updateUsers
+  private subscribeOnUpdateUsers() {
+    this.userDataProvider.listenNeedUpdateUsersData();
   }
 
   private initMap() {
@@ -367,7 +409,7 @@ export class HomePage {
   getUsersDataByTrack() {
     setInterval(() => {
       this.userDataProvider.getUsersByTrack();
-    }, 1000);
+    }, 2000);
   }
   /////////////////// end user ////////////////////////
 
