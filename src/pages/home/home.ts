@@ -32,7 +32,7 @@ export class HomePage {
   // если false другие водители не будут получать координаты этого водителя
   private inMove: boolean = false;
 
-  // 
+  // функция устанавливает коориднаты 
   private updateCoordsInterval: any;
 
   private myLatitude: any;
@@ -88,22 +88,22 @@ export class HomePage {
     // подписались на событие, которое говорит что нужно
     // обновить список водителй
     this.events.subscribe('needUpdateUsersData: true', (data) => {
-      let key =  data.userKey;
+      // let key =  data.userKey;
 
-      // обновляем данные о водителях если мы этого не делали
-      if (this.offlineUserKeyOld !== key) {
-        // обновляем данные водителей
-        this.userDataProvider.getUsersByTrack();
-        // записываем в переменную ключ отключаемого юзера
-        this.offlineUserKeyOld = key
+      // // обновляем данные о водителях если мы этого не делали
+      // if (this.offlineUserKeyOld !== key) {
+      //   // обновляем данные водителей
+      //   this.userDataProvider.getUsersByTrack();
+      //   // записываем в переменную ключ отключаемого юзера
+      //   this.offlineUserKeyOld = key
 
-        // удаляем маркер с карты
-        let markerForRemove = this.arrTrackDriver[key].marker;
-        this.removeMarker(markerForRemove);
+      //   // удаляем маркер с карты
+      //   let markerForRemove = this.arrTrackDriver[key].marker;
+      //   this.removeMarker(markerForRemove);
 
-        // удаляем объект из временного хранилища 
-        delete this.arrTrackDriver[key];
-      }
+      //   // удаляем объект из временного хранилища 
+      //   delete this.arrTrackDriver[key];
+      // }
     });
     
     // слушает когда придут данные других водителей
@@ -406,6 +406,7 @@ export class HomePage {
     }, this.intervalUpdateCoords);
   }
 
+  // получаем всех юзеров которые находятся на выбранном маршруте
   getUsersDataByTrack() {
     setInterval(() => {
       this.userDataProvider.getUsersByTrack();
@@ -431,6 +432,7 @@ export class HomePage {
     this.setUserTrack();
   }
 
+  // отрисовываем путь на карте 
   private showTrack(path) {
     this.trackLayer.setGeoJSON(path);
   }
