@@ -16,6 +16,7 @@ import { ProfilePage } from '../pages/profile/profile';
 import { AuthService } from '../providers/auth';
 import { MsgService } from '../providers/msg-service';
 import { UserDataProvider } from '../providers/user-data-provider';
+import { OtherUsersProvider } from '../providers/other-users-provider';
 import { TrackProvider } from '../providers/track-provider';
 
 // any servicies
@@ -64,6 +65,7 @@ const myFirebaseAuthConfig = {
     AuthService, 
     MsgService, 
     UserDataProvider,
+    OtherUsersProvider,
     TrackProvider
   ]
 })

@@ -6,6 +6,7 @@ import * as L from 'mapbox.js';
 import { AuthService } from '../../providers/auth';
 import { TrackProvider } from '../../providers/track-provider';
 import { UserDataProvider } from '../../providers/user-data-provider';
+import { OtherUsersProvider } from '../../providers/other-users-provider';
 import { LoginPage } from '../../pages/login/login';
 
 @Component({
@@ -53,28 +54,25 @@ export class HomePage {
   // счетчик в котором записано сколько раз предидущие координаты совпали с настоящими 
   //   coutn: ''
   // }
-  private arrTrackDriver: Object = {};
+  private localOnlineOtherUsers: Object = {};
 
   // частота обновления координат в милисекундах других водителей
   private intervalUpdateCoords: number = 1000;
-
-  // ключ водителя который отключился
-  private offlineUserKeyOld: string = '';
-
 
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
     public trackProvider: TrackProvider,
     public userDataProvider: UserDataProvider,
+    public otherUsersProvider: OtherUsersProvider,
     public events: Events
   ) {
 
   }
 
-  ngOnInit() { 
+  public ngOnInit() { 
 
-    // как только данные юзера придут происходит событие
+    // как только данные о текущем юзере придут происходит событие
     this.events.subscribe('userData: finish', () => {
       this.loadDataUser = false;
     });
@@ -85,96 +83,19 @@ export class HomePage {
       this.loadDataAllTracks = false;
     });
 
-    // подписались на событие, которое говорит что нужно
-    // обновить список водителй
-    this.events.subscribe('needUpdateUsersData: true', (data) => {
-      // let key =  data.userKey;
-
-      // // обновляем данные о водителях если мы этого не делали
-      // if (this.offlineUserKeyOld !== key) {
-      //   // обновляем данные водителей
-      //   this.userDataProvider.getUsersByTrack();
-      //   // записываем в переменную ключ отключаемого юзера
-      //   this.offlineUserKeyOld = key
-
-      //   // удаляем маркер с карты
-      //   let markerForRemove = this.arrTrackDriver[key].marker;
-      //   this.removeMarker(markerForRemove);
-
-      //   // удаляем объект из временного хранилища 
-      //   delete this.arrTrackDriver[key];
-      // }
-    });
-    
-    // слушает когда придут данные других водителей
+    // слушает когда будут готовы данные водителей на выбранном маршруте,
+    // которые сейчас находятся online
     this.events.subscribe('usersByTrackData: finish', () => {
-      this.userDataProvider.userData.usersByTrack.forEach(item => {
-        let newLat = item.publicData.latitude;
-        let newLon = item.publicData.longitude;
-        let key = item.$key;
-        
-        // если данных водителя нет в переменной создаем их
-        if (!this.arrTrackDriver[key] ) {
-          this.arrTrackDriver[key] = {
-            marker: '',
-            prevCoords: {latitude: null, longitude: null},
-            count: 0
-          };
+      // для каждого online юзера
+      this.otherUsersProvider.usersDataByTrack.online.forEach(item => {
+        // обрабокта данных offline юзера
+        this.dataProcessingOtherUserOnline(item);
+      });
 
-          let driversName: string = item.publicData.name;
-          // создаем маркер
-          let marker = this.createAddMarker(driversName);
-          // сохраняем маркер в объект
-          this.arrTrackDriver[key].marker = marker;
-        }
-
-        let prevLat = this.arrTrackDriver[key].prevCoords.latitude;
-        let prevLon = this.arrTrackDriver[key].prevCoords.longitude;
-
-        // узнаем изменились ли текущие координаты от предидущих.
-        // Если нет  прибавляем к переменной count единицу
-        if (prevLat == newLat && prevLon == newLon) {
-
-          ++this.arrTrackDriver[key].count;
-          // если координаты какого-либо водителя повторялись 3 раза 
-          // (вероятно что-то случилось с его приложением) ставим его статус inMove = false
-          if (this.arrTrackDriver[key].count == 3) {
-            this.inMove = false;
-            let obj = {
-              'publicData/inMove': this.inMove
-            };
-
-            // устанавливаем статус водителя у которого не обновляются данные  inMove = false
-            this.userDataProvider.updateUsersByTrack(key ,obj).then( authData => {
-              // если изменились обнуляем счетчик
-              this.arrTrackDriver[key].count = 0;
-              
-              // удаляем маркер с карты
-              let markerForRemove = this.arrTrackDriver[key].marker;
-              this.removeMarker(markerForRemove);
-
-
-              // удаляем объект из временного хранилища 
-              delete this.arrTrackDriver[key];
-
-              // сообщаем другим приложениям что нужно обновить список водителей 
-              this.offlineUserKeyOld = key;
-              this.userDataProvider.needUpdateAllUsersData(this.offlineUserKeyOld);
-            }, error => {
-              console.dir(error);
-            });
-          } 
-        } else {
-          // если изменились обнуляем счетчик
-          this.arrTrackDriver[key].count = 0;
-        }
-
-        // записываем координаты в объект для того чтобы при следующем запросе знать изменились они или нет
-        this.arrTrackDriver[key].prevCoords.latitude = newLat;
-        this.arrTrackDriver[key].prevCoords.longitude = newLon;
-        // устанавливаем новое положение маркеру
-        this.arrTrackDriver[key].marker.setLatLng([newLat, newLon]);
-        
+      // для каждого offline юзера
+      this.otherUsersProvider.usersDataByTrack.offline.forEach(item => {
+        // обрабокта данных offline юзера
+        this.dataProcessingOtherUserOffline(item);
       });
     });
 
@@ -182,13 +103,6 @@ export class HomePage {
     this.initTrack();
     this.getUserData();
     this.getTracks();
-    this.subscribeOnUpdateUsers();
-  }
-
-  // выполняем функцию которая будет следить за обновлениями объекта
-  // updateUsers
-  private subscribeOnUpdateUsers() {
-    this.userDataProvider.listenNeedUpdateUsersData();
   }
 
   private initMap() {
@@ -206,7 +120,7 @@ export class HomePage {
     this.trackLayer = L.mapbox.featureLayer().addTo(this.map);
   }
 
-  logout() {
+  public logout() {
     // прекращаем запись в БД
     this.stopSetUserCoords();
     this.authService.logout().then(response => {
@@ -217,7 +131,7 @@ export class HomePage {
   // for develop
   // функция эмитации поездки по квадрату в реале функция
   // определения координат текущего водителя
-  moveMarker() {
+  private moveMarker() {
     this.myLatitude = 54.30801120099681;
     this.myLongitude = 48.39649200439454;
     
@@ -310,7 +224,6 @@ export class HomePage {
     this.showBtnStart = false;
     this.setUserCoords();
     this.getUsersDataByTrack();
-
   }
 
   public hideAllDrivers() {
@@ -318,6 +231,7 @@ export class HomePage {
     this.showBtnStop = false;
     this.stopSetUserCoords();
   }
+
 
   /////////////////// user ////////////////////////
   // выбираем маршрут по которому поедем
@@ -342,9 +256,6 @@ export class HomePage {
     // останавливаем обновление координат
     clearInterval(this.updateCoordsInterval);
 
-    // удаляем слой со всеми чужими маркерами
-
-
     // говорим что другие водители не будут учитывать координаты этого водителя
     this.inMove = false;
     let obj = {
@@ -359,61 +270,116 @@ export class HomePage {
     });
   }
 
-  // сохраняем свои координаты в БД
+  // сохраняем свои координаты в БД когда поедем
   private setUserCoords() {
-
-    // предидущие значения координат
-    let oldValue = {
-      latitude: null,
-      longitude: null
-    } 
-
-    // счетчик котрый учитывает время когда координаты текущего 
-    // водителя не меняются
-    let coutnEqualCoords = 0;
-
     this.updateCoordsInterval = setInterval(() => {
-      // если предыдущие значения координат не равны текущим,
-      //  записываем их в БД
-      if (oldValue.latitude !== this.myLatitude || oldValue.longitude !== this.myLongitude) {
-        // говорим что другие водители будут учитывать координаты этого водителя
-        this.inMove = true;
+      // говорим что другие водители будут учитывать координаты этого водителя
+      this.inMove = true;
 
-        let obj = {
-          'publicData/latitude': this.myLatitude,
-          'publicData/longitude': this.myLongitude,
-          'publicData/inMove': this.inMove
-        };
-        oldValue.latitude = this.myLatitude;
-        oldValue.longitude = this.myLongitude;
-       
-        // обнуляем счетчик
-        coutnEqualCoords = 0;
+      let obj = {
+        'publicData/latitude': this.myLatitude,
+        'publicData/longitude': this.myLongitude,
+        'publicData/inMove': this.inMove
+      };
 
-        // обновляем данные
-        this.userDataProvider.updateData(obj).then( authData => {
+      // обновляем данные
+      this.userDataProvider.updateData(obj).then( authData => {
 
-        }, error => {
-          console.dir(error);
-        });
-      } else if (coutnEqualCoords > this.intervalUpdateCoords * 2 ) {
-        this.stopSetUserCoords();
-      } else {
-        // если координаты не обновляются увеличиваем счетчик на время через которое 
-        // обновляются координаты
-        coutnEqualCoords += this.intervalUpdateCoords; 
-      }
+      }, error => {
+        console.dir(error);
+      });
+
     }, this.intervalUpdateCoords);
   }
 
   // получаем всех юзеров которые находятся на выбранном маршруте
-  getUsersDataByTrack() {
+  private getUsersDataByTrack() {
     setInterval(() => {
-      this.userDataProvider.getUsersByTrack();
+      this.otherUsersProvider.getUsersByTrack();
     }, 2000);
   }
   /////////////////// end user ////////////////////////
 
+
+  /////////////// other users //////////
+  // удаляем маркер если он есть отображается на крте (т.е. есть в локальном объект)
+  private dataProcessingOtherUserOffline(item) {
+    let key = item.$key;
+    if (this.localOnlineOtherUsers[key] ) { 
+      let marker = this.localOnlineOtherUsers[key].marker;
+      this.removeMarker(marker);
+      delete this.localOnlineOtherUsers[key];
+    }
+  }
+
+  // записываем данные юзера в локальную переменную, 
+  // создаем и устанавливаем маркер 
+  private dataProcessingOtherUserOnline(item) {
+    // новые координаты широты 
+    let newLat = item.publicData.latitude;
+    // новые координаты долготы
+    let newLon = item.publicData.longitude;
+    // ключ по в массиве водителей
+    let key = item.$key;
+    
+    // если данных водителя нет в локальной переменной, создаем их
+    if (!this.localOnlineOtherUsers[key] ) {
+      this.createLocalOtherUser(key);    
+
+      let driversName: string = item.publicData.name;
+      // создаем маркер с именем водителя
+      let marker = this.createAddMarker(driversName);
+      // сохраняем маркер в объект
+      this.localOnlineOtherUsers[key].marker = marker;
+    }
+
+    // предидущие координаты долготы 
+    let prevLat = this.localOnlineOtherUsers[key].prevCoords.latitude;
+    // предидущие координаты широты 
+    let prevLon = this.localOnlineOtherUsers[key].prevCoords.longitude;
+
+    // узнаем изменились ли текущие координаты от предидущих.
+    // Если нет  прибавляем к переменной count единицу
+    if (prevLat == newLat && prevLon == newLon) {
+
+      ++this.localOnlineOtherUsers[key].count;
+      // если координаты какого-либо водителя повторялись 3 раза 
+      // (вероятно что-то случилось с его приложением) ставим его статус inMove = false
+      if (this.localOnlineOtherUsers[key].count == 3) {
+        this.inMove = false;
+        let obj = {
+          'publicData/inMove': this.inMove
+        };
+
+        // устанавливаем inMove = false водителю у которого не обновляются данные  
+        this.otherUsersProvider.updateUsersByTrack(key ,obj).then( authData => {
+          console.dir(`Водитель: ${key} offline.`);
+        }, error => {
+          console.dir(error);
+        });
+      } 
+    } else {
+      // если изменились обнуляем счетчик
+      this.localOnlineOtherUsers[key].count = 0;
+      // записываем координаты в объект для того чтобы при следующем запросе знать изменились они или нет
+      this.localOnlineOtherUsers[key].prevCoords.latitude = newLat;
+      this.localOnlineOtherUsers[key].prevCoords.longitude = newLon;
+      // устанавливаем новое положение маркеру
+      this.localOnlineOtherUsers[key].marker.setLatLng([newLat, newLon]);
+    }
+  }
+
+  // сохраняем данные о водителе в локальную переменную 
+  private createLocalOtherUser(key) {
+
+    this.localOnlineOtherUsers[key] = {
+      marker: '',
+      prevCoords: {latitude: null, longitude: null},
+      count: 0
+    };
+  }
+  /////////////// end other users //////////
+  
 
   /////////////////// track ////////////////////////
   private getTracks() {
