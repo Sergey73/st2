@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
+import { Events } from 'ionic-angular';
 
 import { FormBuilder, Validators } from '@angular/forms';
 import { MsgService } from '../../providers/msg-service';
@@ -19,7 +20,8 @@ export class ProfilePage {
     public navParams: NavParams,
     public formBuilder: FormBuilder,
     public msgService: MsgService,
-    public userDataProvider: UserDataProvider
+    public userDataProvider: UserDataProvider,
+    public events: Events
   ) {
     this.profileData.name = this.userDataProvider.userData.name;
     this.profileForm = formBuilder.group({
@@ -39,6 +41,10 @@ export class ProfilePage {
     } else {
       let obj = {'publicData/name': this.profileForm.value.name};
       this.userDataProvider.updateData( obj ).then( authData => {
+        // обновляем переменную userData, чтобы в профиле отображалось новое имя
+        this.userDataProvider.userData.name = this.profileForm.value.name;
+        // событие по которому обновим маркер с именем на карте
+        this.events.publish('changeSelfUserName: update');
         let msg = `Профиль успешно изменен.`
         let callback = () => {
           this.navCtrl.pop();

@@ -72,6 +72,16 @@ export class HomePage {
 
   public ngOnInit() { 
 
+    // обновление своего маркера с измененным именем
+    this.events.subscribe('changeSelfUserName: update', () => {
+      // удалить старый маркер
+      this.removeMarker(this.selfMarker);
+      let name = this.userDataProvider.userData.name;
+      // создать и сохранить новый маркер
+      let newSelfMarker = this.createAddMarker(name);
+      this.selfMarker = newSelfMarker;
+    });
+
     // как только данные о текущем юзере придут происходит событие
     this.events.subscribe('userData: finish', () => {
       this.loadDataUser = false;
@@ -319,6 +329,10 @@ export class HomePage {
     let newLat = item.publicData.latitude;
     // новые координаты долготы
     let newLon = item.publicData.longitude;
+
+    // текущее имя
+    let currentName = item.publicData.name;
+
     // ключ по в массиве водителей
     let key = item.$key;
     
@@ -326,12 +340,20 @@ export class HomePage {
     if (!this.localOnlineOtherUsers[key] ) {
       this.createLocalOtherUser(key);    
 
+      // имя водителя 
       let driversName: string = item.publicData.name;
+      // сохраняем в локальнуюю переменную имя водителя
+      this.localOnlineOtherUsers[key].name = driversName;
+
       // создаем маркер с именем водителя
       let marker = this.createAddMarker(driversName);
       // сохраняем маркер в объект
       this.localOnlineOtherUsers[key].marker = marker;
     }
+
+    let oldName = this.localOnlineOtherUsers[key].name;
+    // если водитель поменял имя обновляем маркер с именем
+    if (oldName !== currentName) this.changeNameDriverByKey(item)
 
     // предидущие координаты долготы 
     let prevLat = this.localOnlineOtherUsers[key].prevCoords.latitude;
@@ -350,13 +372,8 @@ export class HomePage {
         let obj = {
           'publicData/inMove': this.inMove
         };
-
         // устанавливаем inMove = false водителю у которого не обновляются данные  
-        this.otherUsersProvider.updateUsersByTrack(key ,obj).then( authData => {
-          console.dir(`Водитель: ${key} offline.`);
-        }, error => {
-          console.dir(error);
-        });
+        this.updateDriverByKey(key, obj);
       } 
     } else {
       // если изменились обнуляем счетчик
@@ -369,14 +386,42 @@ export class HomePage {
     }
   }
 
+  // удаляем старый маркер и создаем с новым именем
+  private changeNameDriverByKey(item) {
+    // текущее имя 
+    let currentName = item.publicData.name;
+    // ключ в массиве водителей
+    let key = item.$key;
+    // обновляем имя в локальной переменной
+    this.localOnlineOtherUsers[key].name = currentName;
+    // старый маркер
+    let oldMarker = this.localOnlineOtherUsers[key].marker;
+    // стираем маркер со старым именем
+    this.removeMarker(oldMarker);
+    // устанавливаем маркер с новым именем
+    let newMarker = this.createAddMarker(currentName);
+    // записываем в локальную переменную новый маркер
+    this.localOnlineOtherUsers[key].marker = newMarker;
+  }
+
   // сохраняем данные о водителе в локальную переменную 
   private createLocalOtherUser(key) {
 
     this.localOnlineOtherUsers[key] = {
+      name: '',
       marker: '',
       prevCoords: {latitude: null, longitude: null},
       count: 0
     };
+  }
+
+  // обновление водителя по ключу
+  private updateDriverByKey(key, obj) {
+    this.otherUsersProvider.updateUsersByTrack(key ,obj).then( authData => {
+      console.dir(`Успешное бновление по ключу : ${key}.`);
+    }, error => {
+      console.dir(error);
+    });
   }
   /////////////// end other users //////////
   
