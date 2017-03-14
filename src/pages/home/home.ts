@@ -74,12 +74,16 @@ export class HomePage {
 
     // обновление своего маркера с измененным именем
     this.events.subscribe('changeSelfUserName: update', () => {
-      // удалить старый маркер
-      this.removeMarker(this.selfMarker);
-      let name = this.userDataProvider.userData.name;
-      // создать и сохранить новый маркер
-      let newSelfMarker = this.createAddMarker(name);
-      this.selfMarker = newSelfMarker;
+      // если маркер был создан заменяем его на новый с номым 
+      // именем иначе ничего
+      if (this.selfMarker) {
+        // удалить старый маркер
+        this.removeMarker(this.selfMarker);
+        let name = this.userDataProvider.userData.name;
+        // создать и сохранить новый маркер
+        let newSelfMarker = this.createAddMarker(name);
+        this.selfMarker = newSelfMarker;
+      }
     });
 
     // как только данные о текущем юзере придут происходит событие
@@ -166,6 +170,15 @@ export class HomePage {
     let name: string = this.userDataProvider.userData.name;
     // если маркер не создан, создаем маркер
     if (!this.selfMarker) this.selfMarker = this.createAddMarker(name);
+    
+    // тест на много водителей// для разработки
+    let arr = [];
+    for (let i=0; i<200; i++) {
+      let n = 'n-' + i;
+      let m = this.createAddMarker(n);
+      arr.push(m);
+    }
+    // end тест на много водителей// для разработки
 
     let interval = setInterval(() => {
       if (this.myLongitude > 48.24920654296876 && left) {
@@ -186,9 +199,16 @@ export class HomePage {
       } else {
         left = true;
       }
+      // end тест2  на много водителей// для разработки
+      for (let j=0; j< arr.length; j++) {
+        let l = (((this.myLatitude.toFixed(num)-0) * d) + j) /100000
+        let l2 = (((this.myLongitude.toFixed(num)-0) * d) + j) /100000
+        arr[j].setLatLng([l, l2 ]);
+      }
+      // end тест2 на много водителей// для разработки
 
       this.selfMarker.setLatLng([this.myLatitude, this.myLongitude]);
-    },100);
+    },1000);
 
   }
   // end for develop
@@ -312,7 +332,7 @@ export class HomePage {
 
 
   /////////////// other users //////////
-  // удаляем маркер если он есть отображается на крте (т.е. есть в локальном объект)
+  // удаляем маркер если он отображается на крте (т.е. есть в локальном объект)
   private dataProcessingOtherUserOffline(item) {
     let key = item.$key;
     if (this.localOnlineOtherUsers[key] ) { 
