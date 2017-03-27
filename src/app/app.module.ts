@@ -13,11 +13,14 @@ import { ToolTrackPagePage } from '../pages/tool-track-page/tool-track-page';
 import { ProfilePage } from '../pages/profile/profile';
 
 // my servicies
+import { MapProvider } from '../providers/map-provider';
 import { AuthService } from '../providers/auth';
 import { MsgService } from '../providers/msg-service';
 import { UserDataProvider } from '../providers/user-data-provider';
 import { OtherUsersProvider } from '../providers/other-users-provider';
 import { TrackProvider } from '../providers/track-provider';
+import { DevelopProvider } from '../providers/develop-provider';
+import { MarkerProvider } from '../providers/marker-provider';
 
 // any servicies
 import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
@@ -62,11 +65,14 @@ const myFirebaseAuthConfig = {
   ],
   providers: [
     {provide: ErrorHandler, useClass: IonicErrorHandler}, 
+    MapProvider,
     AuthService, 
     MsgService, 
     UserDataProvider,
     OtherUsersProvider,
-    TrackProvider
+    TrackProvider,
+    DevelopProvider,
+    MarkerProvider
   ]
 })
 export class AppModule {}

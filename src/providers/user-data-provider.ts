@@ -19,14 +19,22 @@ export class UserDataProvider {
     name: string,
     role: string,
     key: string,
-    trackNumber: string
+    trackNumber: number,
+    inMove: boolean,      // если false другие водители не будут получать координаты этого водителя
+    selfMarker: any,      // маркер своего местоположения 
+    myLatitude: any,
+    myLongitude: any
   } = {
     uid: '', 
     email: '',
     name: '',
     role: '',
     key: '',
-    trackNumber: ''
+    trackNumber: null,
+    inMove: false,
+    selfMarker: null,
+    myLatitude: 54.30801120099681,
+    myLongitude: 48.39649200439454
   };
 
   constructor(
@@ -35,17 +43,6 @@ export class UserDataProvider {
   ) {
 
   }
-
-  // // функция будет вызывать подписку и говорить о том что нужно обновить 
-  // // список водителей
-  // public listenNeedUpdateUsersData() {
-  //   this.needUpdateUsersDb = this.fire.database.object('/needUpdateUsersData');
-
-  //   this.needUpdateUsersDb.subscribe(data => {
-  //     if (data.userKey === 'null') return;
-  //     this.events.publish('needUpdateUsersData: true', data);
-  //   });
-  // }
 
   public getData() {
     let uidValue = this.userData.uid ? this.userData.uid : '';
@@ -77,7 +74,7 @@ export class UserDataProvider {
       email: this.userData.email,
       publicData: {
         name: '',
-        trackNumber: '',
+        trackNumber: null,
         latitude: 54.30871225899285,   // широта
         longitude: 48.39597702026368, // долгота
         inMove: false,
@@ -94,11 +91,5 @@ export class UserDataProvider {
     this.userData.role = data.role;
     this.userData.key = data.$key;
   }
-
-  // // обновляем значение в БД тем самым сработает подписка на событие в других приложения 
-  // // и юзер с данным ключем будет удален с карты
-  // public needUpdateAllUsersData(key: string) {
-  //   return this.needUpdateUsersDb.update({'userKey': key});
-  // }
 
 }

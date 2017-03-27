@@ -2,9 +2,14 @@ import { Injectable } from '@angular/core';
 import { Events } from 'ionic-angular';
 import "rxjs/add/operator/take";
 
+import * as L from 'mapbox.js';
+
+// providers
+import { MapProvider } from './map-provider';
+import { UserDataProvider } from './user-data-provider';
+
 import { 
   AngularFire, 
-  FirebaseObjectObservable,
   FirebaseListObservable
 } from 'angularfire2';
 
@@ -12,17 +17,42 @@ import {
 @Injectable()
 export class TrackProvider {
   private tracksDb: FirebaseListObservable<any>;
-  private activeTracksDb: FirebaseObjectObservable<any>;
+  // все существующие маршруты. ( переделать на allTracksData)
   public tracksData: Array<any>;
+  // карта 
+  public map: any;
+  // слой для маршрута
+  private trackLayer: any;
+
+  // маршрут который выбрал юзер, по которому поедет
+  public selectedTrack: {
+    path: any,
+    number: number
+  } = {
+    path: null,
+    number: null
+  };
 
   constructor(
     public fire: AngularFire,
-    public events: Events
+    public events: Events,
+    public mapProvider: MapProvider,
+    public userDataProvider: UserDataProvider
     ) {
 
   }
 
-  getAllTracks() {
+
+  public createTrackLayer() {
+    // получаем карту 
+    let map = this.mapProvider.getMap();
+
+    // слой для маршрута
+    this.trackLayer = L.mapbox.featureLayer().addTo(map);
+  }
+
+  // получаем все маршруты из базы
+  public getAllTracks() {
     this.tracksDb = this.fire.database.list(
       '/tracks/', 
       {
@@ -33,19 +63,30 @@ export class TrackProvider {
     );
 
     this.tracksDb.take(1).subscribe(data => {
-      // if (!data.length) {
-      //   // если нет юзера создаем его
-      //   this.createUserData();
-      // } else {
-      //   this.getUserData(data[0]);
-      // }
       this.tracksData = data;
       this.events.publish('tracksData: finish');
     });
   }
 
-  createTrack(trackData) {
+  // сохраняем маршрут в базу 
+  public createTrack(trackData) {
     return this.tracksDb.push(trackData);
   }
+
+  // отрисовываем маршрут на карте 
+  public showTrack(index) {
+    // массив существующих маршрутов
+    let arr =  this.tracksData;
+
+    // сохраняем выбранный маршрут который будем отслеживать
+    this.userDataProvider.userData.trackNumber = arr[index].number;
+
+    // парсим путь маршрута для отображения на карте
+    let path = JSON.parse(arr[index].path);
+
+    // добавлямв маршрут в слой
+    this.trackLayer.setGeoJSON(path);
+  }
+  
 
 }

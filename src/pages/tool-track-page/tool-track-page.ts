@@ -1,19 +1,20 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, Events } from 'ionic-angular';
 
 import { FormBuilder, Validators } from '@angular/forms';
 
 import * as L from 'mapbox.js';
 import * as leafletDraw from 'leaflet-draw';
 
+import { MapProvider } from '../../providers/map-provider';
 import { TrackProvider } from '../../providers/track-provider';
 import { MsgService } from '../../providers/msg-service';
 
 @Component({
 
   selector: 'page-tool-track-page',
-  templateUrl: 'tool-track-page.html',
-  inputs: ['map']
+  templateUrl: 'tool-track-page.html'
+  // inputs: ['map']
 })
 export class ToolTrackPagePage {
   // карта создается в home.ts и передается сюда как параметр
@@ -23,6 +24,8 @@ export class ToolTrackPagePage {
   lng: Number;
   latLng: String;
 
+  la: any;
+  lo: any;
   // форма
   public toolTrackForm: any;
   public trackData: {number: any, path: string} = {number: '', path: ''};
@@ -35,6 +38,8 @@ export class ToolTrackPagePage {
     public formBuilder: FormBuilder,
     public trackProvider: TrackProvider,
     public msgService: MsgService,
+    public events: Events,
+    public mapProvider: MapProvider
   ) {
     // нужен сдесь иначе модуль не работает.
     leafletDraw
@@ -42,21 +47,28 @@ export class ToolTrackPagePage {
     this.toolTrackForm = formBuilder.group({
       trackNumber: [this.trackData.number, Validators.compose([ Validators.required ])]
     });
+
+  }
+
+  public ngOnInit() {
+    this.map = this.mapProvider.getMap();
+    this.createDrawControl();
+    this.ceateTrackEvent();
+    this.moveMarker();
+
+    // как только данные о текущем юзере придут происходит событие
+    this.events.subscribe('coord: start', (coords) => {
+      this.la = coords.latitude;
+      this.lo = coords.longitude
+    });
   }
 
   // для формы 
-  elementChanged(input){
+  public elementChanged(input){
     let field = input.inputControl.name;
     this[field + "Changed"] = true;
   }
   // end для формы
-
-  ngOnInit() {
-    this.createDrawControl();
-    this.ceateTrackEvent();
-    this.moveMarker();
-  }
-
 
   private moveMarker() {
      this.map.on('click', (e) => {

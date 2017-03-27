@@ -1,13 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NavController, Events } from 'ionic-angular';
+import { Geolocation } from 'ionic-native';
 
 import * as L from 'mapbox.js';
 
+// pages
+import { LoginPage } from '../../pages/login/login';
+
+// providers
+// import { MapProvider } from '../../providers/map-provider';
 import { AuthService } from '../../providers/auth';
 import { TrackProvider } from '../../providers/track-provider';
 import { UserDataProvider } from '../../providers/user-data-provider';
 import { OtherUsersProvider } from '../../providers/other-users-provider';
-import { LoginPage } from '../../pages/login/login';
+import { DevelopProvider } from '../../providers/develop-provider';
+import { MarkerProvider } from '../../providers/marker-provider';
 
 @Component({
   selector: 'page-home',
@@ -15,32 +22,34 @@ import { LoginPage } from '../../pages/login/login';
 })
 export class HomePage {
   public map: any;
-  public trackLayer: any;
+
+  // удалить
+  // public trackLayer: any;
   
-  // выбранный маршрут
+  // переменная  выбранного маршрута, для отображения пользователю
   public selectedTrack: number;
 
-  // флаг для отображения селекта выбора номера маршрута
-  // если не ставить селект появляется с пустым значением 
+  // флаг для отображения селекта для выбора номера маршрута
+  // если не ставить, селект появляется с пустым значением 
   // тк данные еще не загружены
   public loadDataUser: boolean = true;
   public loadDataAllTracks: boolean = true;
+
+  // существующие маршруты
   public allTracks: Array<any>;
+
   // выбранный маршрут 
   public selectedIndexTrack: any = '';
   public showBtnStart: boolean = false;
   public showBtnStop: boolean = false;
-  // если false другие водители не будут получать координаты этого водителя
-  private inMove: boolean = false;
+  
 
-  // функция устанавливает коориднаты 
+  // функция для обновления коориднат маркера
   private updateCoordsInterval: any;
 
-  private myLatitude: any;
-  private myLongitude: any;
-  
-  // маркер своего местоположения 
-  private selfMarker: any;
+  // функчия для получения данных о активных пользователях по 
+  // выбранному маршруту
+  private getOtherUsersInterval: any;
 
   // в объект сохраним водителей, 
   // которые находятся на выбранном маршруте
@@ -62,9 +71,12 @@ export class HomePage {
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
+    // public mapProvider: MapProvider,
     public trackProvider: TrackProvider,
     public userDataProvider: UserDataProvider,
     public otherUsersProvider: OtherUsersProvider,
+    public developProvider: DevelopProvider,
+    public markerProvider: MarkerProvider,
     public events: Events
   ) {
 
@@ -72,17 +84,21 @@ export class HomePage {
 
   public ngOnInit() { 
 
-    // обновление своего маркера с измененным именем
+    // строим карту
+    // this.map = this.mapProvider.getMap();
+
+    // обновление своего маркера при измененным именем
     this.events.subscribe('changeSelfUserName: update', () => {
-      // если маркер был создан заменяем его на новый с номым 
+      let data =  this.userDataProvider.userData;
+
+      // если маркер был создан заменяем его на новый с новым 
       // именем иначе ничего
-      if (this.selfMarker) {
+      if (data.selfMarker) {
         // удалить старый маркер
-        this.removeMarker(this.selfMarker);
-        let name = this.userDataProvider.userData.name;
+        this.markerProvider.removeMarker(data.selfMarker);
         // создать и сохранить новый маркер
-        let newSelfMarker = this.createAddMarker(name);
-        this.selfMarker = newSelfMarker;
+        let newSelfMarker = this.markerProvider.createAddMarker(data.name);
+        data.selfMarker = newSelfMarker;
       }
     });
 
@@ -102,7 +118,7 @@ export class HomePage {
     this.events.subscribe('usersByTrackData: finish', () => {
       // для каждого online юзера
       this.otherUsersProvider.usersDataByTrack.online.forEach(item => {
-        // обрабокта данных offline юзера
+        // обрабокта данных online юзера
         this.dataProcessingOtherUserOnline(item);
       });
 
@@ -113,26 +129,14 @@ export class HomePage {
       });
     });
 
-    this.initMap();
-    this.initTrack();
+    // this.initTrack();
+    // создание слоя для маршрута
+    this.trackProvider.createTrackLayer();
+
     this.getUserData();
     this.getTracks();
   }
 
-  private initMap() {
-    // вынести в константу
-    L.mapbox.accessToken = 'pk.eyJ1Ijoic2VyZ2V5NzMiLCJhIjoiY2lyM3JhNXR1MDAydGh6bWM3ZzBjaGlrYyJ9.MxdICo0uhxAtmyWpA_CeVw';
-    this.map = L.mapbox.map('map', 'mapbox.streets', {
-      minZoom: 10,
-      // drawControl: true
-      // maxBounds: [[54.46605, 48.08372], [53.86225, 50.21576]]
-    }).setView([54.33414, 48.42499], 10);
-  }
-
-  private initTrack() {
-    // слой для маршрута
-    this.trackLayer = L.mapbox.featureLayer().addTo(this.map);
-  }
 
   public logout() {
     // прекращаем запись в БД
@@ -142,114 +146,67 @@ export class HomePage {
     });
   }
 
-  // for develop
-  // функция эмитации поездки по квадрату в реале функция
-  // определения координат текущего водителя
-  private moveMarker() {
-    this.myLatitude = 54.30801120099681;
-    this.myLongitude = 48.39649200439454;
-    
-    // разрешает/запрешает движение маркера влево
-    let left = true;
+  private getSelfCoords() {
+    let data = this.userDataProvider.userData;
 
-    // разрешает/запрешает движение маркера вверх
-    let up = true;
-    
-    // для каждого val
-    // для правильного подсчета делаем целое число из дробного,
-    // выполняем вычитание и снова делаем его дробным
-    let val: any;
 
-    // округляем до этого значения знаков после запятой
-    let num: any = 5;
+    var watch = Geolocation.watchPosition({
+      // maximumAge: 1000, 
+      timeout: 2000, 
+      enableHighAccuracy: true
+    });
     
-    // для того чтобы вернуть дробное значение из целого
-    let d: any = Math.pow(10, num);
+    watch.subscribe( (resp) => {
+
+      // console.dir(resp);
+      // console.log('Latitude: '            + resp.coords.latitude          + '\n' +
+      //         'Longitude: '         + resp.coords.longitude         + '\n' +
+      //         'Altitude: '          + resp.coords.altitude          + '\n' +
+      //         'Accuracy: '          + resp.coords.accuracy          + '\n' +
+      //         'Altitude Accuracy: ' + resp.coords.altitudeAccuracy  + '\n' +
+      //         'Heading: '           + resp.coords.heading           + '\n' +
+      //         'Speed: '             + resp.coords.speed             + '\n' +
+      //         'Timestamp: '         + resp.timestamp                + '\n');
+
+
+      // var lat: any = resp.coords.latitude;
+      // var lon: any = resp.coords.longitude;
+      // myLatitude = ((lat.toFixed(4) * 10000) + 2) / 10000;
+      // myLongitude = ((lon.toFixed(4) * 10000) + 2) / 10000;
+     
+
+      data.myLatitude = resp.coords.latitude;
+      data.myLongitude = resp.coords.longitude;
+      
+      this.events.publish('coord: start', resp.coords);
+
+      data.selfMarker.setLatLng([data.myLatitude, data.myLongitude]);
+
+      // this.setPosition(resp.coords.latitude, resp.coords.longitude);
+    });
+    // var lat: any = 54.311096;
+    // var lon: any = 48.3257941;
     
-    // имя водителя
-    let name: string = this.userDataProvider.userData.name;
-    // если маркер не создан, создаем маркер
-    if (!this.selfMarker) this.selfMarker = this.createAddMarker(name);
-    
-    // тест на много водителей// для разработки
-    let arr = [];
-    for (let i=0; i<200; i++) {
-      let n = 'n-' + i;
-      let m = this.createAddMarker(n);
-      arr.push(m);
-    }
-    // end тест на много водителей// для разработки
-
-    let interval = setInterval(() => {
-      if (this.myLongitude > 48.24920654296876 && left) {
-        up = true;
-        val = (this.myLongitude.toFixed(num)-0) * d;
-        this.myLongitude = (val - 1)/d;
-      } else if (this.myLatitude < 54.36935859782679 && up) {
-        left = false;
-        val = (this.myLatitude.toFixed(num)-0) * d;
-        this.myLatitude = (val + 1)/d;
-      } else if (this.myLongitude <  48.380355834960945 && !left) {
-        up = false;
-        val = (this.myLongitude.toFixed(num)-0) * d;
-        this.myLongitude = (val + 1)/d;
-      } else if (this.myLatitude > 54.30801120099681 && !up) {
-        val = (this.myLatitude.toFixed(num)-0) * d;
-        this.myLatitude = (val - 1)/d;
-      } else {
-        left = true;
-      }
-      // end тест2  на много водителей// для разработки
-      for (let j=0; j< arr.length; j++) {
-        let l = (((this.myLatitude.toFixed(num)-0) * d) + j) /100000
-        let l2 = (((this.myLongitude.toFixed(num)-0) * d) + j) /100000
-        arr[j].setLatLng([l, l2 ]);
-      }
-      // end тест2 на много водителей// для разработки
-
-      this.selfMarker.setLatLng([this.myLatitude, this.myLongitude]);
-    },1000);
-
+    // setInterval(() => {
+    //   lat =  ((lat.toFixed(4) * 10000) + 2) / 10000;
+    //   lon =  ((lon.toFixed(4) * 10000) + 2) / 10000;
+    //   this.setPosition(lat, lon);
+    // }, 3000);
   }
-  // end for develop
 
   private getUserData() {
     this.userDataProvider.getData();
   }
 
-  private createAddMarker(label:string = 'Введите имя') {    
-    let svgMarker = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>' +
-      '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height = "15px"  width = "135px">' +
-        '<g>' + 
-          '<text x="15" y="10" fill="red">' + label + '</text>' +
-          '<circle cx="6" cy="6" r="5" stroke="black" stroke-width="2" fill="red" />' +
-        '</g>' +
-      '</svg>'+
-      '<style>svg { -webkit-background-clip: text; }</style>';
-
-    let marker = L.marker([54.4151707, 48.3257941], {
-      icon: new L.DivIcon({
-        // className: 'label',
-        html: svgMarker,
-        iconSize: [0, 0 ]
-      })
-    });
-
-    // let circle = L.circleMarker([54.4151707, 48.3257941], {
-    //   radius: 5,
-    //   color: '#d01111',
-    //   weight: 1
-    // })
-    marker.addTo(this.map);
-
-    return marker;
-  }
-
-  private removeMarker(marker: any) {
-    marker.remove();
-  }
+  // private removeMarker(marker: any) {
+  //   marker.remove();
+  // }
 
   public showAllDrivers() {
+    // функция имитирует передвижение текущего водителя
+    // удалить после разработки !!! 
+    this.developProvider.moveMarker();
+
     this.showBtnStop = true;
     this.showBtnStart = false;
     this.setUserCoords();
@@ -257,25 +214,48 @@ export class HomePage {
   }
 
   public hideAllDrivers() {
+    let data =  this.userDataProvider.userData;
+
     this.showBtnStart = true;
     this.showBtnStop = false;
     this.stopSetUserCoords();
+
+    // останавливаем функцию для получения координат других 
+    // водителей
+    clearInterval(this.getOtherUsersInterval);
+
+    // останавливаем обновление координат своего маркера
+    this.developProvider.stopSelfMoveMarker();
+
+    // удаляем свой маркер с карты
+    this.markerProvider.removeMarker(data.selfMarker);
+    // удаляем маркер из локальной переменной
+    data.selfMarker = null;
+    
+    // удаляем все маркеры других пользователей
+    this.removeAllOnlineMarkers();
+
   }
 
-
+  private removeAllOnlineMarkers() {
+    let obj = this.localOnlineOtherUsers;
+    // проходимся по локальному объекту в котором содержатся 
+    // online маркеры и удаляем их с карты + удаляем данные водителя из 
+    // локальной переменной
+    for (let key in obj ) {
+      this.markerProvider.removeMarker(obj[key].marker);
+      obj[key] = null;
+    }
+  }
   /////////////////// user ////////////////////////
   // выбираем маршрут по которому поедем
   private setUserTrack() {
-    let number = this.userDataProvider.userData.trackNumber;
+    let number = this.selectedTrack;
     let obj = {'publicData/trackNumber': number};
     // сохраняем маршрут в БД
     this.userDataProvider.updateData(obj).then( authData => {
       // показываем кнопку старта
       this.showBtnStart = true;
-      
-      // функция имитирует передвижение текущего водителя
-      // удалить после разработки !!! 
-      this.moveMarker();
     }, error => {
       console.dir(error);
     });
@@ -283,13 +263,13 @@ export class HomePage {
 
   // останавливаем обновление координат текущего водителя в БД 
   private stopSetUserCoords() {
+    let data = this.userDataProvider.userData;
     // останавливаем обновление координат
     clearInterval(this.updateCoordsInterval);
-
     // говорим что другие водители не будут учитывать координаты этого водителя
-    this.inMove = false;
+    data.inMove = false;
     let obj = {
-      'publicData/inMove': this.inMove
+      'publicData/inMove': data.inMove
     };
 
     // обновляем данные
@@ -302,14 +282,16 @@ export class HomePage {
 
   // сохраняем свои координаты в БД когда поедем
   private setUserCoords() {
+    let data = this.userDataProvider.userData;
+
     this.updateCoordsInterval = setInterval(() => {
       // говорим что другие водители будут учитывать координаты этого водителя
-      this.inMove = true;
+      data.inMove = true;
 
       let obj = {
-        'publicData/latitude': this.myLatitude,
-        'publicData/longitude': this.myLongitude,
-        'publicData/inMove': this.inMove
+        'publicData/latitude': data.myLatitude,
+        'publicData/longitude': data.myLongitude,
+        'publicData/inMove': data.inMove
       };
 
       // обновляем данные
@@ -324,7 +306,7 @@ export class HomePage {
 
   // получаем всех юзеров которые находятся на выбранном маршруте
   private getUsersDataByTrack() {
-    setInterval(() => {
+    this.getOtherUsersInterval = setInterval(() => {
       this.otherUsersProvider.getUsersByTrack();
     }, 2000);
   }
@@ -337,7 +319,7 @@ export class HomePage {
     let key = item.$key;
     if (this.localOnlineOtherUsers[key] ) { 
       let marker = this.localOnlineOtherUsers[key].marker;
-      this.removeMarker(marker);
+      this.markerProvider.removeMarker(marker);
       delete this.localOnlineOtherUsers[key];
     }
   }
@@ -345,6 +327,8 @@ export class HomePage {
   // записываем данные юзера в локальную переменную, 
   // создаем и устанавливаем маркер 
   private dataProcessingOtherUserOnline(item) {
+    let data = this.userDataProvider.userData;
+
     // новые координаты широты 
     let newLat = item.publicData.latitude;
     // новые координаты долготы
@@ -366,7 +350,7 @@ export class HomePage {
       this.localOnlineOtherUsers[key].name = driversName;
 
       // создаем маркер с именем водителя
-      let marker = this.createAddMarker(driversName);
+      let marker = this.markerProvider.createAddMarker(driversName);
       // сохраняем маркер в объект
       this.localOnlineOtherUsers[key].marker = marker;
     }
@@ -388,9 +372,9 @@ export class HomePage {
       // если координаты какого-либо водителя повторялись 3 раза 
       // (вероятно что-то случилось с его приложением) ставим его статус inMove = false
       if (this.localOnlineOtherUsers[key].count == 3) {
-        this.inMove = false;
+        data.inMove = false;
         let obj = {
-          'publicData/inMove': this.inMove
+          'publicData/inMove': data.inMove
         };
         // устанавливаем inMove = false водителю у которого не обновляются данные  
         this.updateDriverByKey(key, obj);
@@ -417,9 +401,9 @@ export class HomePage {
     // старый маркер
     let oldMarker = this.localOnlineOtherUsers[key].marker;
     // стираем маркер со старым именем
-    this.removeMarker(oldMarker);
+    this.markerProvider.removeMarker(oldMarker);
     // устанавливаем маркер с новым именем
-    let newMarker = this.createAddMarker(currentName);
+    let newMarker = this.markerProvider.createAddMarker(currentName);
     // записываем в локальную переменную новый маркер
     this.localOnlineOtherUsers[key].marker = newMarker;
   }
@@ -451,21 +435,33 @@ export class HomePage {
     this.trackProvider.getAllTracks();
   }
 
-  selectTrack() {
+
+  // private initTrack() {
+  //   // слой для маршрута
+  //   this.trackLayer = L.mapbox.featureLayer().addTo(this.map);
+  // }
+
+  public selectTrack() {
+    // индекс выбранного трека
     let index = this.selectedIndexTrack;
-    let arr = this.allTracks;
-    let path = JSON.parse(arr[index].path);
-    this.selectedTrack = arr[index].number;
+
+    // let arr = this.allTracks;
+    // let path = JSON.parse(arr[index].path);
+    // this.selectedTrack = arr[index].number;
     
-    this.showTrack(path);
+    // отрисовываем маршрут на карте
+    this.trackProvider.showTrack(index);
+    // выбранный маршрут 
+    this.selectedTrack = this.userDataProvider.userData.trackNumber;
+
     // сохраняем выбранный маршрут который будем отслеживать
-    this.userDataProvider.userData.trackNumber = arr[index].number;
+    // this.userDataProvider.userData.trackNumber = arr[index].number;
     this.setUserTrack();
   }
 
-  // отрисовываем путь на карте 
-  private showTrack(path) {
-    this.trackLayer.setGeoJSON(path);
-  }
+  // // отрисовываем путь на карте 
+  // private showTrack(path) {
+  //   this.trackLayer.setGeoJSON(path);
+  // }
   // end track
 }
