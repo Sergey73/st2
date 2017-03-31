@@ -12,10 +12,11 @@ page-home {
     }
   }
 
-  // убираем фон и рамку для div в котором содержится svg маркек
-  .leaflet-div-icon {
-    background: none;
-    border: none;
+  // хак для имени водителей, иначе имя не видно
+  .leaflet-tooltip-pane {
+    position: absolute;
+    z-index: 4;
+    color: red;
   }
 }
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { UserDataProvider } from './user-data-provider';
 import { MarkerProvider } from './marker-provider';
+import { MapProvider } from './map-provider';
 
 @Injectable()
 export class DevelopProvider {
@@ -10,6 +11,7 @@ export class DevelopProvider {
   constructor(
     public userDataProvider: UserDataProvider,
     public markerProvider: MarkerProvider,
+    public mapProvider: MapProvider
   ) {
 
   }
@@ -24,10 +26,6 @@ export class DevelopProvider {
   // определения координат текущего водителя
   public moveMarker() {
     let data = this.userDataProvider.userData;
-
-    // let myLatitude = this.userDataProvider.userData.myLatitude;
-    // let myLongitude = this.userDataProvider.userData.myLongitude;
-    // let selfMarker =  this.userDataProvider.userData.selfMarker;
     
     // разрешает/запрешает движение маркера влево
     let left = true;
@@ -88,7 +86,36 @@ export class DevelopProvider {
       // // end тест2 на много водителей// для разработки
 
       data.selfMarker.setLatLng([data.myLatitude, data.myLongitude]);
+      this.refreshMapCenterPosition(data.myLatitude, data.myLongitude);
     },1000);
+
+  }
+
+  private refreshMapCenterPosition(lat, lng) {
+
+    let la = lat;
+    let ln = lng;
+
+    let map = this.mapProvider.getMap();
+    // координаты видимой области карты
+    let bounds = map.getBounds();
+    // север
+    let northLat = bounds._northEast.lat;
+    // восток
+    let easthLng = bounds._northEast.lng;
+    // юг
+    let southLat = bounds._southWest.lat;
+    // запад
+    let westLng = bounds._southWest.lng;
+
+    if (
+      la.toFixed(6) * 1000000 > (northLat.toFixed(6) * 1000000) - 300 || 
+      la.toFixed(6) * 1000000 < southLat.toFixed(6) * 1000000 + 300 || 
+      ln.toFixed(6) * 1000000 < westLng.toFixed(6) * 1000000 + 300 ||
+      ln.toFixed(6) * 1000000 > easthLng.toFixed(6) * 1000000 -300 
+    ) {
+      map.setView([lat, lng]);
+    }
 
   }
   // end for develop

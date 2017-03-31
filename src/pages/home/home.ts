@@ -20,7 +20,6 @@ import { MarkerProvider } from '../../providers/marker-provider';
   templateUrl: 'home.html',
 })
 export class HomePage {
-  public map: any;
   
   // переменная  выбранного маршрута, для отображения пользователю
   public selectedTrack: number;
@@ -102,6 +101,11 @@ export class HomePage {
     this.events.subscribe('tracksData: finish', () => {
       this.allTracks = this.trackProvider.tracksData;
       this.loadDataAllTracks = false;
+
+      // для разработки удалить после
+      this.selectedIndexTrack = 1;
+      this.selectTrack();
+      // для разработки удалить после
     });
 
     // слушает когда будут готовы данные водителей на выбранном маршруте,
@@ -247,6 +251,10 @@ export class HomePage {
     this.userDataProvider.updateData(obj).then( authData => {
       // показываем кнопку старта
       this.showBtnStart = true;
+
+      // для разработки удалить после
+      this.showAllDrivers();
+      // для разработки удалить после
     }, error => {
       console.dir(error);
     });

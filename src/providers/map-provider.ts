@@ -27,7 +27,7 @@ export class MapProvider {
     L.mapbox.accessToken = this.mapToken;
     this.map = L.mapbox.map('map', this.mapStyle, {
       minZoom: this.mapMinZoom,
-      // drawControl: true
+      drawControl: true
       // maxBounds: [[54.46605, 48.08372], [53.86225, 50.21576]]
     }).setView([54.33414, 48.42499], 10);
   }

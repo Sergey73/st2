@@ -41,7 +41,7 @@ export class LoginPage implements OnInit {
     });
 
     // временно для разработки
-    // this.loginUser();
+    this.loginUser();
     // end временно для разработки
   }
 
