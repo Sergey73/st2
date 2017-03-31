@@ -62,7 +62,7 @@ export class HomePage {
   private localOnlineOtherUsers: Object = {};
 
   // частота обновления координат в милисекундах других водителей
-  private intervalUpdateCoords: number = 1000;
+  private intervalUpdateSelfCoords: number = 1000;
 
   constructor(
     public navCtrl: NavController,
@@ -123,14 +123,15 @@ export class HomePage {
     // создание слоя для маршрута
     this.trackProvider.createTrackLayer();
 
-    this.getUserData();
+    this.getSelfUserData();
     this.getTracks();
   }
 
 
   public logout() {
     // прекращаем запись в БД
-    this.stopSetUserCoords();
+    this.stopSetSelfUserCoords();
+    // переходим на станицу входа
     this.authService.logout().then(response => {
       this.navCtrl.setRoot(LoginPage);
     });
@@ -184,7 +185,7 @@ export class HomePage {
     // }, 3000);
   }
 
-  private getUserData() {
+  private getSelfUserData() {
     this.userDataProvider.getData();
   }
 
@@ -195,7 +196,7 @@ export class HomePage {
 
     this.showBtnStop = true;
     this.showBtnStart = false;
-    this.setUserCoords();
+    this.setSelfUserCoords();
     this.getUsersDataByTrack();
   }
 
@@ -204,7 +205,7 @@ export class HomePage {
 
     this.showBtnStart = true;
     this.showBtnStop = false;
-    this.stopSetUserCoords();
+    this.stopSetSelfUserCoords();
 
     // останавливаем функцию для получения координат других 
     // водителей
@@ -215,16 +216,19 @@ export class HomePage {
 
     // удаляем свой маркер с карты
     this.markerProvider.removeMarker(data.selfMarker);
-    // удаляем маркер из локальной переменной
+
+    // удаляем свой маркер из локальной переменной
     data.selfMarker = null;
     
-    // удаляем все маркеры других пользователей
+    // удаляем все маркеры других пользователей с карты
     this.removeAllOnlineMarkers();
 
   }
 
   private removeAllOnlineMarkers() {
+    // объект в котором хранятся маркеры активных водителей
     let obj = this.localOnlineOtherUsers;
+
     // проходимся по локальному объекту в котором содержатся 
     // online маркеры и удаляем их с карты + удаляем данные водителя из 
     // локальной переменной
@@ -249,17 +253,17 @@ export class HomePage {
   }
 
   // останавливаем обновление координат текущего водителя в БД 
-  private stopSetUserCoords() {
+  private stopSetSelfUserCoords() {
     let data = this.userDataProvider.userData;
     // останавливаем обновление координат
     clearInterval(this.updateCoordsInterval);
+
     // говорим что другие водители не будут учитывать координаты этого водителя
     data.inMove = false;
     let obj = {
       'publicData/inMove': data.inMove
     };
-
-    // обновляем данные
+    // обновляем данные в БД
     this.userDataProvider.updateData(obj).then( authData => {
 
     }, error => {
@@ -268,7 +272,7 @@ export class HomePage {
   }
 
   // сохраняем свои координаты в БД когда поедем
-  private setUserCoords() {
+  private setSelfUserCoords() {
     let data = this.userDataProvider.userData;
 
     this.updateCoordsInterval = setInterval(() => {
@@ -288,7 +292,7 @@ export class HomePage {
         console.dir(error);
       });
 
-    }, this.intervalUpdateCoords);
+    }, this.intervalUpdateSelfCoords);
   }
 
   // получаем всех юзеров которые находятся на выбранном маршруте
@@ -311,7 +315,7 @@ export class HomePage {
     }
   }
 
-  // записываем данные юзера в локальную переменную, 
+  // записываем данные юзера в локальный объект, 
   // создаем и устанавливаем маркер 
   private dataProcessingOtherUserOnline(item) {
     let data = this.userDataProvider.userData;
@@ -324,21 +328,21 @@ export class HomePage {
     // текущее имя
     let currentName = item.publicData.name;
 
-    // ключ по в массиве водителей
+    // ключ в массиве водителей
     let key = item.$key;
     
-    // если данных водителя нет в локальной переменной, создаем их
+    // если данных водителя нет в локальном объекте, создаем их
     if (!this.localOnlineOtherUsers[key] ) {
       this.createLocalOtherUser(key);    
 
       // имя водителя 
       let driversName: string = item.publicData.name;
-      // сохраняем в локальнуюю переменную имя водителя
+      // сохраняем в локальный объект имя водителя
       this.localOnlineOtherUsers[key].name = driversName;
 
       // создаем маркер с именем водителя
       let marker = this.markerProvider.createAddMarker(driversName);
-      // сохраняем маркер в объект
+      // сохраняем маркер в локальный объект
       this.localOnlineOtherUsers[key].marker = marker;
     }
 
@@ -383,7 +387,7 @@ export class HomePage {
     let currentName = item.publicData.name;
     // ключ в массиве водителей
     let key = item.$key;
-    // обновляем имя в локальной переменной
+    // обновляем имя в локальном объекте
     this.localOnlineOtherUsers[key].name = currentName;
     // старый маркер
     let oldMarker = this.localOnlineOtherUsers[key].marker;
@@ -391,11 +395,11 @@ export class HomePage {
     this.markerProvider.removeMarker(oldMarker);
     // устанавливаем маркер с новым именем
     let newMarker = this.markerProvider.createAddMarker(currentName);
-    // записываем в локальную переменную новый маркер
+    // записываем в локальный объект новый маркер
     this.localOnlineOtherUsers[key].marker = newMarker;
   }
 
-  // сохраняем данные о водителе в локальную переменную 
+  // сохраняем данные о водителе в локальный объект
   private createLocalOtherUser(key) {
 
     this.localOnlineOtherUsers[key] = {
