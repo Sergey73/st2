@@ -8,7 +8,6 @@ import * as L from 'mapbox.js';
 import { LoginPage } from '../../pages/login/login';
 
 // providers
-// import { MapProvider } from '../../providers/map-provider';
 import { AuthService } from '../../providers/auth';
 import { TrackProvider } from '../../providers/track-provider';
 import { UserDataProvider } from '../../providers/user-data-provider';
@@ -22,9 +21,6 @@ import { MarkerProvider } from '../../providers/marker-provider';
 })
 export class HomePage {
   public map: any;
-
-  // удалить
-  // public trackLayer: any;
   
   // переменная  выбранного маршрута, для отображения пользователю
   public selectedTrack: number;
@@ -71,7 +67,6 @@ export class HomePage {
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
-    // public mapProvider: MapProvider,
     public trackProvider: TrackProvider,
     public userDataProvider: UserDataProvider,
     public otherUsersProvider: OtherUsersProvider,
@@ -83,10 +78,6 @@ export class HomePage {
   }
 
   public ngOnInit() { 
-
-    // строим карту
-    // this.map = this.mapProvider.getMap();
-
     // обновление своего маркера при измененным именем
     this.events.subscribe('changeSelfUserName: update', () => {
       let data =  this.userDataProvider.userData;
@@ -129,7 +120,6 @@ export class HomePage {
       });
     });
 
-    // this.initTrack();
     // создание слоя для маршрута
     this.trackProvider.createTrackLayer();
 
@@ -198,10 +188,6 @@ export class HomePage {
     this.userDataProvider.getData();
   }
 
-  // private removeMarker(marker: any) {
-  //   marker.remove();
-  // }
-
   public showAllDrivers() {
     // функция имитирует передвижение текущего водителя
     // удалить после разработки !!! 
@@ -247,6 +233,7 @@ export class HomePage {
       obj[key] = null;
     }
   }
+
   /////////////////// user ////////////////////////
   // выбираем маршрут по которому поедем
   private setUserTrack() {
@@ -435,33 +422,18 @@ export class HomePage {
     this.trackProvider.getAllTracks();
   }
 
-
-  // private initTrack() {
-  //   // слой для маршрута
-  //   this.trackLayer = L.mapbox.featureLayer().addTo(this.map);
-  // }
-
   public selectTrack() {
     // индекс выбранного трека
     let index = this.selectedIndexTrack;
-
-    // let arr = this.allTracks;
-    // let path = JSON.parse(arr[index].path);
-    // this.selectedTrack = arr[index].number;
     
     // отрисовываем маршрут на карте
     this.trackProvider.showTrack(index);
+
     // выбранный маршрут 
     this.selectedTrack = this.userDataProvider.userData.trackNumber;
 
-    // сохраняем выбранный маршрут который будем отслеживать
-    // this.userDataProvider.userData.trackNumber = arr[index].number;
     this.setUserTrack();
   }
 
-  // // отрисовываем путь на карте 
-  // private showTrack(path) {
-  //   this.trackLayer.setGeoJSON(path);
-  // }
   // end track
 }

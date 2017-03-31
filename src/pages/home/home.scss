@@ -11,6 +11,12 @@ page-home {
       width:100%;
     }
   }
+
+  // убираем фон и рамку для div в котором содержится svg маркек
+  .leaflet-div-icon {
+    background: none;
+    border: none;
+  }
 }
 
 

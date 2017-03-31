@@ -42,7 +42,6 @@ export class TrackProvider {
 
   }
 
-
   public createTrackLayer() {
     // получаем карту 
     let map = this.mapProvider.getMap();

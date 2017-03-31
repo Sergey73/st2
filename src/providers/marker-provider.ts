@@ -26,7 +26,8 @@ export class MarkerProvider {
       icon: new L.DivIcon({
         // className: 'label',
         html: svgMarker,
-        iconSize: [0, 0]
+        iconSize: null,
+        iconAnchor: null
       })
     });
     marker.addTo(map);
