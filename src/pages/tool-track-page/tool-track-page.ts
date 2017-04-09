@@ -28,7 +28,7 @@ export class ToolTrackPagePage {
   lo: any;
   // форма
   public toolTrackForm: any;
-  public trackData: {number: any, path: string} = {number: '', path: ''};
+  public trackData: {number: any, path: any} = {number: '', path: {}};
   public submitAttempt: boolean = false;
   // end форма
 
@@ -107,12 +107,38 @@ export class ToolTrackPagePage {
     this.map.on('draw:created', (e) => { 
       let layerType = e.layerType;
       let layer = e.layer;
+      
       let shape = layer.toGeoJSON();
-      let shapeForDb = JSON.stringify(shape);
-      this.trackData.path = shapeForDb;
+
+      // если нет данных о маршруте создаем мульти-линию
+      if (!this.trackData.path || !this.trackData.path.geometry || this.trackData.path.geometry.type !== 'MultiLineString') {
+        this.createMultiPolyline();
+      }
+      let coords = shape.geometry.coordinates;
+      this.addCoordsInMultiPolyline(coords);
 
       this.showPolygonArea(e); 
     });
+  }
+
+  private createMultiPolyline() {
+    let multiPolyline = {
+      type: 'Feature',
+      properties: {
+        'stroke': "#fc4353",
+        'stroke-width': 5
+      },
+      geometry: {
+        type: 'MultiLineString',
+        coordinates: []
+      }
+    }
+    this.trackData.path = multiPolyline;
+  }
+  
+  // добавляем очередную полилинию в общую мультилинию
+  private addCoordsInMultiPolyline(coords: Object) {
+    this.trackData.path.geometry.coordinates.push(coords);
   }
 
   public saveTrackInDb() {
@@ -121,14 +147,24 @@ export class ToolTrackPagePage {
     if (!this.toolTrackForm.valid){
       console.log(this.toolTrackForm.value);
     } else {
-      if(!this.trackData.path) {
+      if(!this.trackData.path && !this.trackData.path.geometry) {
         let message = 'Постройте маршрут!';
         this.msgService.alert(message, null);
         return;
       }
+      
+      // парсим данные маршрута в строку
+      let shapeForDb = JSON.stringify(this.trackData.path);
+      // номер маршрута преобразуем в числовой тип
       this.trackData.number = +this.toolTrackForm.value.trackNumber;
-      this.trackProvider.createTrack(this.trackData).then((data) => {
-
+      // объект для записи данных маршрута в БД
+      let objForDb = {
+        number: this.trackData.number,
+        path: shapeForDb
+      }
+      // this.trackProvider.createTrack(this.trackData).then((data) => {
+      // запись в БД
+      this.trackProvider.createTrack(objForDb).then((data) => {
         let message = `Маршрут №${this.trackData.number} успешно создан.`;
         this.msgService.alert(message, null);
         this.featureGroup.clearLayers();
@@ -152,7 +188,7 @@ export class ToolTrackPagePage {
   
 
   private showPolygonArea(e) {
-    this.featureGroup.clearLayers();
+    // this.featureGroup.clearLayers();
     this.featureGroup.addLayer(e.layer);
     // e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
     e.layer.openPopup();

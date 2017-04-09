@@ -18,8 +18,8 @@ export class UserDataProvider {
     email: string,
     name: string,
     role: string,
-    key: string,
-    trackNumber: number,
+    key: string,          // ключ в БД
+    trackNumber: number,  // номер маршрута
     inMove: boolean,      // если false другие водители не будут получать координаты этого водителя
     selfMarker: any,      // маркер своего местоположения 
     myLatitude: any,

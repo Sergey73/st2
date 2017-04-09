@@ -15,7 +15,7 @@ page-home {
   // хак для имени водителей, иначе имя не видно
   .leaflet-tooltip-pane {
     position: absolute;
-    z-index: 4;
+    z-index: 6;
     color: red;
   }
 }

@@ -22,7 +22,7 @@ export class TrackProvider {
   // карта 
   public map: any;
   // слой для маршрута
-  private trackLayer: any;
+  public trackLayer: any;
 
   // маршрут который выбрал юзер, по которому поедет
   public selectedTrack: {
