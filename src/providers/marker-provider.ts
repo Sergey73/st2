@@ -37,7 +37,7 @@ export class MarkerProvider {
     let marker = L
       // .circleMarker([54.4151707, 48.3257941], markerOptions)
       .marker([54.4151707, 48.3257941])
-      .bindTooltip(label, {permanent: true, direction: 'top' })
+      .bindTooltip(label, {permanent: true, direction: 'top', offset: [0, -10] })
       .addTo(map);
 
     return marker;

@@ -106,7 +106,8 @@ export class DevelopProvider {
       // // end тест2 на много водителей// для разработки
 
       data.selfMarker.setLatLng([data.myLatitude, data.myLongitude]);
-      this.refreshMapCenterPosition(data.myLatitude, data.myLongitude);
+      // если тоггл включег тогда запускаем функцию для позиционируем карты относительно маркера
+      if (data.watchToSelfMarker) this.refreshMapCenterPosition(data.myLatitude, data.myLongitude);
     },1000);
     this.setMarkerOnTrack(data.selfMarker);
 
@@ -160,7 +161,6 @@ export class DevelopProvider {
   // как только маркер водителя подходит к краю карты
   // сделать отключение функции + использовать Polygon.getBounds().contains(MarketLatLng); 
   private refreshMapCenterPosition(lat, lng) {
-
     let la = lat;
     let ln = lng;
 

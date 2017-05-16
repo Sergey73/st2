@@ -40,6 +40,7 @@ const myFirebaseAuthConfig = {
 };
 
 @NgModule({
+  // делает все элементы видимыми для всего приложения
   declarations: [
     MyApp,
     HomePage,

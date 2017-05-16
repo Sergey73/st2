@@ -23,7 +23,8 @@ export class UserDataProvider {
     inMove: boolean,      // если false другие водители не будут получать координаты этого водителя
     selfMarker: any,      // маркер своего местоположения 
     myLatitude: any,
-    myLongitude: any
+    myLongitude: any,
+    watchToSelfMarker: boolean  // тоггл для позиционирования карты относительно маркера
   } = {
     uid: '', 
     email: '',
@@ -34,7 +35,8 @@ export class UserDataProvider {
     inMove: false,
     selfMarker: null,
     myLatitude: 54.30801120099681,
-    myLongitude: 48.39649200439454
+    myLongitude: 48.39649200439454,
+    watchToSelfMarker: false
   };
 
   constructor(

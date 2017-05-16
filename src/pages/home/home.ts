@@ -63,6 +63,9 @@ export class HomePage {
   // частота обновления координат в милисекундах других водителей
   private intervalUpdateSelfCoords: number = 1000;
 
+  // когда марекер выходит за экран, перемещаем карту, чтобы маркер был в центре экрана 
+  public watchToSelfMarker: boolean = false;
+
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
@@ -80,7 +83,6 @@ export class HomePage {
     // обновление своего маркера при измененным именем
     this.events.subscribe('changeSelfUserName: update', () => {
       let data =  this.userDataProvider.userData;
-
       // если маркер был создан заменяем его на новый с новым 
       // именем иначе ничего
       if (data.selfMarker) {
@@ -131,6 +133,10 @@ export class HomePage {
     this.getTracks();
   }
 
+  // разрешает/запрещает позиционировать карту так, чтобы маркер оказался в центре
+  public setWatchToSelfMarker() {
+    this.userDataProvider.userData.watchToSelfMarker = this.watchToSelfMarker;
+  }
 
   public logout() {
     // прекращаем запись в БД
