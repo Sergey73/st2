@@ -103,8 +103,8 @@ export class HomePage {
       this.loadDataAllTracks = false;
 
       // для разработки удалить после
-      this.selectedIndexTrack = 1;
-      this.selectTrack();
+      // this.selectedIndexTrack = 1;
+      // this.selectTrack();
       // для разработки удалить после
     });
 
