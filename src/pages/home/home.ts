@@ -14,6 +14,7 @@ import { UserDataProvider } from '../../providers/user-data-provider';
 import { OtherUsersProvider } from '../../providers/other-users-provider';
 import { DevelopProvider } from '../../providers/develop-provider';
 import { MarkerProvider } from '../../providers/marker-provider';
+import { MapProvider } from '../../providers/map-provider';
 
 @Component({
   selector: 'page-home',
@@ -74,6 +75,7 @@ export class HomePage {
     public otherUsersProvider: OtherUsersProvider,
     public developProvider: DevelopProvider,
     public markerProvider: MarkerProvider,
+    public mapProvider: MapProvider,
     public events: Events
   ) {
 
@@ -390,8 +392,15 @@ export class HomePage {
       // записываем координаты в объект для того чтобы при следующем запросе знать изменились они или нет
       this.localOnlineOtherUsers[key].prevCoords.latitude = newLat;
       this.localOnlineOtherUsers[key].prevCoords.longitude = newLon;
-      // устанавливаем новое положение маркеру
-      this.localOnlineOtherUsers[key].marker.setLatLng([newLat, newLon]);
+      
+      let map = this.mapProvider.getMap();
+      // координаты видимой области карты
+      let bounds = map.getBounds();
+      // узнаем находится ли водитель в зоне видимости карты
+      let showDirver = bounds.contains([newLat, newLon]);
+      // если водитель находится вне зоны выдимости карты не отрисовываем его маркер, 
+      // если находится в зоне устанавливаем новое положение маркеру
+      showDirver ? this.localOnlineOtherUsers[key].marker.setLatLng([newLat, newLon]) : null;
     }
   }
 

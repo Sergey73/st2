@@ -159,7 +159,7 @@ export class DevelopProvider {
   }
 
   // как только маркер водителя подходит к краю карты
-  // сделать отключение функции + использовать Polygon.getBounds().contains(MarketLatLng); 
+  // сделать отключение функции + использовать Polygon.getBounds().contains(MarkerLatLng); 
   private refreshMapCenterPosition(lat, lng) {
     let la = lat;
     let ln = lng;
