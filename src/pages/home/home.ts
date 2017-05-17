@@ -91,7 +91,7 @@ export class HomePage {
         // удалить старый маркер
         this.markerProvider.removeMarker(data.selfMarker);
         // создать и сохранить новый маркер
-        let newSelfMarker = this.markerProvider.createAddMarker(data.name);
+        let newSelfMarker = this.markerProvider.createAddMarker(data.name, 'self');
         data.selfMarker = newSelfMarker;
       }
     });
@@ -357,7 +357,7 @@ export class HomePage {
       this.localOnlineOtherUsers[key].name = driversName;
 
       // создаем маркер с именем водителя
-      let marker = this.markerProvider.createAddMarker(driversName);
+      let marker = this.markerProvider.createAddMarker(driversName, 'other');
       // сохраняем маркер в локальный объект
       this.localOnlineOtherUsers[key].marker = marker;
     }
@@ -417,7 +417,7 @@ export class HomePage {
     // стираем маркер со старым именем
     this.markerProvider.removeMarker(oldMarker);
     // устанавливаем маркер с новым именем
-    let newMarker = this.markerProvider.createAddMarker(currentName);
+    let newMarker = this.markerProvider.createAddMarker(currentName, 'other');
     // записываем в локальный объект новый маркер
     this.localOnlineOtherUsers[key].marker = newMarker;
   }

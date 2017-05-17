@@ -67,7 +67,7 @@ export class DevelopProvider {
     // имя водителя
     let name: string = this.userDataProvider.userData.name;
     // если маркер не создан, создаем маркер
-    if (!data.selfMarker) data.selfMarker = this.markerProvider.createAddMarker(name);
+    if (!data.selfMarker) data.selfMarker = this.markerProvider.createAddMarker(name, 'self');
     
     //  // тест на много водителей// для разработки
     // let arr = [];
