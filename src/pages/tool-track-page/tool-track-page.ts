@@ -17,7 +17,6 @@ import { MsgService } from '../../providers/msg-service';
   // inputs: ['map']
 })
 export class ToolTrackPagePage {
-  // карта создается в home.ts и передается сюда как параметр
   map: any;
   featureGroup: any;
   lat: Number;
@@ -125,8 +124,9 @@ export class ToolTrackPagePage {
     let multiPolyline = {
       type: 'Feature',
       properties: {
-        'stroke': "#fc4353",
-        'stroke-width': 5
+        'stroke': "#f2f04a",
+        'stroke-width': 5,
+        'stroke-opacity': 0.6
       },
       geometry: {
         type: 'MultiLineString',

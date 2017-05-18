@@ -36,7 +36,7 @@ export class MarkerProvider {
     var icon = type == 'self' ? 'assets/img/greenCircle.png' : 'assets/img/yellowCircle.png'
     var greenIcon = L.icon({
       iconUrl: icon,
-      iconSize: [30, 30],
+      iconSize: [32, 30],
       iconAnchor: [15, 15]
     });
     let marker = L
