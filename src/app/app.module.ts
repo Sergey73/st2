@@ -28,6 +28,9 @@ import { MarkerProvider } from '../providers/marker-provider';
 // any servicies
 import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 
+// components
+import { AdminPanelComponent } from '../components/admin-panel/admin-panel';
+
 export const firebaseConfig = {
   apiKey: 'AIzaSyD8cHdez2j1JTcQ4hfPoFs3YCsRSgtPfGY',
   authDomain: 'streetcity73-a464b.firebaseapp.com',
@@ -51,7 +54,8 @@ const myFirebaseAuthConfig = {
     SignupPage,
     ResetPasswordPage,
     ProfilePage,
-    ToolTrackPagePage
+    ToolTrackPagePage,
+    AdminPanelComponent
   ],
   imports: [
     BrowserModule,

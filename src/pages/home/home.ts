@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, Events } from 'ionic-angular';
-import { Geolocation } from 'ionic-native';
+// import { Geolocation } from 'ionic-native';
 
 import * as L from 'mapbox.js';
 
@@ -15,6 +15,9 @@ import { OtherUsersProvider } from '../../providers/other-users-provider';
 import { DevelopProvider } from '../../providers/develop-provider';
 import { MarkerProvider } from '../../providers/marker-provider';
 import { MapProvider } from '../../providers/map-provider';
+
+// components
+// import { AdminPanelComponent } from '../../components/admin-panel/login';
 
 @Component({
   selector: 'page-home',
@@ -149,53 +152,53 @@ export class HomePage {
     });
   }
 
-  private getSelfCoords() {
-    let data = this.userDataProvider.userData;
+  // private getSelfCoords() {
+  //   let data = this.userDataProvider.userData;
 
 
-    var watch = Geolocation.watchPosition({
-      // maximumAge: 1000, 
-      timeout: 2000, 
-      enableHighAccuracy: true
-    });
+  //   var watch = Geolocation.watchPosition({
+  //     // maximumAge: 1000, 
+  //     timeout: 2000, 
+  //     enableHighAccuracy: true
+  //   });
     
-    watch.subscribe( (resp) => {
+  //   watch.subscribe( (resp) => {
 
-      // console.dir(resp);
-      // console.log('Latitude: '            + resp.coords.latitude          + '\n' +
-      //         'Longitude: '         + resp.coords.longitude         + '\n' +
-      //         'Altitude: '          + resp.coords.altitude          + '\n' +
-      //         'Accuracy: '          + resp.coords.accuracy          + '\n' +
-      //         'Altitude Accuracy: ' + resp.coords.altitudeAccuracy  + '\n' +
-      //         'Heading: '           + resp.coords.heading           + '\n' +
-      //         'Speed: '             + resp.coords.speed             + '\n' +
-      //         'Timestamp: '         + resp.timestamp                + '\n');
+  //     // console.dir(resp);
+  //     // console.log('Latitude: '            + resp.coords.latitude          + '\n' +
+  //     //         'Longitude: '         + resp.coords.longitude         + '\n' +
+  //     //         'Altitude: '          + resp.coords.altitude          + '\n' +
+  //     //         'Accuracy: '          + resp.coords.accuracy          + '\n' +
+  //     //         'Altitude Accuracy: ' + resp.coords.altitudeAccuracy  + '\n' +
+  //     //         'Heading: '           + resp.coords.heading           + '\n' +
+  //     //         'Speed: '             + resp.coords.speed             + '\n' +
+  //     //         'Timestamp: '         + resp.timestamp                + '\n');
 
 
-      // var lat: any = resp.coords.latitude;
-      // var lon: any = resp.coords.longitude;
-      // myLatitude = ((lat.toFixed(4) * 10000) + 2) / 10000;
-      // myLongitude = ((lon.toFixed(4) * 10000) + 2) / 10000;
+  //     // var lat: any = resp.coords.latitude;
+  //     // var lon: any = resp.coords.longitude;
+  //     // myLatitude = ((lat.toFixed(4) * 10000) + 2) / 10000;
+  //     // myLongitude = ((lon.toFixed(4) * 10000) + 2) / 10000;
      
 
-      data.myLatitude = resp.coords.latitude;
-      data.myLongitude = resp.coords.longitude;
+  //     data.myLatitude = resp.coords.latitude;
+  //     data.myLongitude = resp.coords.longitude;
       
-      this.events.publish('coord: start', resp.coords);
+  //     this.events.publish('coord: start', resp.coords);
 
-      data.selfMarker.setLatLng([data.myLatitude, data.myLongitude]);
+  //     data.selfMarker.setLatLng([data.myLatitude, data.myLongitude]);
 
-      // this.setPosition(resp.coords.latitude, resp.coords.longitude);
-    });
-    // var lat: any = 54.311096;
-    // var lon: any = 48.3257941;
+  //     // this.setPosition(resp.coords.latitude, resp.coords.longitude);
+  //   });
+  //   // var lat: any = 54.311096;
+  //   // var lon: any = 48.3257941;
     
-    // setInterval(() => {
-    //   lat =  ((lat.toFixed(4) * 10000) + 2) / 10000;
-    //   lon =  ((lon.toFixed(4) * 10000) + 2) / 10000;
-    //   this.setPosition(lat, lon);
-    // }, 3000);
-  }
+  //   // setInterval(() => {
+  //   //   lat =  ((lat.toFixed(4) * 10000) + 2) / 10000;
+  //   //   lon =  ((lon.toFixed(4) * 10000) + 2) / 10000;
+  //   //   this.setPosition(lat, lon);
+  //   // }, 3000);
+  // }
 
   private getSelfUserData() {
     this.userDataProvider.getData();
