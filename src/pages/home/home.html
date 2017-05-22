@@ -51,9 +51,18 @@
 
 </ion-header>
 
-<admin-panel></admin-panel>
-
-<page-tool-track-page></page-tool-track-page>
+<!--<admin-panel></admin-panel>-->
+<ion-content>
+    <ion-fab right top>
+    <button ion-fab color="light" (click)="hideAllMenu()"><ion-icon name="arrow-dropdown"></ion-icon></button>
+    <ion-fab-list side="down">
+      <button ion-fab (click)="showHightMenu('driverPathMenu')"><ion-icon name="git-merge"></ion-icon></button>
+      <button ion-fab (click)="showHightMenu('checkPointMenu')"><ion-icon name="git-commit"></ion-icon></button>
+    </ion-fab-list>
+  </ion-fab>
+</ion-content>
+ 
+<page-tool-track-page *ngIf="driverPathMenu"></page-tool-track-page>
 <ion-content class="map">
   <div class="map__container" id='map'></div>
 </ion-content>

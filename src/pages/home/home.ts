@@ -70,6 +70,10 @@ export class HomePage {
   // когда марекер выходит за экран, перемещаем карту, чтобы маркер был в центре экрана 
   public watchToSelfMarker: boolean = false;
 
+  // 
+  public driverPathMenu: boolean = false;
+  public checkPointMenu: boolean = false;
+
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
@@ -151,6 +155,25 @@ export class HomePage {
       this.navCtrl.setRoot(LoginPage);
     });
   }
+
+  // menu
+  public showHightMenu(menuType) {
+    this.hideAllMenu();
+    switch(menuType) {
+      case 'driverPathMenu':
+        this.driverPathMenu = true;
+        break;
+      case 'checkPointMenu':
+        this.checkPointMenu = true;
+        break;
+    }
+  }
+
+  public hideAllMenu() {
+    this.driverPathMenu = false;
+    this.checkPointMenu = false;
+  }
+  // end menu
 
   // private getSelfCoords() {
   //   let data = this.userDataProvider.userData;
