@@ -1,0 +1,12 @@
+.timer {
+
+  &_head {
+    background-color: red;
+  }
+  &_body {
+    color: green;
+  }
+  &_selected {
+    background-color: yellow;
+  }
+}

@@ -30,6 +30,7 @@ import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 
 // components
 import { AdminPanelComponent } from '../components/admin-panel/admin-panel';
+import { TimerComponent } from '../components/timer/timer';
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyD8cHdez2j1JTcQ4hfPoFs3YCsRSgtPfGY',
@@ -55,7 +56,8 @@ const myFirebaseAuthConfig = {
     ResetPasswordPage,
     ProfilePage,
     ToolTrackPagePage,
-    AdminPanelComponent
+    AdminPanelComponent,
+    TimerComponent,
   ],
   imports: [
     BrowserModule,
