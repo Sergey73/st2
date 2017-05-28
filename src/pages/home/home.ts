@@ -231,11 +231,18 @@ export class HomePage {
     // функция имитирует передвижение текущего водителя
     // удалить после разработки !!! 
     this.developProvider.moveMarker();
-
+    
     this.showBtnStop = true;
     this.showBtnStart = false;
+    // как только нажали кнопку 'Поехали' запускаем таймер
+    this.startTimer();
     this.setSelfUserCoords();
     this.getUsersDataByTrack();
+  }
+
+  public startTimer() { 
+    // отправляем событие в таймер для запуска
+    this.events.publish('timer: start');
   }
 
   public hideAllDrivers() {

@@ -1,8 +1,9 @@
 import { Component, Input } from '@angular/core';
+import { Events } from 'ionic-angular';
 
 export interface CountdownTimer {
-    seconds: number;
-    secondsRemaining: number;
+    secondsPassed: number;
+    // secondsRemaining: number;
     runTimer: boolean;
     hasStarted: boolean;
     hasFinished: boolean;
@@ -16,14 +17,17 @@ export interface CountdownTimer {
 })
 export class TimerComponent {
 
-  @Input() timeInSeconds: number;
+  // @Input() timeInSeconds: number;
   timer: CountdownTimer;
 
-  constructor() {
+  constructor(public events: Events) {
   }
   
   ngOnInit() {
     this.initTimer();
+    this.events.subscribe('timer: start', () => {
+      this.startTimer();
+    });
   }
 
   hasFinished() {
@@ -31,17 +35,18 @@ export class TimerComponent {
   }
 
   initTimer() {
-    if (!this.timeInSeconds) { this.timeInSeconds = 0; }
+    // if (!this.timeInSeconds) { this.timeInSeconds = 0; }
 
     this.timer = <CountdownTimer>{
-      seconds: this.timeInSeconds,
+      secondsPassed: 0,
       runTimer: false,
       hasStarted: false,
-      hasFinished: false,
-      secondsRemaining: this.timeInSeconds
+      hasFinished: false
+      // secondsRemaining: this.timeInSeconds
     };
 
-    this.timer.displayTime = this.getSecondsAsDigitalClock(this.timer.secondsRemaining);
+    // this.timer.displayTime = this.getSecondsAsDigitalClock(this.timer.secondsRemaining);
+    this.timer.displayTime = this.getSecondsAsDigitalClock(this.timer.secondsPassed);
   }
 
   startTimer() {
@@ -61,9 +66,10 @@ export class TimerComponent {
   timerTick() {
     setTimeout(() => {
       if (!this.timer.runTimer) { return; }
-      this.timer.secondsRemaining--;
-      this.timer.displayTime = this.getSecondsAsDigitalClock(this.timer.secondsRemaining);
-      if (this.timer.secondsRemaining > 0) {
+      // this.timer.secondsRemaining--;
+      this.timer.secondsPassed++;
+      this.timer.displayTime = this.getSecondsAsDigitalClock(this.timer.secondsPassed);
+      if (this.timer.secondsPassed > 0) {
         this.timerTick();
       }
       else {

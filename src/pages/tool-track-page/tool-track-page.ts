@@ -52,7 +52,7 @@ export class ToolTrackPagePage {
   public ngOnInit() {
     this.map = this.mapProvider.getMap();
     this.createDrawControl();
-    this.ceateTrackEvent();
+    this.ceateDrawEvent();
     this.moveMarker();
 
     // как только данные о текущем юзере придут происходит событие
@@ -102,22 +102,29 @@ export class ToolTrackPagePage {
 
   }
 
-  private ceateTrackEvent() {
+  private ceateDrawEvent() {
     this.map.on('draw:created', (e) => { 
+      if (e.layerType == 'polygon') this.createTrack(e);
+    });
+  }
+
+  private createTrack(e) {
       let layerType = e.layerType;
       let layer = e.layer;
       
       let shape = layer.toGeoJSON();
-
       // если нет данных о маршруте создаем мульти-линию
-      if (!this.trackData.path || !this.trackData.path.geometry || this.trackData.path.geometry.type !== 'MultiLineString') {
+      if (
+        !this.trackData.path || 
+        !this.trackData.path.geometry || 
+        this.trackData.path.geometry.type !== 'MultiLineString'
+      ) {
         this.createMultiPolyline();
       }
       let coords = shape.geometry.coordinates;
       this.addCoordsInMultiPolyline(coords);
 
       this.showPolygonArea(e); 
-    });
   }
 
   private createMultiPolyline() {
