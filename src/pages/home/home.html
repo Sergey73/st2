@@ -62,7 +62,8 @@
   </ion-fab>
 </ion-content>
  
-<page-tool-track-page *ngIf="driverPathMenu"></page-tool-track-page>
+<page-tool-track-page [hidden]="!driverPathMenu"></page-tool-track-page>
+<checkpoint-panel [hidden]="!checkPointMenu"></checkpoint-panel>
 <ion-content class="map">
   <div class="map__container" id='map'></div>
 </ion-content>

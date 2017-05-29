@@ -31,6 +31,7 @@ import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 // components
 import { AdminPanelComponent } from '../components/admin-panel/admin-panel';
 import { TimerComponent } from '../components/timer/timer';
+import { CheckpointPanelComponent } from '../components/checkpoint-panel/checkpoint-panel';
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyD8cHdez2j1JTcQ4hfPoFs3YCsRSgtPfGY',
@@ -58,6 +59,7 @@ const myFirebaseAuthConfig = {
     ToolTrackPagePage,
     AdminPanelComponent,
     TimerComponent,
+    CheckpointPanelComponent
   ],
   imports: [
     BrowserModule,

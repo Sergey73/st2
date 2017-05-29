@@ -104,7 +104,12 @@ export class ToolTrackPagePage {
 
   private ceateDrawEvent() {
     this.map.on('draw:created', (e) => { 
-      if (e.layerType == 'polygon') this.createTrack(e);
+      if (e.layerType !== 'polyline') {
+        let message = 'Для построения маршрута используйте полилинию!';
+        this.msgService.alert(message, null);
+        return;
+      } 
+      this.createTrack(e);
     });
   }
 
