@@ -1,13 +1,6 @@
-<ion-header>
-
-  <ion-navbar class="head">
-    <ion-title>Параметры маршрута</ion-title>
-  </ion-navbar>
-
-</ion-header>
-
 <ion-content padding class="body">
-   <form [formGroup]="toolTrackForm" (submit)="saveTrackInDb()" novalidate>
+  <form [formGroup]="toolTrackForm" (submit)="saveTrackInDb()" novalidate>
+    <ion-item-divider color="light">Параметры нового маршрута</ion-item-divider>
     <ion-item>
       <ion-label color="primary" stacked>Номер маршрута</ion-label>
       <ion-input 
