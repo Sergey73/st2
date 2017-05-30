@@ -69,8 +69,8 @@ export class MapProvider {
         polygon: false,
         polyline: false,
         rectangle: false,
-        circle: true,
-        marker: false
+        circle: false,
+        marker: true
       }
     }).addTo(this.map);
 

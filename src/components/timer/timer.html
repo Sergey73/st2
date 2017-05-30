@@ -2,7 +2,7 @@
 	<ion-card-header>
 		<button 
       ion-button 
-      large block clear class="timer-button x-large"
+       block clear class="timer-button"
     >{{timer.displayTime}}</button>
 	<!--	<button ion-button 
       *ngIf="!timeInSeconds || timeInSeconds == 0" 
@@ -13,7 +13,6 @@
 	<!--<ion-item *ngIf="timeInSeconds && timeInSeconds > 0">-->
 	<ion-item>
 		<button ion-button clear 
-      class="large" 
       color="danger" 
       (click)="initTimer()" 
       item-left 
@@ -24,7 +23,6 @@
     </button>
 		<button 
       ion-button clear 
-      class="large" 
       (click)="pauseTimer()" 
       item-right 
       *ngIf="timer.runTimer && timer.hasStarted && !timer.hasFinished"
@@ -33,7 +31,6 @@
       Pause
     </button>
 		<button ion-button clear 
-      class="large" 
       (click)="resumeTimer()" 
       item-right 
       *ngIf="!timer.runTimer && timer.hasStarted && !timer.hasFinished"
@@ -42,7 +39,6 @@
       Resume
     </button>
 		<button ion-button clear 
-      class="large" 
       (click)="startTimer()" 
       item-right *ngIf="!timer.hasStarted"
     >

@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import * as leafletDraw from 'leaflet-draw';
 
 import { MapProvider } from '../../providers/map-provider';
+import { MarkerProvider } from '../../providers/marker-provider';
 
 @Component({
   selector: 'checkpoint-panel',
@@ -13,7 +14,8 @@ export class CheckpointPanelComponent {
   private featureGroupCheckpoint: any;
 
   constructor(
-    public mapProvider: MapProvider
+    public mapProvider: MapProvider,
+    public markerProvider: MarkerProvider
   ) {
     // нужен сдесь иначе модуль не работает.
     leafletDraw
@@ -27,14 +29,13 @@ export class CheckpointPanelComponent {
 
   private ceateDrawEvent() {
     this.map.on('draw:created', (e) => { 
-      if (e.layerType !== 'circle') {
-        // let message = 'Для построения маршрута используйте полилинию!';
-        // this.msgService.alert(message, null);
-        return;
-      } 
-      console.dir('circle create')
-      // this.createCheckpoint(e);
+      if (e.layerType !== 'marker') return;
+      this.createCheckpoint(e);
     });
+  }
+
+  private createCheckpoint(e) {
+    let newSelfMarker = this.markerProvider.createAddMarker('checkpoint', 'self');
   }
 
 }
