@@ -9,6 +9,8 @@ export class MapProvider {
   private mapToken: string;
   private mapStyle: string;
   private mapMinZoom: number;
+  public featureGroupTrack: any;
+  public featureGroupCheckpoint: any;
 
   constructor(
     public events: Events
@@ -27,7 +29,7 @@ export class MapProvider {
     L.mapbox.accessToken = this.mapToken;
     this.map = L.mapbox.map('map', this.mapStyle, {
       minZoom: this.mapMinZoom,
-      drawControl: true,
+      drawControl: false,
       maxBounds: [[54.46605, 48.08372], [53.86225, 50.21576]],
       // с этми нельзя заходить за границы maxBounds
       maxBoundsViscosity: 1
@@ -37,6 +39,41 @@ export class MapProvider {
     this.map.on('zoom', e => {
       this.events.publish('map: zoom', e);
     });
+
+    // создаем панель для редактирования
+    this.createDrawControl();
+  }
+
+  private createDrawControl () {
+    this.featureGroupTrack = L.featureGroup().addTo(this.map);
+    this.featureGroupCheckpoint = L.featureGroup().addTo(this.map);
+
+    new L.Control.Draw({
+      edit: {
+        featureGroup: this.featureGroupTrack
+      },
+      draw: {
+        polygon: false,
+        polyline: true,
+        rectangle: false,
+        circle: false,
+        marker: false
+      }
+    }).addTo(this.map);
+
+    new L.Control.Draw({
+      edit: {
+        featureGroup: this.featureGroupCheckpoint
+      },
+      draw: {
+        polygon: false,
+        polyline: false,
+        rectangle: false,
+        circle: true,
+        marker: false
+      }
+    }).addTo(this.map);
+
   }
 
 }

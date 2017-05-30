@@ -3,7 +3,6 @@ import { NavController, NavParams, Events } from 'ionic-angular';
 
 import { FormBuilder, Validators } from '@angular/forms';
 
-import * as L from 'mapbox.js';
 import * as leafletDraw from 'leaflet-draw';
 
 import { MapProvider } from '../../providers/map-provider';
@@ -11,14 +10,12 @@ import { TrackProvider } from '../../providers/track-provider';
 import { MsgService } from '../../providers/msg-service';
 
 @Component({
-
   selector: 'page-tool-track-page',
   templateUrl: 'tool-track-page.html'
-  // inputs: ['map']
 })
 export class ToolTrackPagePage {
-  map: any;
-  featureGroup: any;
+  private map: any;
+  private featureGroupTrack: any;
   lat: Number;
   lng: Number;
   latLng: String;
@@ -51,7 +48,8 @@ export class ToolTrackPagePage {
 
   public ngOnInit() {
     this.map = this.mapProvider.getMap();
-    this.createDrawControl();
+    this.featureGroupTrack = this.mapProvider.featureGroupTrack;
+    // this.createTrackLayer();
     this.ceateDrawEvent();
     this.moveMarker();
 
@@ -84,29 +82,15 @@ export class ToolTrackPagePage {
     });
   }
 
-  private createDrawControl () {
-    this.featureGroup = L.featureGroup().addTo(this.map);
-
-    new L.Control.Draw({
-      edit: {
-        featureGroup: this.featureGroup
-      },
-      draw: {
-        polygon: true,
-        polyline: false,
-        rectangle: false,
-        circle: false,
-        marker: false
-      }
-    }).addTo(this.map);
-
-  }
+  // private createTrackLayer() {
+  //   this.featureGroup = L.featureGroup().addTo(this.map);
+  // }
 
   private ceateDrawEvent() {
     this.map.on('draw:created', (e) => { 
       if (e.layerType !== 'polyline') {
-        let message = 'Для построения маршрута используйте полилинию!';
-        this.msgService.alert(message, null);
+        // let message = 'Для построения маршрута используйте полилинию!';
+        // this.msgService.alert(message, null);
         return;
       } 
       this.createTrack(e);
@@ -179,7 +163,7 @@ export class ToolTrackPagePage {
       this.trackProvider.createTrack(objForDb).then((data) => {
         let message = `Маршрут №${this.trackData.number} успешно создан.`;
         this.msgService.alert(message, null);
-        this.featureGroup.clearLayers();
+        this.featureGroupTrack.clearLayers();
         this.clearTrackData();
       }).catch((error) => {
         console.dir(error);
@@ -201,7 +185,7 @@ export class ToolTrackPagePage {
 
   private showPolygonArea(e) {
     // this.featureGroup.clearLayers();
-    this.featureGroup.addLayer(e.layer);
+    this.featureGroupTrack.addLayer(e.layer);
     // e.layer.bindPopup((LGeo.area(e.layer) / 1000000).toFixed(2) + ' km<sup>2</sup>');
     e.layer.openPopup();
   }
