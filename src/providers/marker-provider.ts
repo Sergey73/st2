@@ -33,15 +33,27 @@ export class MarkerProvider {
     //   fillColor: 'red', 
     //   fillOpacity: 0.5
     // };
-    var icon = type == 'self' ? 'assets/img/greenCircle.png' : 'assets/img/yellowCircle.png'
-    var greenIcon = L.icon({
+    // let icon = type == 'self' ? 'assets/img/greenCircle.png' : 'assets/img/yellowCircle.png'
+
+    let icon;
+    switch(type) {
+      case 'self': 
+        icon = 'assets/img/greenCircle.png';
+        break;
+      case 'checkpoint':
+        icon = 'assets/img/redCircle.png';
+        break;
+      case 'other':
+        icon = 'assets/img/yellowCircle.png';
+    }
+    let markerIcon = L.icon({
       iconUrl: icon,
       iconSize: [32, 30],
       iconAnchor: [15, 15]
     });
     let marker = L
       // .circleMarker([54.4151707, 48.3257941], markerOptions)
-      .marker([54.4151707, 48.3257941], {icon: greenIcon})
+      .marker([54.4151707, 48.3257941], {icon: markerIcon})
       .bindTooltip(label, {permanent: true, direction: 'top', offset: [0, -10] })
       .addTo(map);
 

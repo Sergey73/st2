@@ -35,7 +35,9 @@ export class CheckpointPanelComponent {
   }
 
   private createCheckpoint(e) {
-    let newSelfMarker = this.markerProvider.createAddMarker('checkpoint', 'self');
+    let coords = e.layer.getLatLng();
+    let checkpointfMarker = this.markerProvider.createAddMarker('0:35:00', 'checkpoint');
+    checkpointfMarker.setLatLng(coords);
   }
 
 }
