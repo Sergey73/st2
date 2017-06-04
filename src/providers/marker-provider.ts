@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import * as L from 'mapbox.js';
 
-// import * as leafletGeometryutil from 'leaflet-geometryutil';
+import * as leafletGeometryutil from 'leaflet-geometryutil';
 // import * as leafletSnap from 'leaflet-snap';
 
 
@@ -19,7 +19,7 @@ export class MarkerProvider {
     ) {
     // // нужно сделать иначе не работает
     // debugger;
-    // leafletGeometryutil;
+    leafletGeometryutil;
     // leafletSnap
   }
 
@@ -51,11 +51,18 @@ export class MarkerProvider {
       iconSize: [32, 30],
       iconAnchor: [15, 15]
     });
+
+    let coords = [54.3405477, 48.5046386];
     let marker = L
       // .circleMarker([54.4151707, 48.3257941], markerOptions)
-      .marker([54.4151707, 48.3257941], {icon: markerIcon})
-      .bindTooltip(label, {permanent: true, direction: 'top', offset: [0, -10] })
-      .addTo(map);
+      .marker(coords, {icon: markerIcon})
+      .addTo(map)
+      .bindTooltip(label, { 
+        permanent: true,
+        className: 'my-tooltip',
+        direction: 'top', 
+        offset: [0, -20],
+      });
 
     return marker;
   }

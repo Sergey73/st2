@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 
 import * as leafletDraw from 'leaflet-draw';
-
 import { MapProvider } from '../../providers/map-provider';
 import { MarkerProvider } from '../../providers/marker-provider';
 
@@ -38,6 +37,11 @@ export class CheckpointPanelComponent {
     let coords = e.layer.getLatLng();
     let checkpointfMarker = this.markerProvider.createAddMarker('0:35:00', 'checkpoint');
     checkpointfMarker.setLatLng(coords);
+
+    // var me = checkpointfMarker.getElement();
+    // var t = checkpointfMarker.getTooltip();
+    // var te = t.getElement();
+    // te.style.transform = me.style.transform;
   }
 
 }
