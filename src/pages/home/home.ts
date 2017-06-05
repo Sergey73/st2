@@ -95,10 +95,12 @@ export class HomePage {
       // если маркер был создан заменяем его на новый с новым 
       // именем иначе ничего
       if (data.selfMarker) {
+        let map = this.mapProvider.getMap();
         // удалить старый маркер
         this.markerProvider.removeMarker(data.selfMarker);
         // создать и сохранить новый маркер
         let newSelfMarker = this.markerProvider.createAddMarker(data.name, 'self');
+        newSelfMarker.addTo(map);
         data.selfMarker = newSelfMarker;
       }
     });
@@ -368,6 +370,7 @@ export class HomePage {
   // создаем и устанавливаем маркер 
   private dataProcessingOtherUserOnline(item) {
     let data = this.userDataProvider.userData;
+    let map = this.mapProvider.getMap();
 
     // новые координаты широты 
     let newLat = item.publicData.latitude;
@@ -391,6 +394,7 @@ export class HomePage {
 
       // создаем маркер с именем водителя
       let marker = this.markerProvider.createAddMarker(driversName, 'other');
+      marker.addTo(map);
       // сохраняем маркер в локальный объект
       this.localOnlineOtherUsers[key].marker = marker;
     }
@@ -439,6 +443,7 @@ export class HomePage {
 
   // удаляем старый маркер и создаем с новым именем
   private changeNameDriverByKey(item) {
+    let map = this.mapProvider.getMap();
     // текущее имя 
     let currentName = item.publicData.name;
     // ключ в массиве водителей
@@ -451,6 +456,7 @@ export class HomePage {
     this.markerProvider.removeMarker(oldMarker);
     // устанавливаем маркер с новым именем
     let newMarker = this.markerProvider.createAddMarker(currentName, 'other');
+    newMarker.addTo(map);
     // записываем в локальный объект новый маркер
     this.localOnlineOtherUsers[key].marker = newMarker;
   }

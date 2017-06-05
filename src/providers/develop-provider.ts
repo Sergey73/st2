@@ -46,6 +46,7 @@ export class DevelopProvider {
   // определения координат текущего водителя
   public moveMarker() {
     let data = this.userDataProvider.userData;
+    let map = this.mapProvider.getMap();
 
     // разрешает/запрешает движение маркера влево
     let left = true;
@@ -67,13 +68,17 @@ export class DevelopProvider {
     // имя водителя
     let name: string = this.userDataProvider.userData.name;
     // если маркер не создан, создаем маркер
-    if (!data.selfMarker) data.selfMarker = this.markerProvider.createAddMarker(name, 'self');
+    if (!data.selfMarker) {
+      data.selfMarker = this.markerProvider.createAddMarker(name, 'self');
+      data.selfMarker.addTo(map);
+    }
     
     //  // тест на много водителей// для разработки
     // let arr = [];
     // for (let i=0; i<200; i++) {
     //   let n = 'n-' + i;
     //   let m = this.createAddMarker(n);
+    //   m.addTo(map);
     //   arr.push(m);
     // }
     // // end тест на много водителей// для разработки
@@ -117,7 +122,6 @@ export class DevelopProvider {
   // и отрисовываем точно на выбранном маршруте
   public setMarkerOnTrack(marker) {
     let map = this.mapProvider.map;
-    
 
     // в зависимости от уровня зума указать дистанцию привязки к маршруту
     this.distanceCalculationByZoom();
@@ -139,7 +143,7 @@ export class DevelopProvider {
     let map = this.mapProvider.map;
     let zoom = map.getZoom();
 
-    console.dir(`zoom: ${zoom}`);
+    // console.dir(`zoom: ${zoom}`);
     switch(zoom) {
       case 16: 
         this.dictanceForSnap = 8;

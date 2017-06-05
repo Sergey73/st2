@@ -24,17 +24,7 @@ export class MarkerProvider {
   }
 
   // создание маркера и добавление его на карту
-  public createAddMarker(label:string = 'Введите имя', type: string) { 
-    let map = this.mapProvider.map;
-    // let markerOptions = {
-    //   radius: 8,
-    //   color: 'black',
-    //   weight: '1', 
-    //   fillColor: 'red', 
-    //   fillOpacity: 0.5
-    // };
-    // let icon = type == 'self' ? 'assets/img/greenCircle.png' : 'assets/img/yellowCircle.png'
-
+  public createAddMarker(label:string = 'Введите имя', type: string) {
     let icon;
     switch(type) {
       case 'self': 
@@ -54,9 +44,7 @@ export class MarkerProvider {
 
     let coords = [54.3405477, 48.5046386];
     let marker = L
-      // .circleMarker([54.4151707, 48.3257941], markerOptions)
-      .marker(coords, {icon: markerIcon})
-      .addTo(map)
+      .marker(coords, {icon: markerIcon, draggable: true})
       .bindTooltip(label, { 
         permanent: true,
         className: 'my-tooltip',

@@ -86,6 +86,5 @@ export class TrackProvider {
     // добавлямв маршрут в слой
     this.trackLayer.setGeoJSON(path);
   }
-  
 
 }
