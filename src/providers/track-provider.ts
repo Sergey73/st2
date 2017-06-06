@@ -27,10 +27,12 @@ export class TrackProvider {
   // маршрут который выбрал юзер, по которому поедет
   public selectedTrack: {
     path: any,
-    number: number
+    number: number,
+    key: string
   } = {
     path: null,
-    number: null
+    number: null,
+    key: ''
   };
 
   constructor(
@@ -83,8 +85,18 @@ export class TrackProvider {
     // парсим путь маршрута для отображения на карте
     let path = JSON.parse(arr[index].path);
 
+    // сохраняем путь маршрута 
+    this.selectedTrack.key = arr[index].$key;
+    this.selectedTrack.path = path;
+    this.selectedTrack.number = arr[index].number;
+
+
     // добавлямв маршрут в слой
     this.trackLayer.setGeoJSON(path);
   }
 
+  public createCheckpoint(obj) {
+    this.tracksDb
+    
+  }
 }

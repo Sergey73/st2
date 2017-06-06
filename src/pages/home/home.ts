@@ -26,7 +26,7 @@ import { MapProvider } from '../../providers/map-provider';
 export class HomePage {
   
   // переменная  выбранного маршрута, для отображения пользователю
-  public selectedTrack: number;
+  public selectedTrackNum: number;
 
   // флаг для отображения селекта для выбора номера маршрута
   // если не ставить, селект появляется с пустым значением 
@@ -288,7 +288,7 @@ export class HomePage {
   /////////////////// user ////////////////////////
   // выбираем маршрут по которому поедем
   private setUserTrack() {
-    let number = this.selectedTrack;
+    let number = this.selectedTrackNum;
     let obj = {'publicData/trackNumber': number};
     // сохраняем маршрут в БД
     this.userDataProvider.updateData(obj).then( authData => {
@@ -496,7 +496,7 @@ export class HomePage {
     this.trackProvider.showTrack(index);
 
     // выбранный маршрут 
-    this.selectedTrack = this.userDataProvider.userData.trackNumber;
+    this.selectedTrackNum = this.userDataProvider.userData.trackNumber;
 
     this.setUserTrack();
   }

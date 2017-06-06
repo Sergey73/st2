@@ -6,6 +6,7 @@ import { MapProvider } from '../../providers/map-provider';
 import { MarkerProvider } from '../../providers/marker-provider';
 import { UserDataProvider } from '../../providers/user-data-provider';
 import { DevelopProvider } from '../../providers/develop-provider';
+import { TrackProvider } from '../../providers/track-provider';
 
 @Component({
   selector: 'checkpoint-panel',
@@ -21,7 +22,8 @@ export class CheckpointPanelComponent {
     public mapProvider: MapProvider,
     public markerProvider: MarkerProvider,
     public userDataProvider: UserDataProvider,
-    public developProvider: DevelopProvider
+    public developProvider: DevelopProvider,
+    public trackProvider: TrackProvider
 
   ) {
     // нужен сдесь иначе модуль не работает.
@@ -58,10 +60,12 @@ export class CheckpointPanelComponent {
     checkpointfMarker.setLatLng(coords);
     this.showCheckpoint(checkpointfMarker);
     this.developProvider.setMarkerOnTrack(checkpointfMarker);
-    // var me = checkpointfMarker.getElement();
-    // var t = checkpointfMarker.getTooltip();
-    // var te = t.getElement();
-    // te.style.transform = me.style.transform;
+
+    var checkpointObj = {
+      coords: JSON.stringify(coords),
+      time: ''
+    }
+    this.trackProvider.createCheckpoint(checkpointObj);
   }
 
 
