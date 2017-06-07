@@ -96,7 +96,7 @@ export class TrackProvider {
   }
 
   public createCheckpoint(obj) {
-    this.tracksDb
-    
+    var ref = this.tracksDb.$ref.ref;
+    ref.child(this.selectedTrack.key + '/checkpoint').push(obj)
   }
 }
