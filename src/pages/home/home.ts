@@ -495,7 +495,7 @@ export class HomePage {
     // отрисовываем маршрут на карте
     this.trackProvider.showTrack(index);
 
-    // выбранный маршрут 
+    // номер выбранного маршрута
     this.selectedTrackNum = this.userDataProvider.userData.trackNumber;
 
     this.setUserTrack();

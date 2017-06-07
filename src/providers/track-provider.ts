@@ -28,11 +28,13 @@ export class TrackProvider {
   public selectedTrack: {
     path: any,
     number: number,
-    key: string
+    key: string,
+    checkpoint: object
   } = {
     path: null,
     number: null,
-    key: ''
+    key: '',
+    checkpoint: {}
   };
 
   constructor(
@@ -85,18 +87,23 @@ export class TrackProvider {
     // парсим путь маршрута для отображения на карте
     let path = JSON.parse(arr[index].path);
 
-    // сохраняем путь маршрута 
+    // сохраняем данные о выбранном маршруте
     this.selectedTrack.key = arr[index].$key;
     this.selectedTrack.path = path;
     this.selectedTrack.number = arr[index].number;
-
+    this.selectedTrack.checkpoint = arr[index].checkpoint;
+  
+    // событие после которого будут отрисованы контрольные точки
+    this.events.publish('tracksData: selectedDataCreated');
 
     // добавлямв маршрут в слой
     this.trackLayer.setGeoJSON(path);
   }
 
+  // добавляем данные контрольной точки
   public createCheckpoint(obj) {
-    var ref = this.tracksDb.$ref.ref;
-    ref.child(this.selectedTrack.key + '/checkpoint').push(obj)
+    let ref = this.tracksDb.$ref.ref;
+    let arrPoint = ref.child(this.selectedTrack.key + '/checkpoint').push();
+    arrPoint.set(obj);
   }
 }

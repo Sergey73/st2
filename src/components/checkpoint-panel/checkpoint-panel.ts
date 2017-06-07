@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Events } from 'ionic-angular';
 import { ToastController } from 'ionic-angular';
 
 import * as leafletDraw from 'leaflet-draw';
@@ -18,6 +19,7 @@ export class CheckpointPanelComponent {
   private featureGroupCheckpoint: any;
 
   constructor(
+    public events: Events,
     public toastCtrl: ToastController,
     public mapProvider: MapProvider,
     public markerProvider: MarkerProvider,
@@ -36,6 +38,10 @@ export class CheckpointPanelComponent {
     this.userData = this.userDataProvider.userData;
     this.ceateDrawEvent();
     this.editDrawEvent();
+
+    this.events.subscribe('tracksData: selectedDataCreated', () => {
+      this.x();
+    });
   }
 
   private ceateDrawEvent() {
@@ -82,4 +88,15 @@ export class CheckpointPanelComponent {
         });
     });
   }
+
+  private x() {
+       for( let key in this.trackProvider.selectedTrack.checkpoint) {
+      let point = this.trackProvider.selectedTrack.checkpoint[key];
+
+      let checkpointfMarker = this.markerProvider.createAddMarker(point.time, 'checkpoint');
+      checkpointfMarker.setLatLng(JSON.parse(point.coords));
+      this.showCheckpoint(checkpointfMarker);
+    }
+  }
+
 }
