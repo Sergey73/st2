@@ -17,8 +17,7 @@ export class MarkerProvider {
     public mapProvider: MapProvider,
     // public trackProvider: TrackProvider
     ) {
-    // // нужно сделать иначе не работает
-    // debugger;
+    // нужно сделать иначе не работает
     leafletGeometryutil;
     // leafletSnap
   }
@@ -44,7 +43,7 @@ export class MarkerProvider {
 
     let coords = [54.3405477, 48.5046386];
     let marker = L
-      .marker(coords, {icon: markerIcon, draggable: true})
+      .marker(coords, {icon: markerIcon, draggable: false})
       .bindTooltip(label, { 
         permanent: true,
         className: 'my-tooltip',

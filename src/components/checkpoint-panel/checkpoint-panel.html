@@ -1,9 +1,15 @@
 <ion-content>
   <ion-item-group>
-    <ion-item-divider color="light">Параметры контрольных точек</ion-item-divider>
+    <ion-item-divider color="light">Параметры контрольной точки</ion-item-divider>
     <ion-item>
       <ion-label color="primary">время точки</ion-label>
-      <ion-input placeholder="00:15:00" clearInput></ion-input>
+      <!--<ion-input [(ngModel)]="timePoint" placeholder="00:15:00" clearInput></ion-input>-->
+      <ion-datetime 
+        displayFormat="HH:mm:ss" 
+        [(ngModel)]="timePoint"
+        doneText="Готово"
+        cancelText="Отмена"
+      ></ion-datetime>
     </ion-item>
     <ion-item-divider></ion-item-divider>
   </ion-item-group>

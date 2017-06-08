@@ -15,6 +15,8 @@ import { TrackProvider } from '../../providers/track-provider';
 })
 export class CheckpointPanelComponent {
   private map: any;
+  private coutnerPoint: number; // счетчик количества маркеров
+  private timePoint: string // через какое время нужно быть в точке полсе старта
   private userData: any;
   private featureGroupCheckpoint: any;
 
@@ -29,7 +31,8 @@ export class CheckpointPanelComponent {
 
   ) {
     // нужен сдесь иначе модуль не работает.
-    leafletDraw
+    leafletDraw;
+    this.timePoint = '';
   }
 
   public ngOnInit() {
@@ -56,28 +59,47 @@ export class CheckpointPanelComponent {
         toast.present();
         return;
       } 
-      this.createCheckpoint(e);
+
+      this.coutnerPoint = this.coutnerPoint ? ++this.coutnerPoint : 1;
+      let coords = e.layer.getLatLng();
+      let time = this.timePoint;
+      let label = this.createLabel(time);
+      this.createCheckpoint(coords, label);
+
+      var checkpointObj = {
+        coords: JSON.stringify(coords),
+        time: time,
+        num: this.coutnerPoint
+      }
+      this.timePoint
+      this.trackProvider.createCheckpoint(checkpointObj);
     });
   }
 
-  private createCheckpoint(e) {
-    let coords = e.layer.getLatLng();
-    let checkpointfMarker = this.markerProvider.createAddMarker('0:35:00', 'checkpoint');
+  private createCheckpoint(coords, label) {
+    let checkpointfMarker = this.markerProvider.createAddMarker(label, 'checkpoint');
     checkpointfMarker.setLatLng(coords);
     this.showCheckpoint(checkpointfMarker);
     this.developProvider.setMarkerOnTrack(checkpointfMarker);
-
-    var checkpointObj = {
-      coords: JSON.stringify(coords),
-      time: ''
-    }
-    this.trackProvider.createCheckpoint(checkpointObj);
   }
 
-
+  private x() {
+    for(let key in this.trackProvider.selectedTrack.checkpoint) {
+      let point = this.trackProvider.selectedTrack.checkpoint[key];
+      let coords = JSON.parse(point.coords);
+      this.coutnerPoint = +point.num;
+      let label = this.createLabel(point.time) 
+      this.createCheckpoint(coords, label);
+    }
+  }
 
   private showCheckpoint(marker) {
     this.featureGroupCheckpoint.addLayer(marker);
+  }
+
+  private createLabel(time) {
+    return '<div class="checkpoint-marker">' + time + 
+    '<div/><div> точка №' + this.coutnerPoint + '<div>';
   }
 
   private editDrawEvent() {
@@ -89,14 +111,5 @@ export class CheckpointPanelComponent {
     });
   }
 
-  private x() {
-       for( let key in this.trackProvider.selectedTrack.checkpoint) {
-      let point = this.trackProvider.selectedTrack.checkpoint[key];
-
-      let checkpointfMarker = this.markerProvider.createAddMarker(point.time, 'checkpoint');
-      checkpointfMarker.setLatLng(JSON.parse(point.coords));
-      this.showCheckpoint(checkpointfMarker);
-    }
-  }
 
 }
