@@ -25,6 +25,8 @@ export class UserDataProvider {
     myLatitude: any,
     myLongitude: any,
     watchToSelfMarker: boolean  // тоггл для позиционирования карты относительно маркера
+    // добавить поле чтобы определить водитель на маршруте или нет,
+    // надо для восстановление данных времени по маршруту
   } = {
     uid: '', 
     email: '',

@@ -240,6 +240,7 @@ export class HomePage {
     this.startTimer();
     this.setSelfUserCoords();
     this.getUsersDataByTrack();
+    this.events.publish('home: pushGoBtn');
   }
 
   public startTimer() { 

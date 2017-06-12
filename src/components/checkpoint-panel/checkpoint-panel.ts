@@ -3,6 +3,7 @@ import { Events } from 'ionic-angular';
 import { ToastController } from 'ionic-angular';
 
 import * as leafletDraw from 'leaflet-draw';
+import * as moment from 'moment';
 import { MapProvider } from '../../providers/map-provider';
 import { MarkerProvider } from '../../providers/marker-provider';
 import { UserDataProvider } from '../../providers/user-data-provider';
@@ -32,6 +33,7 @@ export class CheckpointPanelComponent {
   ) {
     // нужен сдесь иначе модуль не работает.
     leafletDraw;
+    moment;
     this.timePoint = '';
   }
 
@@ -44,6 +46,10 @@ export class CheckpointPanelComponent {
 
     this.events.subscribe('tracksData: selectedDataCreated', () => {
       this.x();
+    });
+    
+    this.events.subscribe('home: pushGoBtn', () => {
+      this.setLabelTime();
     });
   }
 
@@ -100,6 +106,28 @@ export class CheckpointPanelComponent {
   private createLabel(time) {
     return '<div class="checkpoint-marker">' + time + 
     '<div/><div> точка №' + this.coutnerPoint + '<div>';
+  }
+
+  //устанавливаем время + проверяем устанавливалось ли оно
+  private setLabelTime() {
+
+    this.featureGroupCheckpoint.clearLayers();
+    // this.featureGroupCheckpoint.eachLayer(layer => {
+    //   console.dir(layer);
+    //   let tooltip = layer.getTooltip();
+    //   this.trackProvider.selectedTrack.checkpoint
+
+    // });
+
+
+    for(let key in this.trackProvider.selectedTrack.checkpoint) {
+      let point = this.trackProvider.selectedTrack.checkpoint[key];
+      let coords = JSON.parse(point.coords);
+      this.coutnerPoint = +point.num;
+      let time = moment(point.time, 'HH:mm:ss')
+      let label = this.createLabel(time) 
+      this.createCheckpoint(coords, label);
+    }
   }
 
   private editDrawEvent() {
