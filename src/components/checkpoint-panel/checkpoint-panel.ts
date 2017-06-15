@@ -57,6 +57,8 @@ export class CheckpointPanelComponent {
     this.map.on('draw:created', (e) => { 
       let layerType = e.layerType;
       if (layerType !== 'marker') return;
+      
+      // сделать сервис с тостами 
       if ( !this.userData.trackNumber){
         let toast = this.toastCtrl.create({
           message: 'выберите маршрут для привязки маркера!',
@@ -65,10 +67,32 @@ export class CheckpointPanelComponent {
         toast.present();
         return;
       } 
+      if ( !this.timePoint){
+        let toast = this.toastCtrl.create({
+          message: 'Задайте время точки!',
+          duration: 3000
+        });
+        toast.present();
+        return;
+      } 
 
+      // номер маркера
       this.coutnerPoint = this.coutnerPoint ? ++this.coutnerPoint : 1;
       let coords = e.layer.getLatLng();
-      let time = this.timePoint;
+      // время через которое нужно быть в точке,  если точку старта брать за нуль.
+      let arrTime = this.timePoint.split(':');
+
+      // время которое будем отнимать 
+      let timeA: any = moment({ 
+        hour: +arrTime[0], 
+        minute: +arrTime[1],
+        second: +arrTime[2]
+      });
+
+      let timeB: any = moment({hour: 0});
+      // время в миллисекундах 
+      let time = timeA - timeB;
+
       let label = this.createLabel(time);
       this.createCheckpoint(coords, label);
 
@@ -119,6 +143,7 @@ export class CheckpointPanelComponent {
 
     // });
 
+    let m = moment;
 
     for(let key in this.trackProvider.selectedTrack.checkpoint) {
       let point = this.trackProvider.selectedTrack.checkpoint[key];
