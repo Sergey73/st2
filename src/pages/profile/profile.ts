@@ -3,7 +3,7 @@ import { NavController, NavParams } from 'ionic-angular';
 import { Events } from 'ionic-angular';
 
 import { FormBuilder, Validators } from '@angular/forms';
-import { MsgService } from '../../providers/msg-service';
+import { MsgService } from '../../services/msg.service';
 import { UserDataProvider } from '../../providers/user-data-provider';
 
 @Component({

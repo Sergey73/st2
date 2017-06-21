@@ -69,7 +69,7 @@ export class DevelopProvider {
     let name: string = this.userDataProvider.userData.name;
     // если маркер не создан, создаем маркер
     if (!data.selfMarker) {
-      data.selfMarker = this.markerProvider.createAddMarker(name, 'self');
+      data.selfMarker = this.markerProvider.createMarker(name, 'self');
       data.selfMarker.addTo(map);
     }
     
@@ -77,7 +77,7 @@ export class DevelopProvider {
     // let arr = [];
     // for (let i=0; i<200; i++) {
     //   let n = 'n-' + i;
-    //   let m = this.createAddMarker(n);
+    //   let m = this.createMarker(n);
     //   m.addTo(map);
     //   arr.push(m);
     // }

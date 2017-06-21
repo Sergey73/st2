@@ -3,7 +3,7 @@ import { NavController } from 'ionic-angular';
 
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../providers/auth';
-import { MsgService } from '../../providers/msg-service';
+import { MsgService } from '../../services/msg.service';
 import { UserDataProvider } from '../../providers/user-data-provider';
 
 import { SignupPage } from '../../pages/signup/signup';

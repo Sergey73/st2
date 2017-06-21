@@ -16,12 +16,14 @@ import { DevelopProvider } from '../../providers/develop-provider';
 import { MarkerProvider } from '../../providers/marker-provider';
 import { MapProvider } from '../../providers/map-provider';
 
-// components
-// import { AdminPanelComponent } from '../../components/admin-panel/login';
+// services
+import { ToastService } from '../../services/toast.service';
+
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html',
+  providers: [ToastService]
 })
 export class HomePage {
   
@@ -99,7 +101,7 @@ export class HomePage {
         // удалить старый маркер
         this.markerProvider.removeMarker(data.selfMarker);
         // создать и сохранить новый маркер
-        let newSelfMarker = this.markerProvider.createAddMarker(data.name, 'self');
+        let newSelfMarker = this.markerProvider.createMarker(data.name, 'self');
         newSelfMarker.addTo(map);
         data.selfMarker = newSelfMarker;
       }
@@ -240,7 +242,6 @@ export class HomePage {
     this.startTimer();
     this.setSelfUserCoords();
     this.getUsersDataByTrack();
-    this.events.publish('home: pushGoBtn');
   }
 
   public startTimer() { 
@@ -394,7 +395,7 @@ export class HomePage {
       this.localOnlineOtherUsers[key].name = driversName;
 
       // создаем маркер с именем водителя
-      let marker = this.markerProvider.createAddMarker(driversName, 'other');
+      let marker = this.markerProvider.createMarker(driversName, 'other');
       marker.addTo(map);
       // сохраняем маркер в локальный объект
       this.localOnlineOtherUsers[key].marker = marker;
@@ -456,7 +457,7 @@ export class HomePage {
     // стираем маркер со старым именем
     this.markerProvider.removeMarker(oldMarker);
     // устанавливаем маркер с новым именем
-    let newMarker = this.markerProvider.createAddMarker(currentName, 'other');
+    let newMarker = this.markerProvider.createMarker(currentName, 'other');
     newMarker.addTo(map);
     // записываем в локальный объект новый маркер
     this.localOnlineOtherUsers[key].marker = newMarker;

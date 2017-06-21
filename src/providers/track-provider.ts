@@ -94,14 +94,14 @@ export class TrackProvider {
     this.selectedTrack.checkpoint = arr[index].checkpoint;
   
     // событие после которого будут отрисованы контрольные точки
-    this.events.publish('tracksData: selectedDataCreated');
+    this.events.publish('trackProvider: trackShown');
 
     // добавлямв маршрут в слой
     this.trackLayer.setGeoJSON(path);
   }
 
   // добавляем данные контрольной точки
-  public createCheckpoint(obj) {
+  public saveCheckpointInBd(obj) {
     let ref = this.tracksDb.$ref.ref;
     let arrPoint = ref.child(this.selectedTrack.key + '/checkpoint').push();
     arrPoint.set(obj);

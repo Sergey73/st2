@@ -2,7 +2,7 @@ import { NavController } from 'ionic-angular';
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../providers/auth';
-import { MsgService } from '../../providers/msg-service';
+import { MsgService } from '../../services/msg.service';
 
 @Component({
   selector: 'page-signup',

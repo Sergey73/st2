@@ -24,7 +24,11 @@ page-home {
     left: 0;
   }
   .checkpoint-marker {
-    width: 60px;
+    width: 70px;
+    text-align: center;
+    line-height: 12px;
+    background-color: rgba(1,1,1,1);
+    border: 1px solid;
   }
 }
 

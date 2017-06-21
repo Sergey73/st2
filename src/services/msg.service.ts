@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { AlertController } from 'ionic-angular';
+import { AlertController} from 'ionic-angular';
 
 @Injectable()
 export class MsgService {
+  
   constructor(public alertCtrl: AlertController) {
-
   }
 
   alert(message, callback) {

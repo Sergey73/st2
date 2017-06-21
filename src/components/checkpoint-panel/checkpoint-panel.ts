@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Events } from 'ionic-angular';
-import { ToastController } from 'ionic-angular';
 
 import * as leafletDraw from 'leaflet-draw';
 import * as moment from 'moment';
@@ -9,6 +8,7 @@ import { MarkerProvider } from '../../providers/marker-provider';
 import { UserDataProvider } from '../../providers/user-data-provider';
 import { DevelopProvider } from '../../providers/develop-provider';
 import { TrackProvider } from '../../providers/track-provider';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'checkpoint-panel',
@@ -23,13 +23,12 @@ export class CheckpointPanelComponent {
 
   constructor(
     public events: Events,
-    public toastCtrl: ToastController,
     public mapProvider: MapProvider,
     public markerProvider: MarkerProvider,
     public userDataProvider: UserDataProvider,
     public developProvider: DevelopProvider,
-    public trackProvider: TrackProvider
-
+    public trackProvider: TrackProvider,
+    public toast: ToastService
   ) {
     // нужен сдесь иначе модуль не работает.
     leafletDraw;
@@ -44,12 +43,8 @@ export class CheckpointPanelComponent {
     this.ceateDrawEvent();
     this.editDrawEvent();
 
-    this.events.subscribe('tracksData: selectedDataCreated', () => {
-      this.x();
-    });
-    
-    this.events.subscribe('home: pushGoBtn', () => {
-      this.setLabelTime();
+    this.events.subscribe('trackProvider: trackShown', () => {
+      this.drawCheckpointOnTrack();
     });
   }
 
@@ -58,40 +53,40 @@ export class CheckpointPanelComponent {
       let layerType = e.layerType;
       if (layerType !== 'marker') return;
       
-      // сделать сервис с тостами 
-      if ( !this.userData.trackNumber){
-        let toast = this.toastCtrl.create({
-          message: 'выберите маршрут для привязки маркера!',
-          duration: 3000
-        });
-        toast.present();
+      if ( !this.userData || !this.userData.trackNumber){
+        let message: string = 'выберите маршрут для привязки маркера!';
+        this.toast.showMsg(message);
         return;
       } 
       if ( !this.timePoint){
-        let toast = this.toastCtrl.create({
-          message: 'Задайте время точки!',
-          duration: 3000
-        });
-        toast.present();
+        let message: string = 'Задайте время точки!';
+        this.toast.showMsg(message);
         return;
       } 
 
       // номер маркера
       this.coutnerPoint = this.coutnerPoint ? ++this.coutnerPoint : 1;
       let coords = e.layer.getLatLng();
-      // время через которое нужно быть в точке,  если точку старта брать за нуль.
-      let arrTime = this.timePoint.split(':');
 
-      // время которое будем отнимать 
-      let timeA: any = moment({ 
-        hour: +arrTime[0], 
-        minute: +arrTime[1],
-        second: +arrTime[2]
-      });
+      // сохранение в бд в миллисекундах
+      // // время через которое нужно быть в точке,  если точку старта брать за нуль.
+      // let arrTime = this.timePoint.split(':');
 
-      let timeB: any = moment({hour: 0});
-      // время в миллисекундах 
-      let time = timeA - timeB;
+      // // время которое будем отнимать 
+      // let timeA: any = moment({ 
+      //   hour: +arrTime[0], 
+      //   minute: +arrTime[1],
+      //   second: +arrTime[2]
+      // });
+
+      // // сегодняшнее число со временем 00:00:00
+      // let timeB: any = moment({hour: 0});
+
+      // // время в миллисекундах 
+      // let time = timeA - timeB;
+      // end сохранение в бд в миллисекундах
+
+      let time = this.timePoint;
 
       let label = this.createLabel(time);
       this.createCheckpoint(coords, label);
@@ -101,19 +96,26 @@ export class CheckpointPanelComponent {
         time: time,
         num: this.coutnerPoint
       }
-      this.timePoint
-      this.trackProvider.createCheckpoint(checkpointObj);
+      
+      this.trackProvider.saveCheckpointInBd(checkpointObj);
     });
   }
 
+  private createLabel(time) {
+    return `<div class="checkpoint-marker">
+      ${time}
+      точка № ${this.coutnerPoint}
+    </div>`;
+  }
+  
   private createCheckpoint(coords, label) {
-    let checkpointfMarker = this.markerProvider.createAddMarker(label, 'checkpoint');
-    checkpointfMarker.setLatLng(coords);
-    this.showCheckpoint(checkpointfMarker);
-    this.developProvider.setMarkerOnTrack(checkpointfMarker);
+    let checkpointMarker = this.markerProvider.createMarker(label, 'checkpoint');
+    checkpointMarker.setLatLng(coords);
+    this.showCheckpoint(checkpointMarker);
+    this.developProvider.setMarkerOnTrack(checkpointMarker);
   }
 
-  private x() {
+  private drawCheckpointOnTrack() {
     for(let key in this.trackProvider.selectedTrack.checkpoint) {
       let point = this.trackProvider.selectedTrack.checkpoint[key];
       let coords = JSON.parse(point.coords);
@@ -127,34 +129,6 @@ export class CheckpointPanelComponent {
     this.featureGroupCheckpoint.addLayer(marker);
   }
 
-  private createLabel(time) {
-    return '<div class="checkpoint-marker">' + time + 
-    '<div/><div> точка №' + this.coutnerPoint + '<div>';
-  }
-
-  //устанавливаем время + проверяем устанавливалось ли оно
-  private setLabelTime() {
-
-    this.featureGroupCheckpoint.clearLayers();
-    // this.featureGroupCheckpoint.eachLayer(layer => {
-    //   console.dir(layer);
-    //   let tooltip = layer.getTooltip();
-    //   this.trackProvider.selectedTrack.checkpoint
-
-    // });
-
-    let m = moment;
-
-    for(let key in this.trackProvider.selectedTrack.checkpoint) {
-      let point = this.trackProvider.selectedTrack.checkpoint[key];
-      let coords = JSON.parse(point.coords);
-      this.coutnerPoint = +point.num;
-      let time = moment(point.time, 'HH:mm:ss')
-      let label = this.createLabel(time) 
-      this.createCheckpoint(coords, label);
-    }
-  }
-
   private editDrawEvent() {
     this.map.on('draw:edited', (e) => {
         var layers = e.layers;
@@ -163,6 +137,4 @@ export class CheckpointPanelComponent {
         });
     });
   }
-
-
 }

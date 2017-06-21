@@ -7,13 +7,14 @@ import * as leafletDraw from 'leaflet-draw';
 
 import { MapProvider } from '../../providers/map-provider';
 import { TrackProvider } from '../../providers/track-provider';
-import { MsgService } from '../../providers/msg-service';
+import { MsgService } from '../../services/msg.service';
 
 @Component({
-  selector: 'page-tool-track-page',
-  templateUrl: 'tool-track-page.html'
+  selector: 'track-panel',
+  templateUrl: 'track-panel.html'
 })
-export class ToolTrackPagePage {
+
+export class TrackPanelComponent {
   private map: any;
   private featureGroupTrack: any;
   lat: Number;
@@ -28,7 +29,7 @@ export class ToolTrackPagePage {
   public submitAttempt: boolean = false;
   // end форма
 
-  constructor(
+constructor(
     public navCtrl: NavController, 
     public navParams: NavParams,
     public formBuilder: FormBuilder,
@@ -143,7 +144,7 @@ export class ToolTrackPagePage {
     if (!this.toolTrackForm.valid){
       console.log(this.toolTrackForm.value);
     } else {
-      if(!this.trackData.path && !this.trackData.path.geometry) {
+      if(!this.trackData.path || !this.trackData.path.geometry) {
         let message = 'Постройте маршрут!';
         this.msgService.alert(message, null);
         return;

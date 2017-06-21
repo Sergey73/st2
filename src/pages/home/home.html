@@ -51,7 +51,6 @@
 
 </ion-header>
 
-<!--<admin-panel></admin-panel>-->
 <ion-content>
     <ion-fab right top>
     <button ion-fab color="light" (click)="hideAllMenu()"><ion-icon name="arrow-dropdown"></ion-icon></button>
@@ -62,7 +61,7 @@
   </ion-fab>
 </ion-content>
  
-<page-tool-track-page [hidden]="!driverPathMenu"></page-tool-track-page>
+<track-panel [hidden]="!driverPathMenu"></track-panel>
 <checkpoint-panel [hidden]="!checkPointMenu"></checkpoint-panel>
 <ion-content class="map">
   <div class="map__container" id='map'></div>

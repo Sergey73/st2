@@ -11,14 +11,14 @@ import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { SignupPage } from '../pages/signup/signup';
 import { ResetPasswordPage } from '../pages/reset-password/reset-password';
-import { ToolTrackPagePage } from '../pages/tool-track-page/tool-track-page';
+// import { ToolTrackPagePage } from '../pages/tool-track-page/tool-track-page';
 
 import { ProfilePage } from '../pages/profile/profile';
 
 // my servicies
 import { MapProvider } from '../providers/map-provider';
 import { AuthService } from '../providers/auth';
-import { MsgService } from '../providers/msg-service';
+import { MsgService } from '../services/msg.service';
 import { UserDataProvider } from '../providers/user-data-provider';
 import { OtherUsersProvider } from '../providers/other-users-provider';
 import { TrackProvider } from '../providers/track-provider';
@@ -29,9 +29,9 @@ import { MarkerProvider } from '../providers/marker-provider';
 import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
 
 // components
-import { AdminPanelComponent } from '../components/admin-panel/admin-panel';
 import { TimerComponent } from '../components/timer/timer';
 import { CheckpointPanelComponent } from '../components/checkpoint-panel/checkpoint-panel';
+import { TrackPanelComponent } from '../components/track-panel/track-panel';
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyD8cHdez2j1JTcQ4hfPoFs3YCsRSgtPfGY',
@@ -56,10 +56,9 @@ const myFirebaseAuthConfig = {
     SignupPage,
     ResetPasswordPage,
     ProfilePage,
-    ToolTrackPagePage,
-    AdminPanelComponent,
     TimerComponent,
-    CheckpointPanelComponent
+    CheckpointPanelComponent,
+    TrackPanelComponent
   ],
   imports: [
     BrowserModule,
@@ -73,8 +72,7 @@ const myFirebaseAuthConfig = {
     LoginPage,
     SignupPage,
     ResetPasswordPage,
-    ProfilePage,
-    ToolTrackPagePage
+    ProfilePage
   ],
   providers: [
     StatusBar,
