@@ -43,6 +43,7 @@ export class HomePage {
   public selectedIndexTrack: any = '';
   public showBtnStart: boolean = false;
   public showBtnStop: boolean = false;
+  public showBtnResumeLap: boolean = false;
   
 
   // функция для обновления коориднат маркера
@@ -231,29 +232,66 @@ export class HomePage {
     this.userDataProvider.getData();
   }
 
-  public showAllDrivers() {
+  public resumeLap() {
+    // после нажатия кнопки "Продолжить", продолжаем счет секундомера
+    this.resumeTimer();
+    this.actionAfterStart();
+  }
+
+  public startLap() {
+    // как только нажали кнопку 'Поехали' запускаем таймер
+    this.startTimer();
+    this.actionAfterStart();
+  }
+
+  // продолжаем счет секундомера
+  private resumeTimer() {
+    this.events.publish('timer: resume');
+  }
+  
+  public startTimer() { 
+    // время начала старта круга
+    let timeStartLap = new Date();
+    // устанавливаем время старта круга
+    this.updateTimer(timeStartLap);
+    // отправляем событие в таймер для запуска
+    this.events.publish('timer: start');
+  }
+
+  private actionAfterStart() {   
     // функция имитирует передвижение текущего водителя
     // удалить после разработки !!! 
     this.developProvider.moveMarker();
     
     this.showBtnStop = true;
     this.showBtnStart = false;
-    // как только нажали кнопку 'Поехали' запускаем таймер
-    this.startTimer();
+    this.showBtnResumeLap = false;
     this.setSelfUserCoords();
     this.getUsersDataByTrack();
   }
 
-  public startTimer() { 
-    // отправляем событие в таймер для запуска
-    this.events.publish('timer: start');
+  private setToZeroTimer () {
+    // обнуляем время старта круга
+    this.updateTimer('');
+    // отправляем событие в таймер для сброса счетчика
+    this.events.publish('timer: setToZero');
   }
 
-  public hideAllDrivers() {
-    let data =  this.userDataProvider.userData;
 
+  private updateTimer(date: Date | string) {
+    // время старта круга
+    let obj = {'publicData/timeStartLap': date};
+    // обновляем время старта круга
+    this.userDataProvider.updateData(obj)
+  }
+
+  public finishLap() {
+    let data =  this.userDataProvider.userData;
+    
+    this.setToZeroTimer();
     this.showBtnStart = true;
     this.showBtnStop = false;
+    this.showBtnResumeLap = false;
     this.stopSetSelfUserCoords();
 
     // останавливаем функцию для получения координат других 
@@ -296,9 +334,14 @@ export class HomePage {
     this.userDataProvider.updateData(obj).then( authData => {
       // показываем кнопку старта
       this.showBtnStart = true;
+      
+      // устанавливаем кнопку "продолжить" в true, которая продолжает 
+      // время секундомера после последней остановки ( например при вылете программы)
+      let data =  this.userDataProvider.userData;
+      this.showBtnResumeLap = data.timeStartLap ? true : false;
 
       // для разработки удалить после
-      this.showAllDrivers();
+      // this.startLap();
       // для разработки удалить после
     }, error => {
       console.dir(error);

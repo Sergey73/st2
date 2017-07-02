@@ -15,10 +15,18 @@
 
     <ion-buttons end>
       <button 
+        *ngIf="showBtnResumeLap" 
+        ion-button block 
+        type="submit" 
+        (click)="resumeLap()"
+      >Продолжить</button>
+    </ion-buttons>
+    <ion-buttons end>
+      <button 
         *ngIf="showBtnStart" 
         ion-button block 
         type="submit" 
-        (click)="showAllDrivers()"
+        (click)="startLap()"
       >Поехали</button>
     </ion-buttons>
     <ion-buttons end>
@@ -26,7 +34,7 @@
         *ngIf="showBtnStop" 
         ion-button block 
         type="submit" 
-        (click)="hideAllDrivers()"
+        (click)="finishLap()"
       >Стоп</button>
     </ion-buttons>
 

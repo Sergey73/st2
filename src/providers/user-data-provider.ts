@@ -14,30 +14,32 @@ export class UserDataProvider {
   // public needUpdateUsersDb: FirebaseObjectObservable<any>;
   private userDb: FirebaseListObservable<any>;
   userData: {
-    uid: string, 
     email: string,
-    name: string,
-    role: string,
-    key: string,          // ключ в БД
-    trackNumber: number,  // номер маршрута
     inMove: boolean,      // если false другие водители не будут получать координаты этого водителя
-    selfMarker: any,      // маркер своего местоположения 
+    key: string,          // ключ в БД
     myLatitude: any,
     myLongitude: any,
+    name: string,
+    role: string,
+    selfMarker: any,      // маркер своего местоположения 
+    timeStartLap: string,
+    trackNumber: number,  // номер маршрута
+    uid: string, 
     watchToSelfMarker: boolean  // тоггл для позиционирования карты относительно маркера
     // добавить поле чтобы определить водитель на маршруте или нет,
     // надо для восстановление данных времени по маршруту
   } = {
-    uid: '', 
     email: '',
-    name: '',
-    role: '',
-    key: '',
-    trackNumber: null,
     inMove: false,
-    selfMarker: null,
+    key: '',
     myLatitude: 54.30801120099681,
     myLongitude: 48.39649200439454,
+    name: '',
+    role: '',
+    selfMarker: null,
+    timeStartLap: '',
+    trackNumber: null,
+    uid: '', 
     watchToSelfMarker: false
   };
 
@@ -91,9 +93,10 @@ export class UserDataProvider {
   }
 
   private getUserData(data: any) {
+    this.userData.key = data.$key;
     this.userData.name = data.publicData.name;
     this.userData.role = data.role;
-    this.userData.key = data.$key;
+    this.userData.timeStartLap = data.publicData.timeStartLap;
   }
 
 }

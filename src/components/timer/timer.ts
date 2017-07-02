@@ -28,6 +28,12 @@ export class TimerComponent {
     this.events.subscribe('timer: start', () => {
       this.startTimer();
     });
+    this.events.subscribe('timer: setToZero', () => {
+      this.setToZeroTimer();
+    });
+    this.events.subscribe('timer: resume', () => {
+      this.resumeTimer();
+    });
   }
 
   hasFinished() {
@@ -55,12 +61,17 @@ export class TimerComponent {
     this.timerTick();
   }
 
+  setToZeroTimer() {
+    this.timer.secondsPassed = -1;
+  }
+
   pauseTimer() {
     this.timer.runTimer = false;
   }
 
   resumeTimer() {
-    this.startTimer();
+    // this.startTimer();
+    
   }
 
   timerTick() {

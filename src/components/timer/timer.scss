@@ -1,5 +1,14 @@
 timer {
   width: 200px;
+  .card {
+    height: 40px;
+    .card-header {
+      padding: 0;
+      .timer-button {
+        font-size: 4.4rem;
+      }
+    }
+  }
   &_head {
     background-color: red;
   }
