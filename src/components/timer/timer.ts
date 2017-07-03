@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Events } from 'ionic-angular';
+import { UserDataProvider } from '../../providers/user-data-provider';
 
 export interface CountdownTimer {
     secondsPassed: number;
@@ -20,7 +21,10 @@ export class TimerComponent {
   // @Input() timeInSeconds: number;
   timer: CountdownTimer;
 
-  constructor(public events: Events) {
+  constructor(
+    public events: Events,
+    public userDataProvider: UserDataProvider
+  ) {
   }
   
   ngOnInit() {
@@ -70,8 +74,17 @@ export class TimerComponent {
   }
 
   resumeTimer() {
-    // this.startTimer();
-    
+    // получаем время начала круга
+    let time = this.userDataProvider.userData.timeStartLap;
+    // преобразуем его в миллисекунды
+    let date = +new Date(time);
+    // получаем время на данный момент
+    let nowDate = +new Date();
+    // вычисляем сколько прошло с момента старта 
+    // круга и сохраняем в переменную ( в секундах)
+    this.timer.secondsPassed = (nowDate - date) / 1000;
+    // запускаем таймер учитывая старт круга
+    this.startTimer();
   }
 
   timerTick() {

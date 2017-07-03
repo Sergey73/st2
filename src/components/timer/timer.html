@@ -1,17 +1,47 @@
-<ion-card *ngIf="timer">
+<!--<ion-card>-->
+  <!--<ion-list>
+    <button outline
+
+    >
+      {{timer.displayTime}}
+      <ion-icon name="timer"></ion-icon>
+    </button>
+  </ion-list>-->
+
+  <!--<ion-row center>
+    <ion-col center text-center>-->
+      <button ion-button icon-center outline large>
+        <div>
+          {{timer.displayTime}}
+        </div>
+        <ion-datetime 
+          displayFormat="HH:mm:ss" 
+          [(ngModel)]="timePoint"
+          doneText="Готово"
+          cancelText="Отмена"
+        ></ion-datetime>
+        <ion-icon name="timer"></ion-icon>
+      </button>
+    <!--</ion-col>
+  </ion-row>-->
+
+<!--</ion-card>-->
+
+
+<!--<ion-card *ngIf="timer">
 	<ion-card-header>
 		<button 
       ion-button 
        block clear class="timer-button"
     >{{timer.displayTime}}</button>
-	<!--	<button ion-button 
+	<button ion-button 
       *ngIf="!timeInSeconds || timeInSeconds == 0" 
       large block clear 
       class="timer-button"
-    >Timer set up incorrectly</button>-->
+    >Timer set up incorrectly</button>
 	</ion-card-header>
-	<!--<ion-item *ngIf="timeInSeconds && timeInSeconds > 0">-->
-	<!--<ion-item>
+	<ion-item *ngIf="timeInSeconds && timeInSeconds > 0">
+	<ion-item>
 		<button ion-button clear 
       color="danger" 
       (click)="initTimer()" 
@@ -45,5 +75,5 @@
       <ion-icon name="play"></ion-icon>
       Start
     </button>
-	</ion-item>-->
-</ion-card>
+	</ion-item>
+</ion-card>-->
