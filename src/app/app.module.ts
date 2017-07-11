@@ -13,6 +13,7 @@ import { SignupPage } from '../pages/signup/signup';
 import { ResetPasswordPage } from '../pages/reset-password/reset-password';
 
 import { ProfilePage } from '../pages/profile/profile';
+import { TimePage } from '../pages/time/time';
 
 // my servicies
 import { MapProvider } from '../providers/map-provider';
@@ -55,6 +56,7 @@ const myFirebaseAuthConfig = {
     SignupPage,
     ResetPasswordPage,
     ProfilePage,
+    TimePage,
     TimerComponent,
     CheckpointPanelComponent,
     TrackPanelComponent
@@ -71,7 +73,8 @@ const myFirebaseAuthConfig = {
     LoginPage,
     SignupPage,
     ResetPasswordPage,
-    ProfilePage
+    ProfilePage,
+    TimePage
   ],
   providers: [
     StatusBar,

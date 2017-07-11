@@ -1,0 +1,19 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Время</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content padding>
+    <ion-item>
+      <ion-label> установить время</ion-label>
+      <ion-datetime 
+        displayFormat="HH:mm:ss" 
+        [(ngModel)]="timePoint"
+        doneText="Готово"
+        cancelText="Отмена"
+      ></ion-datetime>
+    </ion-item>
+</ion-content>

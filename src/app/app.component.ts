@@ -9,6 +9,7 @@ import { AuthService } from '../providers/auth';
 // import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { ProfilePage } from '../pages/profile/profile';
+import { TimePage } from '../pages/time/time';
 
 @Component({
   templateUrl: 'app.html'
@@ -23,7 +24,8 @@ export class MyApp {
     public authService: AuthService
   ) { 
     this.pages = [
-      { title: 'профиль', component: ProfilePage }
+      { title: 'профиль', component: ProfilePage },
+      { title: 'время', component: TimePage }
     ];
     
     this.initializeApp();
