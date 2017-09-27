@@ -246,7 +246,7 @@ export class HomePage {
 
   // продолжаем счет секундомера
   private resumeTimer() {
-    this.events.publish('timer: resume');
+    this.events.publish('timer:resume');
   }
   
   public startTimer() { 
@@ -255,7 +255,7 @@ export class HomePage {
     // устанавливаем время старта круга
     this.updateTimer(timeStartLap);
     // отправляем событие в таймер для запуска
-    this.events.publish('timer: start');
+    this.events.publish('timer:start');
   }
 
   private actionAfterStart() {   
@@ -274,7 +274,7 @@ export class HomePage {
     // обнуляем время старта круга
     this.updateTimer('');
     // отправляем событие в таймер для сброса счетчика
-    this.events.publish('timer: setToZero');
+    this.events.publish('timer:stop');
   }
 
 

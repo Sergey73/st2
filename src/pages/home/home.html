@@ -6,7 +6,8 @@
     
     <timer></timer>
 
-    <ion-buttons end style="display: none">
+    <!-- <ion-buttons end style="display: none"> -->
+    <ion-buttons end>
       <ion-item>
         <ion-label>я в центре</ion-label>
         <ion-toggle [(ngModel)]="watchToSelfMarker" (ionChange)="setWatchToSelfMarker()"></ion-toggle>
@@ -38,7 +39,8 @@
       >Стоп</button>
     </ion-buttons>
 
-    <ion-buttons style="display: none"
+    <!-- <ion-buttons style="display: none" -->
+    <ion-buttons
       [hidden]="loadDataUser && loadDataAllTracks ||  !showBtnStart && showBtnStop" 
       end>
       <ion-item>
