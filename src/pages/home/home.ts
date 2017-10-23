@@ -156,9 +156,10 @@ export class HomePage {
     // прекращаем запись в БД
     this.stopSetSelfUserCoords();
     // переходим на станицу входа
-    this.authService.logout().then(response => {
-      this.navCtrl.setRoot(LoginPage);
-    });
+    this.authService.logout()
+      .then(response => {
+        this.navCtrl.setRoot(LoginPage);
+      });
   }
 
   // menu

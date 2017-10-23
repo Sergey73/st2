@@ -65,7 +65,8 @@ export class CheckpointPanelComponent {
       } 
 
       // номер маркера
-      this.coutnerPoint = this.coutnerPoint ? ++this.coutnerPoint : 1;
+      this.coutnerPoint = this.coutnerPoint ? 
+        ++this.coutnerPoint : 1;
       let coords = e.layer.getLatLng();
 
       // сохранение в бд в миллисекундах
@@ -111,6 +112,10 @@ export class CheckpointPanelComponent {
   private createCheckpoint(coords, label) {
     let checkpointMarker = this.markerProvider.createMarker(label, 'checkpoint');
     checkpointMarker.setLatLng(coords);
+    checkpointMarker.on('click', e => {
+      // устанавливать класс редактируемого маркера
+      console.dir(e);
+    });
     this.showCheckpoint(checkpointMarker);
     this.developProvider.setMarkerOnTrack(checkpointMarker);
   }
@@ -132,6 +137,7 @@ export class CheckpointPanelComponent {
   private editDrawEvent() {
     this.map.on('draw:edited', (e) => {
         var layers = e.layers;
+        console.dir('SAVE');
         layers.eachLayer(function (layer) {
             //do whatever you want; most likely save back to db
         });
