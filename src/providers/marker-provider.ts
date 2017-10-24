@@ -57,7 +57,8 @@ export class MarkerProvider {
     let icon = L.icon({
       iconUrl: path,
       iconSize: [32, 30],
-      iconAnchor: [15, 15]
+      iconAnchor: [15, 15],
+      className: `${type}-marker`
     });
     
     return icon;

@@ -103,7 +103,7 @@ export class CheckpointPanelComponent {
   }
 
   private createLabel(time) {
-    return `<div class="checkpoint-marker">
+    return `<div class="checkpoint-label">
       ${time}
       точка № ${this.coutnerPoint}
     </div>`;
@@ -113,8 +113,13 @@ export class CheckpointPanelComponent {
     let checkpointMarker = this.markerProvider.createMarker(label, 'checkpoint');
     checkpointMarker.setLatLng(coords);
     checkpointMarker.on('click', e => {
+      let markerIconClass = 'selected';
+
+      this.featureGroupCheckpoint.eachLayer(marker => {
+        marker._icon.classList.remove(markerIconClass);
+      })
       // устанавливать класс редактируемого маркера
-      console.dir(e);
+      e.originalEvent.target.classList.add(markerIconClass);
     });
     this.showCheckpoint(checkpointMarker);
     this.developProvider.setMarkerOnTrack(checkpointMarker);

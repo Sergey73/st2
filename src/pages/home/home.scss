@@ -12,6 +12,9 @@ page-home {
     }
   }
 
+  .checkpoint-marker.selected {
+    border: 1px solid green;
+  }
   // хак для имени водителей, иначе имя не видно
   .leaflet-tooltip-pane {
  
@@ -23,7 +26,7 @@ page-home {
     position: absolute;
     left: 0;
   }
-  .checkpoint-marker {
+  .checkpoint-label {
     width: 70px;
     text-align: center;
     line-height: 12px;
