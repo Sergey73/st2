@@ -119,8 +119,9 @@ export class HomePage {
       this.loadDataAllTracks = false;
 
       // для разработки удалить после
-      // this.selectedIndexTrack = 1;
-      // this.selectTrack();
+      // автоматический выбор 3-го маршрута
+      this.selectedIndexTrack = 2;
+      this.selectTrack();
       // для разработки удалить после
     });
 

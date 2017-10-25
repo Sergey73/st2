@@ -20,6 +20,7 @@ export class CheckpointPanelComponent {
   private timePoint: string // через какое время нужно быть в точке полсе старта
   private userData: any;
   private featureGroupCheckpoint: any;
+  private selectedCheckpointMarker: any; // выбранный элемент для редактирования
 
   constructor(
     public events: Events,
@@ -115,11 +116,15 @@ export class CheckpointPanelComponent {
     checkpointMarker.on('click', e => {
       let markerIconClass = 'selected';
 
-      this.featureGroupCheckpoint.eachLayer(marker => {
-        marker._icon.classList.remove(markerIconClass);
-      })
+      // удаляем класс с выбранного маркера
+      this.selectedCheckpointMarker ? 
+        this.selectedCheckpointMarker.classList.remove(markerIconClass) : null;
+      
+      // сохраняем в переменную новый выбранный маркер
+      this.selectedCheckpointMarker = e.originalEvent.target;
+
       // устанавливать класс редактируемого маркера
-      e.originalEvent.target.classList.add(markerIconClass);
+      this.selectedCheckpointMarker.classList.add(markerIconClass);
     });
     this.showCheckpoint(checkpointMarker);
     this.developProvider.setMarkerOnTrack(checkpointMarker);
