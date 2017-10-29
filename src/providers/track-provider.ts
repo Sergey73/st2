@@ -8,6 +8,9 @@ import * as L from 'mapbox.js';
 import { MapProvider } from './map-provider';
 import { UserDataProvider } from './user-data-provider';
 
+// iface
+import { Checkpoint } from '../interfaces/Checkpoint';
+
 import { 
   AngularFire, 
   FirebaseListObservable
@@ -105,5 +108,12 @@ export class TrackProvider {
     let ref = this.tracksDb.$ref.ref;
     let arrPoint = ref.child(this.selectedTrack.key + '/checkpoint').push();
     arrPoint.set(obj);
+  }
+
+  // обновление данных контрольной точки
+  public updateCheckpoint(key: string, obj: Checkpoint) {
+    this.tracksDb.$ref.ref
+      .child(`${this.selectedTrack.key}/checkpoint/${key}`)
+      .update(obj);
   }
 }

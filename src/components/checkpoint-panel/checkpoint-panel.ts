@@ -10,6 +10,8 @@ import { DevelopProvider } from '../../providers/develop-provider';
 import { TrackProvider } from '../../providers/track-provider';
 import { ToastService } from '../../services/toast.service';
 
+import { Checkpoint } from '../../interfaces/Checkpoint';
+
 @Component({
   selector: 'checkpoint-panel',
   templateUrl: 'checkpoint-panel.html'
@@ -21,6 +23,7 @@ export class CheckpointPanelComponent {
   private userData: any;
   private featureGroupCheckpoint: any;
   private selectedCheckpointMarker: any; // выбранный элемент для редактирования
+  private currentChecpointObj: Checkpoint;
 
   constructor(
     public events: Events,
@@ -93,16 +96,28 @@ export class CheckpointPanelComponent {
       let label = this.createLabel(time);
       this.createCheckpoint(coords, label);
 
-      var checkpointObj = {
+      this.currentChecpointObj = {
         coords: JSON.stringify(coords),
         time: time,
         num: this.coutnerPoint
       }
       
-      this.trackProvider.saveCheckpointInBd(checkpointObj);
     });
   }
+  
+  public saveCheckpointData() {
+    // либо создаем новую точку, либо обновляем 
+  }
 
+  public saveCheckpointInBd(){
+    this.trackProvider.saveCheckpointInBd(this.currentChecpointObj);
+  }
+
+  public updateCheckpointInBd(){
+    // обновляем контрольную точку
+    // this.trackProvider.updateCheckpoint('-Kx9EhFcLeBQuTKsuHDN', obj);
+  }
+ 
   private createLabel(time) {
     return `<div class="checkpoint-label">
       ${time}

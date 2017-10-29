@@ -121,7 +121,7 @@ export class HomePage {
       // для разработки удалить после
       // автоматический выбор 3-го маршрута
       this.selectedIndexTrack = 2;
-      this.selectTrack();
+      //this.selectTrack();
       // для разработки удалить после
     });
 
