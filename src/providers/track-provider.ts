@@ -103,15 +103,15 @@ export class TrackProvider {
     this.trackLayer.setGeoJSON(path);
   }
 
-  // добавляем данные контрольной точки
+  // добавляем данные контрольной точки в БД
   public saveCheckpointInBd(obj) {
     let ref = this.tracksDb.$ref.ref;
     let arrPoint = ref.child(this.selectedTrack.key + '/checkpoint').push();
     arrPoint.set(obj);
   }
 
-  // обновление данных контрольной точки
-  public updateCheckpoint(key: string, obj: Checkpoint) {
+  // обновление данных контрольной точки в БД
+  public updateCheckpoint(key: string, obj) {
     this.tracksDb.$ref.ref
       .child(`${this.selectedTrack.key}/checkpoint/${key}`)
       .update(obj);
