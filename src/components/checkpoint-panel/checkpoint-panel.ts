@@ -25,6 +25,10 @@ export class CheckpointPanelComponent {
   private featureGroupCheckpoint: any;
   private selectedCheckpointMarker: any; // выбранный маркер для редактирования
   private checpointObjForSaveDB: Checkpoint;
+  private typeEditedObj: string; // тип редактированного объекта (объект на который кликнули)
+  private editBtnPressed: boolean; // кнопка редактирования нажата, или нет
+  private objMarkersKeyForUpdate: any = {};
+  private objAllCheckopints: any = {}; // при создании контрольных точек сохраняем их в объект
 
   constructor(
     public events: Events,
@@ -48,6 +52,12 @@ export class CheckpointPanelComponent {
     this.ceateDrawEvent();
     this.editDrawEvent();
     this.moveMarker();
+    this.startDrawEvent();
+    this.stopDrawEvent();
+
+    this.deletedMarker();
+    this.deleteStartMarker();
+    this.deleteStopMarker();
 
     this.events.subscribe('trackProvider: trackShown', () => {
       this.drawCheckpointOnTrack();
@@ -56,64 +66,68 @@ export class CheckpointPanelComponent {
 
   // создание новой контрольной точки
   private ceateDrawEvent() {
-    this.map.on('draw:created', (e) => { 
-      // убираем выделение с выделенной контрольной точки
-      this.selectedCheckpointMarker = null;
-      // удаляем класс
-      let markerIconClass = 'selected';
-      this.removeMarkerClass(markerIconClass);
-
-      let layerType = e.layerType;
-      if (layerType !== 'marker') return;
-      
-      if ( !this.userData || !this.userData.trackNumber){
-        let message: string = 'выберите маршрут для привязки маркера!';
-        this.toast.showMsg(message);
-        return;
-      } 
-
-      // если время точки не проставлено выходим из функции
-      if ( !this.chckTimePoint()){return } 
-
-      // номер контрольной точки
-      this.coutnerPoint = this.coutnerPoint ? 
-        ++this.coutnerPoint : 1;
-      let coords = e.layer.getLatLng();
-
-      // сохранение в бд в миллисекундах
-      // // время через которое нужно быть в точке,  если точку старта брать за нуль.
-      // let arrTime = this.timePoint.split(':');
-
-      // // время которое будем отнимать 
-      // let timeA: any = moment({ 
-      //   hour: +arrTime[0], 
-      //   minute: +arrTime[1],
-      //   second: +arrTime[2]
-      // });
-
-      // // сегодняшнее число со временем 00:00:00
-      // let timeB: any = moment({hour: 0});
-
-      // // время в миллисекундах 
-      // let time = timeA - timeB;
-      // end сохранение в бд в миллисекундах
-
-      let time = this.timePoint;
-
-      let label = this.createLabel(time);
-      // создаем контрольную точку для сохранения в БД
-      this.createCheckpoint(coords, label);
-
-      // объект который еще не сохранен в БД но отрисован на карте
-      this.checpointObjForSaveDB = {
-        coords: JSON.stringify(coords),
-        time: time,
-        num: this.coutnerPoint
-      }
-      
+    this.map.on('draw:created', (e) => {
+      if (e.layerType === 'marker') this.createNewMarker(e);      
     });
   }
   
+  private createNewMarker(e) {
+    // убираем выделение с выделенной контрольной точки
+    this.selectedCheckpointMarker = null;
+    // удаляем класс
+    let markerIconClass = 'selected';
+    this.selectedCheckpointMarker ? 
+      this.removeMarkerClass(markerIconClass) : null;
+
+    let layerType = e.layerType;
+    if (layerType !== 'marker') return;
+    
+    if ( !this.userData || !this.userData.trackNumber){
+      let message: string = 'выберите маршрут для привязки маркера!';
+      this.toast.showMsg(message);
+      return;
+    } 
+
+    // если время точки не проставлено выходим из функции
+    if ( !this.chckTimePoint()){return } 
+
+    // номер контрольной точки
+    this.coutnerPoint = this.coutnerPoint ? 
+      ++this.coutnerPoint : 1;
+    let coords = e.layer.getLatLng();
+
+    // сохранение в бд в миллисекундах
+    // // время через которое нужно быть в точке,  если точку старта брать за нуль.
+    // let arrTime = this.timePoint.split(':');
+
+    // // время которое будем отнимать 
+    // let timeA: any = moment({ 
+    //   hour: +arrTime[0], 
+    //   minute: +arrTime[1],
+    //   second: +arrTime[2]
+    // });
+
+    // // сегодняшнее число со временем 00:00:00
+    // let timeB: any = moment({hour: 0});
+
+    // // время в миллисекундах 
+    // let time = timeA - timeB;
+    // end сохранение в бд в миллисекундах
+
+    let time = this.timePoint;
+
+    let label = this.createLabel(time);
+    // создаем контрольную точку для сохранения в БД
+    this.createCheckpoint(coords, label);
+
+    // объект который еще не сохранен в БД но отрисован на карте
+    this.checpointObjForSaveDB = {
+      coords: JSON.stringify(coords),
+      time: time,
+      num: this.coutnerPoint
+    }
+  }
+
   private chckTimePoint(): boolean {
     if ( !this.timePoint){
       let message: string = 'Задайте время точки!';
@@ -123,32 +137,33 @@ export class CheckpointPanelComponent {
     return true;
   }
   
-  public saveCheckpointData() {
+  public saveCheckpointData(): void {
     // либо создаем новую точку, либо обновляем 
     this.selectedCheckpointMarker === null ? 
       this.saveCheckpointInBd() : 
       this.updateCheckpointInBd();
   }
 
-  private saveCheckpointInBd(){
+  private saveCheckpointInBd() {
     this.trackProvider.saveCheckpointInBd(this.checpointObjForSaveDB);
   }
 
-  private updateCheckpointInBd(){
+  private updateCheckpointInBd() {
     // ключ в БД
-    let key: string = this.selectedCheckpointMarker.target.options.key;
+    // let key: string = this.selectedCheckpointMarker.target.options.key;
     
     // если время точки не проставлено выходим из функции
-    if ( !this.chckTimePoint()){return } 
+    // if ( !this.chckTimePoint()){return } 
     
-    // создаем объект с новыми данными для обновления контрольной точки
-    let updatedCheckpointObj = {
-      coords: JSON.stringify(this.selectedCheckpointMarker.target.getLatLng()),
-      time: this.timePoint
-    };
-
-    // обновляем контрольную точку
-    this.trackProvider.updateCheckpoint(key, updatedCheckpointObj);
+    for (let key in this.objMarkersKeyForUpdate) {
+      let obj = this.objAllCheckopints[key];
+      let updatedCheckpointObj = {
+        coords: JSON.stringify(obj.getLatLng()),
+        time: obj.options.time
+      };
+      // обновляем контрольную точку
+      this.trackProvider.updateCheckpoint(key, updatedCheckpointObj);
+    }
   }
  
   private createLabel(time) {
@@ -164,24 +179,41 @@ export class CheckpointPanelComponent {
     checkpointMarker.setLatLng(coords);
     checkpointMarker.options.key = key;
     checkpointMarker.options.time = time;
-    checkpointMarker.on('click', e => {
-      this.checpointObjForSaveDB = null;
-
-      let markerIconClass = 'selected';
-      // удаляем класс с предыдущего выбранного маркера
-      this.selectedCheckpointMarker ? 
-        this.removeMarkerClass(markerIconClass) : null;
-      
-      // сохраняем в переменную новый выбранный маркер, который хотим редактировать
-      this.selectedCheckpointMarker = e;
-
-      // устанавливать класс редактируемого маркера
-      this.addMarkerClass(markerIconClass);
-      // устанавлилваем время контрольной точки в поле для редактирования
-      this.timePoint = e.target.options.time;
+    
+    checkpointMarker.on('click', (e) => {
+      this.editCheckpointMarker(e);
     });
     this.showCheckpoint(checkpointMarker);
     this.developProvider.setMarkerOnTrack(checkpointMarker);
+    key ? this.objAllCheckopints[key] = checkpointMarker : null;
+  }
+
+  private editCheckpointMarker(e) {
+    // устанавливаем тип редактированного объекта - маркер
+    this.typeEditedObj = 'maker';
+
+    // запрет на редактирование если не нажата кнопка редактировать
+    if (!this.editBtnPressed) return;
+
+    this.checpointObjForSaveDB = null;
+
+    let markerIconClass = 'selected';
+    // удаляем класс с предыдущего выбранного маркера
+    this.selectedCheckpointMarker ? 
+      this.removeMarkerClass(markerIconClass) : null;
+    
+    // сохраняем в переменную новый выбранный маркер, который хотим редактировать
+    this.selectedCheckpointMarker = e;
+
+    // устанавливать класс редактируемого маркера
+    this.addMarkerClass(markerIconClass);
+    // устанавлилваем время контрольной точки в поле для редактирования
+    this.timePoint = e.target.options.time;
+
+
+    // let key = this.selectedCheckpointMarker.target.options.key;
+      // time: this.selectedCheckpointMarker.target.options.time,
+      // coords: JSON.stringify(this.selectedCheckpointMarker.target.getLatLng())
   }
 
   private removeMarkerClass(markerIconClass: string) {
@@ -206,24 +238,48 @@ export class CheckpointPanelComponent {
     this.featureGroupCheckpoint.addLayer(marker);
   }
 
-  private editDrawEvent() {
-    this.map.on('draw:edited', (e) => {
-        var layers = e.layers;
-        console.dir('SAVE');
-        layers.eachLayer(function (layer) {
-            //do whatever you want; most likely save back to db
-        });
+  private startDrawEvent() {
+    this.map.on('draw:editstart', (e) => {
+      this.editBtnPressed = true;
     });
   }
+
+  private stopDrawEvent() {
+    this.map.on('draw:editstop', (e) => {
+      this.editBtnPressed = false;
+      let markerIconClass = 'selected';
+      // удаляем класс с предыдущего выбранного маркера
+      this.selectedCheckpointMarker ? 
+        this.removeMarkerClass(markerIconClass) : null;
+    });
+  }
+
+  private editDrawEvent() {
+    this.map.on('draw:edited', (e) => {
+      this.updateCheckpointInBd();
+    });
+  }
+
   private moveMarker() {
-    this.map.on('draw:editmove ', (e) => {
-        var layers = e.layers;
-        console.dir('move');
-        console.dir(e);
-        console.dir('move end');
-        //layers.eachLayer(function (layer) {
-            //do whatever you want; most likely save back to db
-        //});
+    this.map.on('draw:editmove', (e) => {
+      // добавляем редактируемый объект в общий объект , который сохраним при нажатии на кнопку "save"
+      this.objMarkersKeyForUpdate[e.layer.options.key] = '';
+    });
+  }
+  private deletedMarker() {
+    this.map.on('draw:deleted', (e) => {
+      console.dir('deleted');
+    });
+  }
+  private deleteStartMarker() {
+    this.map.on('draw:deletestart', (e) => {
+      console.dir('delete: start');
+
+    });
+  }
+  private deleteStopMarker() {
+    this.map.on('draw:deletestop', (e) => {
+      console.dir('delete: stop');
     });
   }
 }
