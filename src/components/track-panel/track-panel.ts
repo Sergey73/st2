@@ -166,7 +166,7 @@ constructor(
         this.msgService.alert(message, null);
         this.featureGroupTrack.clearLayers();
         this.clearTrackData();
-      }).catch((error) => {
+      }, (error) => {
         console.dir(error);
       });
     }

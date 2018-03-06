@@ -14,7 +14,19 @@
     <ion-item-divider></ion-item-divider>
   </ion-item-group>
 
-  <button (click)="saveCheckpointData()" ion-button block type="submit">
-    Сохранить
+  <button 
+    *ngIf="!selectedCheckpointMarker"
+    (click)="saveCheckpointData()" 
+    ion-button block type="submit"
+  >
+    Создать точку
+  </button>
+  <button 
+  *ngIf="selectedCheckpointMarker"
+    (click)="changeCheckpointTime()" 
+    ion-button block 
+    type="submit"
+  >
+    Изменить время точки
   </button>
 </ion-content>

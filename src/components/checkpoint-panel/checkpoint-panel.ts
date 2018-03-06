@@ -39,7 +39,7 @@ export class CheckpointPanelComponent {
     public trackProvider: TrackProvider,
     public toast: ToastService
   ) {
-    // нужен сдесь иначе модуль не работает.
+    // нужен здесь иначе модуль не работает.
     leafletDraw;
     moment;
     this.timePoint = '';
@@ -60,8 +60,14 @@ export class CheckpointPanelComponent {
     this.deleteStopMarker();
 
     this.events.subscribe('trackProvider: trackShown', () => {
+      this.removeAllCheckpointsFromLayer();
       this.drawCheckpointOnTrack();
     });
+  }
+
+  // удаляем все чекпоинты со слоя 
+  private removeAllCheckpointsFromLayer() {
+    this.featureGroupCheckpoint.clearLayers();
   }
 
   // создание новой контрольной точки
@@ -89,7 +95,7 @@ export class CheckpointPanelComponent {
     } 
 
     // если время точки не проставлено выходим из функции
-    if ( !this.chckTimePoint()){return } 
+    if ( !this.checkTimePoint()){return } 
 
     // номер контрольной точки
     this.coutnerPoint = this.coutnerPoint ? 
@@ -128,7 +134,7 @@ export class CheckpointPanelComponent {
     }
   }
 
-  private chckTimePoint(): boolean {
+  private checkTimePoint(): boolean {
     if ( !this.timePoint){
       let message: string = 'Задайте время точки!';
       this.toast.showMsg(message);
@@ -136,30 +142,45 @@ export class CheckpointPanelComponent {
     } 
     return true;
   }
-  
+
   public saveCheckpointData(): void {
     // либо создаем новую точку, либо обновляем 
-    this.selectedCheckpointMarker === null ? 
-      this.saveCheckpointInBd() : 
-      this.updateCheckpointInBd();
+    if (this.selectedCheckpointMarker === null) {
+      debugger;
+      this.saveCheckpointInBd();
+    } 
+
+  }
+  
+  // меняем время над маркером
+  public changeCheckpointTime() {
+    // получаем тултип выбранного маркера
+    const label = this.selectedCheckpointMarker.target.getTooltip();
+    // получаем dom элемент тултипа
+    var elem = label.getElement();
+    // получаке dom элемент с текстом времени
+    var timeText = elem.getElementsByClassName('checkpoint-label_time')[0];
+    // устанавливаем новое время
+    timeText.innerText = this.timePoint;
   }
 
   private saveCheckpointInBd() {
     this.trackProvider.saveCheckpointInBd(this.checpointObjForSaveDB);
   }
 
+
   private updateCheckpointInBd() {
     // ключ в БД
     // let key: string = this.selectedCheckpointMarker.target.options.key;
     
     // если время точки не проставлено выходим из функции
-    // if ( !this.chckTimePoint()){return } 
-    
+    // if ( !this.checkTimePoint()){return } 
     for (let key in this.objMarkersKeyForUpdate) {
       let obj = this.objAllCheckopints[key];
       let updatedCheckpointObj = {
         coords: JSON.stringify(obj.getLatLng()),
-        time: obj.options.time
+        //time: obj.options.time
+        time: this.timePoint
       };
       // обновляем контрольную точку
       this.trackProvider.updateCheckpoint(key, updatedCheckpointObj);
@@ -167,10 +188,10 @@ export class CheckpointPanelComponent {
   }
  
   private createLabel(time) {
-    return `<div class="checkpoint-label">
-      ${time}
-      точка № ${this.coutnerPoint}
-    </div>`;
+    return  `<div class="checkpoint-label">
+              <div class="checkpoint-label_time">${time}</div>
+              <span class="checkpoint-label_point-number">точка № ${this.coutnerPoint}</span>
+            </div>`;
   }
   
   // переменная key для обращения к контрольной точке, по id привсоенного в БД
@@ -274,7 +295,7 @@ export class CheckpointPanelComponent {
   private deleteStartMarker() {
     this.map.on('draw:deletestart', (e) => {
       console.dir('delete: start');
-
+      debugger;
     });
   }
   private deleteStopMarker() {

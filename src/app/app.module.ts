@@ -26,7 +26,9 @@ import { DevelopProvider } from '../providers/develop-provider';
 import { MarkerProvider } from '../providers/marker-provider';
 
 // any servicies
-import {AngularFireModule, AuthProviders, AuthMethods} from 'angularfire2';
+import {AngularFireModule /* , AuthProviders, AuthMethods */} from 'angularfire2';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireDatabase } from 'angularfire2/database';
 
 // components
 import { TimerComponent } from '../components/timer/timer';
@@ -43,10 +45,10 @@ export const firebaseConfig = {
 };
 
 // данные входе
-const myFirebaseAuthConfig = {
+/* const myFirebaseAuthConfig = {
   provider: AuthProviders.Password,
   method: AuthMethods.Password
-};
+}; */
 
 @NgModule({
   // делает все элементы видимыми для всего приложения
@@ -65,7 +67,7 @@ const myFirebaseAuthConfig = {
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
-    AngularFireModule.initializeApp(firebaseConfig, myFirebaseAuthConfig)
+    AngularFireModule.initializeApp(firebaseConfig/* , myFirebaseAuthConfig */)
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -89,7 +91,9 @@ const myFirebaseAuthConfig = {
     TrackProvider,
     DevelopProvider,
     MarkerProvider,
-    TimerProvider
+    TimerProvider,
+    AngularFireAuth,
+    AngularFireDatabase
   ]
 })
 export class AppModule {}

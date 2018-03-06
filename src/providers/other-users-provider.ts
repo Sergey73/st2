@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Events } from 'ionic-angular';
+import { Observable } from 'rxjs/Observable';
 
 import { 
-  AngularFire, 
-  FirebaseListObservable
-} from 'angularfire2';
+  AngularFireDatabase,
+  // AngularFireList
+} from 'angularfire2/database';
 
 import "rxjs/add/operator/take";
 
@@ -13,8 +14,8 @@ import { UserDataProvider } from './user-data-provider';
 
 @Injectable()
 export class OtherUsersProvider {
-  // private userDb: FirebaseListObservable<any>;
-  private usersDb: FirebaseListObservable<any>;
+  private usersDb: any;
+  private usersObs: Observable<any[]>;
 
   usersDataByTrack: {
     offline: Array<any>,
@@ -25,7 +26,7 @@ export class OtherUsersProvider {
   };
 
   constructor(
-    public fire: AngularFire,
+    public fireDb: AngularFireDatabase,
     public events: Events,
     // данные водителей по выбранному маршруту
     public userDataProvider: UserDataProvider,
@@ -44,14 +45,13 @@ export class OtherUsersProvider {
   public getUsersByTrack() {
     let trackNumber = this.userDataProvider.userData.trackNumber;
 
-    this.usersDb = this.fire.database.list('/users', {
-      query: {
-        orderByChild: 'publicData/trackNumber',
-        equalTo: trackNumber
-      }
+    this.usersDb = this.fireDb.list('/users', (ref) => { 
+      return ref.orderByChild('publicData/trackNumber').equalTo(trackNumber);
     });
 
-    this.usersDb.take(1).subscribe(data => {
+    this.usersObs = this.usersDb.valueChanges();
+
+    this.usersObs.take(1).subscribe(data => { 
       this.sortingDataUsersByTrack(data);
     });
   }

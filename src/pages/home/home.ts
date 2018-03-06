@@ -143,7 +143,6 @@ export class HomePage {
 
     // создание слоя для маршрута
     this.trackProvider.createTrackLayer();
-
     this.getSelfUserData();
     this.getTracks();
   }

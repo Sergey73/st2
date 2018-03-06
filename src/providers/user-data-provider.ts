@@ -1,18 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Events } from 'ionic-angular';
+// import { Observable } from 'rxjs/Observable';
 
-import { 
-  AngularFire, 
-  FirebaseObjectObservable,
-  FirebaseListObservable
-} from 'angularfire2';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 
 import "rxjs/add/operator/take";
 
 @Injectable()
 export class UserDataProvider {
-  // public needUpdateUsersDb: FirebaseObjectObservable<any>;
-  private userDb: FirebaseListObservable<any>;
+  private userDb: AngularFireList<any>;
+  // private userObs: Observable<any[]>;
+
   userData: {
     email: string,
     inMove: boolean,      // если false другие водители не будут получать координаты этого водителя
@@ -44,7 +42,7 @@ export class UserDataProvider {
   };
 
   constructor(
-    public fire: AngularFire,
+    public fireDb: AngularFireDatabase,
     public events: Events
   ) {
 
@@ -52,14 +50,12 @@ export class UserDataProvider {
 
   public getData() {
     let uidValue = this.userData.uid ? this.userData.uid : '';
-    this.userDb = this.fire.database.list('/users', {
-      query: {
-        orderByChild: 'publicData/uid',
-        equalTo: uidValue
-      }
+
+    this.userDb = this.fireDb.list('/users', (ref) => {
+      return  ref.orderByChild('publicData/uid').equalTo(uidValue);
     });
 
-    this.userDb.take(1).subscribe(data => {
+    this.userDb.snapshotChanges().take(1).subscribe(data => {
       if (!data.length) {
         // если нет юзера создаем его
         this.createUserData();
@@ -68,6 +64,19 @@ export class UserDataProvider {
       }
       this.events.publish('userData: finish');
     });
+    
+    // this.userObs = this.userDb.valueChanges();
+
+    // this.userObs.take(1).subscribe(data => {
+    //   debugger;
+    //   if (!data.length) {
+    //     // если нет юзера создаем его
+    //     this.createUserData();
+    //   } else {
+    //     this.getUserData(data[0]);
+    //   }
+    //   this.events.publish('userData: finish');
+    // });
   }
 
   
@@ -93,10 +102,11 @@ export class UserDataProvider {
   }
 
   private getUserData(data: any) {
-    this.userData.key = data.$key;
-    this.userData.name = data.publicData.name;
-    this.userData.role = data.role;
-    this.userData.timeStartLap = data.publicData.timeStartLap;
+    const obj = data.payload.val();
+    this.userData.key = data.key;
+    this.userData.name = obj.publicData.name;
+    this.userData.role = obj.role;
+    this.userData.timeStartLap = obj.publicData.timeStartLap;
   }
 
 }
