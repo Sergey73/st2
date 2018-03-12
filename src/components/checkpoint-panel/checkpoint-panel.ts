@@ -27,9 +27,13 @@ export class CheckpointPanelComponent {
   private checpointObjForSaveDB: Checkpoint;
   private typeEditedObj: string; // тип редактированного объекта (объект на который кликнули)
   private editBtnPressed: boolean; // кнопка редактирования нажата, или нет
+  private deleteBtnPressed: boolean = false; // кнопка удаления нажата, или нет
   private objMarkersKeyForUpdate: any = {};
   private objAllCheckopints: any = {}; // при создании контрольных точек сохраняем их в объект
-
+  private arrCheckpointForDel: string[] = []; // массив с ключами контрольных точек, на 
+  // которые кликнули в режиме удаления, для дальнейшего их удаления при нажатии на save
+  private confirmDelete: boolean = false;
+ 
   constructor(
     public events: Events,
     public mapProvider: MapProvider,
@@ -202,11 +206,24 @@ export class CheckpointPanelComponent {
     checkpointMarker.options.time = time;
     
     checkpointMarker.on('click', (e) => {
-      this.editCheckpointMarker(e);
+      if (this.editBtnPressed) { 
+        this.editCheckpointMarker(e);
+      }
+      // если нажали на кнопку удаления вызываем функция удаления
+      if (this.deleteBtnPressed) {
+        this.deleteCheckpointMarker(e);
+      }
     });
     this.showCheckpoint(checkpointMarker);
     this.developProvider.setMarkerOnTrack(checkpointMarker);
     key ? this.objAllCheckopints[key] = checkpointMarker : null;
+  }
+
+  private deleteCheckpointMarker(e) { 
+    // запрет на удаление если не нажата кнопка удаления
+    if (!this.deleteBtnPressed) return;
+    const key = e.target.options.key;
+    this.arrCheckpointForDel.push(key);
   }
 
   private editCheckpointMarker(e) {
@@ -287,20 +304,33 @@ export class CheckpointPanelComponent {
       this.objMarkersKeyForUpdate[e.layer.options.key] = '';
     });
   }
+
   private deletedMarker() {
     this.map.on('draw:deleted', (e) => {
       console.dir('deleted');
+      this.confirmDelete = true;
     });
   }
+
   private deleteStartMarker() {
     this.map.on('draw:deletestart', (e) => {
       console.dir('delete: start');
-      debugger;
+      this.deleteBtnPressed = true;
     });
   }
+  
   private deleteStopMarker() {
     this.map.on('draw:deletestop', (e) => {
       console.dir('delete: stop');
+      // если нажали кнопку сохранить, удаляем из базы маркеры
+      if (this.confirmDelete) {
+        this.arrCheckpointForDel.forEach(key => {
+          this.trackProvider.removeCheckpointFromBd(key);
+        });
+      }
+      this.confirmDelete = false;
+      this.deleteBtnPressed = false;
+      this.arrCheckpointForDel.length = 0;
     });
   }
 }

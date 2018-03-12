@@ -404,7 +404,7 @@ export class HomePage {
   /////////////// other users //////////
   // удаляем маркер если он отображается на крте (т.е. есть в локальном объект)
   private dataProcessingOtherUserOffline(item) {
-    let key = item.$key;
+    let key = item.key;
     if (this.localOnlineOtherUsers[key] ) { 
       let marker = this.localOnlineOtherUsers[key].marker;
       this.markerProvider.removeMarker(marker);
@@ -425,9 +425,8 @@ export class HomePage {
 
     // текущее имя
     let currentName = item.publicData.name;
-
     // ключ в массиве водителей
-    let key = item.$key;
+    let key = item.key;
     
     // если данных водителя нет в локальном объекте, создаем их
     if (!this.localOnlineOtherUsers[key] ) {
@@ -493,7 +492,7 @@ export class HomePage {
     // текущее имя 
     let currentName = item.publicData.name;
     // ключ в массиве водителей
-    let key = item.$key;
+    let key = item.key;
     // обновляем имя в локальном объекте
     this.localOnlineOtherUsers[key].name = currentName;
     // старый маркер

@@ -62,26 +62,12 @@ export class TrackProvider {
   // получаем все маршруты из базы
   public getAllTracks() {
     this.tracksDb = this.fireDb.list('/tracks/', ref => ref.orderByChild('number'));
-    // this.tracksObs =this.tracksDb.valueChanges();
 
-    // this.tracksDb = this.fireDb.database.list(
-    //   '/tracks/', 
-    //   {
-    //     query: {
-    //       orderByChild: 'number'
-    //     }
-    //   }
-    // );
     this.tracksDb.snapshotChanges().take(1).subscribe(dataSnap => {
       // добавляем ключь к данным
       this.tracksData = dataSnap.map(data => ({ key: data.payload.key, ...data.payload.val() }));
       this.events.publish('tracksData: finish');
     });
-    // this.tracksObs.take(1).subscribe(data => {
-    //   debugger
-    //   this.tracksData = data;
-    //   this.events.publish('tracksData: finish');
-    // });
   }
 
   // сохраняем маршрут в базу 
@@ -134,5 +120,11 @@ export class TrackProvider {
       .list(`/tracks/${this.selectedTrack.key}/checkpoint`)
       .update(key, obj)
       .catch(err => console.log(err));
+  }
+
+  public removeCheckpointFromBd(key) {
+    this.fireDb
+      .list(`/tracks/${this.selectedTrack.key}/checkpoint`)
+      .remove(key);
   }
 }

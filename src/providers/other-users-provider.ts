@@ -16,6 +16,7 @@ import { UserDataProvider } from './user-data-provider';
 export class OtherUsersProvider {
   private usersDb: any;
   private usersObs: Observable<any[]>;
+  private usersData: Array<any>;
 
   usersDataByTrack: {
     offline: Array<any>,
@@ -49,10 +50,15 @@ export class OtherUsersProvider {
       return ref.orderByChild('publicData/trackNumber').equalTo(trackNumber);
     });
 
-    this.usersObs = this.usersDb.valueChanges();
+    // this.usersObs = this.usersDb.valueChanges();
 
-    this.usersObs.take(1).subscribe(data => { 
-      this.sortingDataUsersByTrack(data);
+    // this.usersObs.take(1).subscribe(data => { 
+    //   this.sortingDataUsersByTrack(data);
+    // });
+    this.usersData = this.usersDb.snapshotChanges().take(1).subscribe(dataSnap => {
+      // добавляем ключь к данным
+      const trackData = dataSnap.map(data => ({ key: data.payload.key, ...data.payload.val() }));
+      this.sortingDataUsersByTrack(trackData);
     });
   }
 
