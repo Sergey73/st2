@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import * as d3 from 'd3';
 
 import * as L from 'mapbox.js';
 
@@ -43,21 +44,69 @@ export class MarkerProvider {
   }
 
   private _createMarkerIcon(type: string) {
-    let path;
-    switch(type) {
-      case 'self': 
-        path = 'assets/img/greenCircle.png';
-        break;
-      case 'checkpoint':
-        path = 'assets/img/redCircle.png';
-        break;
-      case 'other':
-        path = 'assets/img/yellowCircle.png';
-    }
-    let icon = L.icon({
-      iconUrl: path,
-      iconSize: [32, 30],
-      iconAnchor: [15, 15],
+    let path = `<svg
+      width="30"
+      height="30"
+      viewBox="0 0 30 30"
+      id="svg2"
+    >
+      <g
+        id="layer1"
+        transform="translate(0,-1022.3622)"
+      >
+        <path
+          style="fill:#00ff00;
+          fill-opacity:1;
+          stroke:none;
+          stroke-width:1;
+          stroke-linejoin:miter;
+          stroke-miterlimit:4;
+          stroke-dasharray:none;
+          stroke-opacity:1"
+          id="path4136"
+          d="M -1.2274447e-6,1052.3622 26.855693,1005.8468 l 26.855696,-46.51544 26.855692,46.51544 26.855699,46.5154 -53.711391,0 z"
+          transform="matrix(0.27927038,0,0,0.32247366,-8.8465578e-7,713.00312)" 
+        />
+      </g>
+    </svg>`;
+    // switch(type) {
+    //   case 'self': 
+    //     path = 'assets/img/greenCircle.png';
+    //     break;
+    //     case 'checkpoint':
+    //       path = 'assets/img/redCircle.png';
+    //     break;
+    //   case 'other':
+    //     path = 'assets/img/yellowCircle.png';
+    // }
+    // let icon = L.icon({
+    //   iconUrl: path,
+    //   iconSize: [32, 30],
+    //   iconAnchor: [15, 15],
+    //   className: `${type}-marker`
+    // });
+    let circleData = [15, 15, 10]
+    let div = d3.creator("div");
+    div.id = 'x'
+    
+    let svg = d3.select('#x').append('svg')
+      .attr('width', 30)
+      .attr('height', 30);
+    let circle = svg.selectAll('circle')
+      .data(circleData)
+      .enter()
+      .append('circle')
+    let attribute = circle
+      .attr('cx', 15)
+      .attr('cy', 15)
+      .attr('r', d => d)
+      .style('fill', 'green');
+
+    let icon = L.divIcon({
+      // iconUrl: path,
+      html: svg,
+      // iconSize: [32, 30],
+      // iconAnchor: [15, 15],
       className: `${type}-marker`
     });
     
