@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import * as d3 from 'd3';
 
 import * as L from 'mapbox.js';
-
 import * as leafletGeometryutil from 'leaflet-geometryutil';
 // import * as leafletSnap from 'leaflet-snap';
 
@@ -44,31 +43,31 @@ export class MarkerProvider {
   }
 
   private _createMarkerIcon(type: string) {
-    let path = `<svg
-      width="30"
-      height="30"
-      viewBox="0 0 30 30"
-      id="svg2"
-    >
-      <g
-        id="layer1"
-        transform="translate(0,-1022.3622)"
-      >
-        <path
-          style="fill:#00ff00;
-          fill-opacity:1;
-          stroke:none;
-          stroke-width:1;
-          stroke-linejoin:miter;
-          stroke-miterlimit:4;
-          stroke-dasharray:none;
-          stroke-opacity:1"
-          id="path4136"
-          d="M -1.2274447e-6,1052.3622 26.855693,1005.8468 l 26.855696,-46.51544 26.855692,46.51544 26.855699,46.5154 -53.711391,0 z"
-          transform="matrix(0.27927038,0,0,0.32247366,-8.8465578e-7,713.00312)" 
-        />
-      </g>
-    </svg>`;
+    // let path = `<svg
+    //   width="30"
+    //   height="30"
+    //   viewBox="0 0 30 30"
+    //   id="svg2"
+    // >
+    //   <g
+    //     id="layer1"
+    //     transform="translate(0,-1022.3622)"
+    //   >
+    //     <path
+    //       style="fill:#00ff00;
+    //       fill-opacity:1;
+    //       stroke:none;
+    //       stroke-width:1;
+    //       stroke-linejoin:miter;
+    //       stroke-miterlimit:4;
+    //       stroke-dasharray:none;
+    //       stroke-opacity:1"
+    //       id="path4136"
+    //       d="M -1.2274447e-6,1052.3622 26.855693,1005.8468 l 26.855696,-46.51544 26.855692,46.51544 26.855699,46.5154 -53.711391,0 z"
+    //       transform="matrix(0.27927038,0,0,0.32247366,-8.8465578e-7,713.00312)" 
+    //     />
+    //   </g>
+    // </svg>`;
     // switch(type) {
     //   case 'self': 
     //     path = 'assets/img/greenCircle.png';
@@ -86,25 +85,31 @@ export class MarkerProvider {
     //   className: `${type}-marker`
     // });
     let circleData = [15, 15, 10]
-    let div = d3.creator("div");
-    div.id = 'x'
-    
-    let svg = d3.select('#x').append('svg')
+
+
+    let div = document.createElement("div");    
+    let svg = d3.select(div).append('svg')
       .attr('width', 30)
-      .attr('height', 30);
-    let circle = svg.selectAll('circle')
+      .attr('height', 50);
+    const circle = svg.selectAll('circle')
       .data(circleData)
       .enter()
       .append('circle')
-    let attribute = circle
+    const attribute = circle
       .attr('cx', 15)
-      .attr('cy', 15)
+      .attr('cy', 35)
       .attr('r', d => d)
       .style('fill', 'green');
 
+    svg.append('text')
+      .attr('x', 0)
+      .attr('y', 10)
+      .text('helloooo')
+
+      let test = this.serializeXmlNode(div);
     let icon = L.divIcon({
       // iconUrl: path,
-      html: svg,
+      html: test,
       // iconSize: [32, 30],
       // iconAnchor: [15, 15],
       className: `${type}-marker`
@@ -112,4 +117,14 @@ export class MarkerProvider {
     
     return icon;
   }
+
+  private serializeXmlNode(xmlNode) {
+
+    if (typeof window.XMLSerializer != "undefined") {
+        return (new window.XMLSerializer()).serializeToString(xmlNode);
+    } else if (typeof xmlNode.xml != "undefined") {
+        return xmlNode.xml;
+    }
+    return "";
+}
 }
