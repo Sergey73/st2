@@ -43,88 +43,133 @@ export class MarkerProvider {
   }
 
   private _createMarkerIcon(type: string) {
-    // let path = `<svg
-    //   width="30"
-    //   height="30"
-    //   viewBox="0 0 30 30"
-    //   id="svg2"
-    // >
-    //   <g
-    //     id="layer1"
-    //     transform="translate(0,-1022.3622)"
-    //   >
-    //     <path
-    //       style="fill:#00ff00;
-    //       fill-opacity:1;
-    //       stroke:none;
-    //       stroke-width:1;
-    //       stroke-linejoin:miter;
-    //       stroke-miterlimit:4;
-    //       stroke-dasharray:none;
-    //       stroke-opacity:1"
-    //       id="path4136"
-    //       d="M -1.2274447e-6,1052.3622 26.855693,1005.8468 l 26.855696,-46.51544 26.855692,46.51544 26.855699,46.5154 -53.711391,0 z"
-    //       transform="matrix(0.27927038,0,0,0.32247366,-8.8465578e-7,713.00312)" 
-    //     />
-    //   </g>
-    // </svg>`;
-    // switch(type) {
-    //   case 'self': 
-    //     path = 'assets/img/greenCircle.png';
-    //     break;
-    //     case 'checkpoint':
-    //       path = 'assets/img/redCircle.png';
-    //     break;
-    //   case 'other':
-    //     path = 'assets/img/yellowCircle.png';
-    // }
-    // let icon = L.icon({
-    //   iconUrl: path,
-    //   iconSize: [32, 30],
-    //   iconAnchor: [15, 15],
+    let icon;
+    switch(type) {
+      case 'self': 
+        icon = this.createTriangle(type);
+        // path = 'assets/img/greenCircle.png';
+        break;
+      case 'checkpoint':
+        // path = 'assets/img/redCircle.png';
+        icon = L.divIcon({
+          // iconUrl: path,
+          html: '',
+          // iconSize: [32, 30],
+          iconAnchor: [50, 25],
+          className: `${type}-marker`
+        });
+        break;
+      case 'other':
+        icon = L.divIcon({
+          // iconUrl: path,
+          html: '',
+          // iconSize: [32, 30],
+          iconAnchor: [50, 25],
+          className: `${type}-marker`
+        });
+        // path = 'assets/img/yellowCircle.png';
+    }
+   
+    
+    
+    // let circleData = [15, 15, 10]
+
+    // let div = document.createElement("div");    
+    // let svg = d3.select(div).append('svg')
+    //   .attr('width', 30)
+    //   .attr('height', 50);
+
+
+    // svg.append('rect')
+    //   .attr('x', 0)
+    //   .attr('y', 0)
+    //   .attr('width', 30)
+    //   .attr('height', 50)
+    //   .attr('fill', 'none')
+    //   .attr('stroke', '#000')
+    //   .attr('stroke-width', 2);
+    
+    // const context = d3.path();
+    // context.moveTo(0, 0);
+    // context.lineTo(15, 25);
+    // context.lineTo(0, 50);
+
+    // svg.append('path')
+    //   .attr('d', context.toString());
+    
+
+    // const circle = svg.selectAll('circle')
+    //   .data(circleData)
+    //   .enter()
+    //   .append('circle')
+    // const attribute = circle
+    //   .attr('cx', 15)
+    //   .attr('cy', 35)
+    //   .attr('r', d => d)
+    //   .style('fill', 'pink');
+
+    // svg.append('text')
+    //   .attr('x', 0)
+    //   .attr('y', 10)
+    //   .text('helloooo')
+    //   .style('fill', 'red')
+
+    // let test = this.serializeXmlNode(div);
+
+    // let icon = L.divIcon({
+    //   // iconUrl: path,
+    //   html: markerPath,
+    //   // iconSize: [32, 30],
+    //   iconAnchor: [50, 25],
     //   className: `${type}-marker`
     // });
-    let circleData = [15, 15, 10]
+    
+    return icon;
+  }
 
-
+  private createTriangle(type: string) {
     let div = document.createElement("div");    
     let svg = d3.select(div).append('svg')
-      .attr('width', 30)
+      .attr('width', 100)
       .attr('height', 50);
-    const circle = svg.selectAll('circle')
-      .data(circleData)
-      .enter()
-      .append('circle')
-    const attribute = circle
-      .attr('cx', 15)
-      .attr('cy', 35)
-      .attr('r', d => d)
-      .style('fill', 'green');
+
+    const context = d3.path();
+    context.moveTo(30, 100);
+    context.lineTo(50, 25);
+    context.lineTo(70, 100);
+    context.closePath();
+
+    
+    svg.append('path')
+      .attr('fill', 'green')
+      .attr('d', context.toString());
 
     svg.append('text')
       .attr('x', 0)
       .attr('y', 10)
       .text('helloooo')
+      .style('fill', 'red');
 
-      let test = this.serializeXmlNode(div);
+    let markerPath = this.serializeXmlNode(div);
+
     let icon = L.divIcon({
       // iconUrl: path,
-      html: test,
+      html: markerPath,
       // iconSize: [32, 30],
-      // iconAnchor: [15, 15],
+      iconAnchor: [50, 25],
       className: `${type}-marker`
     });
-    
     return icon;
   }
 
+  // функция преобразовывает dom элемент в сторковой
   private serializeXmlNode(xmlNode) {
-
-    if (typeof window.XMLSerializer != "undefined") {
-        return (new window.XMLSerializer()).serializeToString(xmlNode);
+    if (typeof window['XMLSerializer'] != "undefined") {
+        return (new window['XMLSerializer']()).serializeToString(xmlNode);
     } else if (typeof xmlNode.xml != "undefined") {
         return xmlNode.xml;
     }
     return "";
-}
+  }
+  
 }
