@@ -24,16 +24,16 @@ export class MarkerProvider {
 
   // создание маркера и добавление его на карту
   public createMarker(label:string = 'Введите имя', type: string) {
-    let markerIcon = this._createMarkerIcon(type);
+    let markerIcon = this._createMarkerIcon(type, label);
     let coords = this.defaultCoords;
     let marker = L
       .marker(coords, {icon: markerIcon, draggable: false})
-      .bindTooltip(label, { 
+    /*   .bindTooltip(label, { 
         permanent: true,
         className: 'my-tooltip',
         direction: 'top', 
         offset: [0, -20],
-      });
+      }) */;
 
     return marker;
   }
@@ -42,92 +42,62 @@ export class MarkerProvider {
     marker.remove();
   }
 
-  private _createMarkerIcon(type: string) {
+  private _createMarkerIcon(type: string, label: string) {
     let icon;
     switch(type) {
       case 'self': 
-        icon = this.createTriangle(type);
+        icon = this.createDriverMarker(type, label);
         // path = 'assets/img/greenCircle.png';
         break;
       case 'checkpoint':
+        icon = this.createCheckpointMarker(type, label);
         // path = 'assets/img/redCircle.png';
-        icon = L.divIcon({
-          // iconUrl: path,
-          html: '',
-          // iconSize: [32, 30],
-          iconAnchor: [50, 25],
-          className: `${type}-marker`
-        });
         break;
       case 'other':
-        icon = L.divIcon({
-          // iconUrl: path,
-          html: '',
-          // iconSize: [32, 30],
-          iconAnchor: [50, 25],
-          className: `${type}-marker`
-        });
+      icon = this.createDriverMarker(type, label);
         // path = 'assets/img/yellowCircle.png';
     }
-   
-    
-    
-    // let circleData = [15, 15, 10]
-
-    // let div = document.createElement("div");    
-    // let svg = d3.select(div).append('svg')
-    //   .attr('width', 30)
-    //   .attr('height', 50);
-
-
-    // svg.append('rect')
-    //   .attr('x', 0)
-    //   .attr('y', 0)
-    //   .attr('width', 30)
-    //   .attr('height', 50)
-    //   .attr('fill', 'none')
-    //   .attr('stroke', '#000')
-    //   .attr('stroke-width', 2);
-    
-    // const context = d3.path();
-    // context.moveTo(0, 0);
-    // context.lineTo(15, 25);
-    // context.lineTo(0, 50);
-
-    // svg.append('path')
-    //   .attr('d', context.toString());
-    
-
-    // const circle = svg.selectAll('circle')
-    //   .data(circleData)
-    //   .enter()
-    //   .append('circle')
-    // const attribute = circle
-    //   .attr('cx', 15)
-    //   .attr('cy', 35)
-    //   .attr('r', d => d)
-    //   .style('fill', 'pink');
-
-    // svg.append('text')
-    //   .attr('x', 0)
-    //   .attr('y', 10)
-    //   .text('helloooo')
-    //   .style('fill', 'red')
-
-    // let test = this.serializeXmlNode(div);
-
-    // let icon = L.divIcon({
-    //   // iconUrl: path,
-    //   html: markerPath,
-    //   // iconSize: [32, 30],
-    //   iconAnchor: [50, 25],
-    //   className: `${type}-marker`
-    // });
-    
     return icon;
   }
 
-  private createTriangle(type: string) {
+  private createCheckpointMarker(type: string, label: string) {
+    let div = document.createElement("div");    
+    let svg = d3.select(div).append('svg')
+      .attr('width', 100)
+      .attr('height', 70);
+
+    let circleData = [15];
+
+    const circle = svg.selectAll('circle')
+      .data(circleData)
+      .enter()
+      .append('circle');
+
+    circle
+      .attr('cx', 50)
+      .attr('cy', 55)
+      .attr('r', d => d)
+      .style('fill', 'pink');
+    
+    svg.append('foreignObject')
+      .attr('width', '100%' )
+      .append('xhtml:body')
+      .html(label)
+      .style("font", "18px 'Helvetica Neue'")
+
+    let markerPath = this.serializeXmlNode(div);
+
+    let icon = L.divIcon({
+      html: markerPath,
+      iconAnchor: [50, 35],
+      className: `${type}-marker`
+    });
+    return icon;
+  }
+
+  private createDriverMarker(type: string, label: string) {
+    const color = type === 'self' ? 'green' : 'yellow';
+
     let div = document.createElement("div");    
     let svg = d3.select(div).append('svg')
       .attr('width', 100)
@@ -141,14 +111,15 @@ export class MarkerProvider {
 
     
     svg.append('path')
-      .attr('fill', 'green')
+      .attr('fill', color)
       .attr('d', context.toString());
 
     svg.append('text')
-      .attr('x', 0)
+      .attr('x', 50)
       .attr('y', 10)
-      .text('helloooo')
-      .style('fill', 'red');
+      .text(label)
+      .style('fill', 'red')
+      .style('text-anchor', 'middle');;
 
     let markerPath = this.serializeXmlNode(div);
 

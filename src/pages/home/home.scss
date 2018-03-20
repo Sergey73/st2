@@ -19,18 +19,18 @@ page-home {
   .leaflet-tooltip-pane {
  
   }
-  .my-tooltip {
-    z-index: 6;
-    color: red;
-    top: 0;
-    position: absolute;
-    left: 0;
-  }
+  // .my-tooltip {
+  //   z-index: 6;
+  //   color: red;
+  //   top: 0;
+  //   position: absolute;
+  //   left: 0;
+  // }
   .checkpoint-label {
-    width: 70px;
+    // width: 70px;
     text-align: center;
     line-height: 12px;
-    background-color: rgba(1,1,1,1);
+    // background-color: rgba(1,1,1,1);
     border: 1px solid;
   }
 }
