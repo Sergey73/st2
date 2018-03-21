@@ -13,6 +13,8 @@ import { ToastService } from '../../services/toast.service';
 import { Checkpoint } from '../../interfaces/Checkpoint';
 import { Coords } from '../../interfaces/Coords';
 
+import * as L from 'mapbox.js';
+
 @Component({
   selector: 'checkpoint-panel',
   templateUrl: 'checkpoint-panel.html'
@@ -158,14 +160,24 @@ export class CheckpointPanelComponent {
   
   // меняем время над маркером
   public changeCheckpointTime() {
+    const tempNum = this.coutnerPoint;
+    const key = this.selectedCheckpointMarker.target.options.key;
+    const currentNum = this.trackProvider.selectedTrack.checkpoint[key].num;
+    this.coutnerPoint = currentNum;
+    const label = this.createLabel(this.timePoint);
+    this.coutnerPoint = tempNum;
+    const time = this.timePoint;
+    const coords = this.selectedCheckpointMarker.target.getLatLng();
+    this.selectedCheckpointMarker.target.remove();
+    this.createCheckpoint(coords, label, key, time);
     // получаем тултип выбранного маркера
-    const label = this.selectedCheckpointMarker.target.getTooltip();
-    // получаем dom элемент тултипа
-    var elem = label.getElement();
-    // получаке dom элемент с текстом времени
-    var timeText = elem.getElementsByClassName('checkpoint-label_time')[0];
-    // устанавливаем новое время
-    timeText.innerText = this.timePoint;
+    // const label = this.selectedCheckpointMarker.target.getTooltip();
+    // // получаем dom элемент тултипа
+    // var elem = label.getElement();
+    // // получаке dom элемент с текстом времени
+    // var timeText = elem.getElementsByClassName('checkpoint-label_time')[0];
+    // // устанавливаем новое время
+    // timeText.innerText = this.timePoint;
   }
 
   private saveCheckpointInBd() {

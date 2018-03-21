@@ -24,16 +24,10 @@ export class MarkerProvider {
 
   // создание маркера и добавление его на карту
   public createMarker(label:string = 'Введите имя', type: string) {
-    let markerIcon = this._createMarkerIcon(type, label);
+    let markerIcon = this.createMarkerIcon(type, label);
     let coords = this.defaultCoords;
     let marker = L
-      .marker(coords, {icon: markerIcon, draggable: false})
-    /*   .bindTooltip(label, { 
-        permanent: true,
-        className: 'my-tooltip',
-        direction: 'top', 
-        offset: [0, -20],
-      }) */;
+      .marker(coords, {icon: markerIcon, draggable: false});
 
     return marker;
   }
@@ -42,7 +36,7 @@ export class MarkerProvider {
     marker.remove();
   }
 
-  private _createMarkerIcon(type: string, label: string) {
+  public createMarkerIcon(type: string, label: string) {
     let icon;
     switch(type) {
       case 'self': 
