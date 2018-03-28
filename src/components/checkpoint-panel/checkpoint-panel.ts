@@ -66,6 +66,7 @@ export class CheckpointPanelComponent {
     this.deleteStopMarker();
 
     this.events.subscribe('trackProvider: trackShown', () => {
+      debugger;
       this.removeAllCheckpointsFromLayer();
       this.drawCheckpointOnTrack();
     });
@@ -151,8 +152,8 @@ export class CheckpointPanelComponent {
 
   public saveCheckpointData(): void {
     // либо создаем новую точку, либо обновляем 
+    debugger;
     if (this.selectedCheckpointMarker === null) {
-      debugger;
       this.saveCheckpointInBd();
     } 
 
@@ -166,10 +167,15 @@ export class CheckpointPanelComponent {
     this.coutnerPoint = currentNum;
     const label = this.createLabel(this.timePoint);
     this.coutnerPoint = tempNum;
-    const time = this.timePoint;
-    const coords = this.selectedCheckpointMarker.target.getLatLng();
-    this.selectedCheckpointMarker.target.remove();
-    this.createCheckpoint(coords, label, key, time);
+    // const time = this.timePoint;
+    // const coords = this.selectedCheckpointMarker.target.getLatLng();
+    debugger
+    // this.selectedCheckpointMarker.target.remove();
+    // this.createCheckpoint(coords, label, key, time);
+    this.selectedCheckpointMarker.target.options.time = this.timePoint
+    let markerIcon = this.markerProvider.createMarkerIcon('checkpoint', label);
+    this.selectedCheckpointMarker.target.setIcon(markerIcon)
+    this.objMarkersKeyForUpdate[key] = '';
     // получаем тултип выбранного маркера
     // const label = this.selectedCheckpointMarker.target.getTooltip();
     // // получаем dom элемент тултипа
@@ -195,8 +201,8 @@ export class CheckpointPanelComponent {
       let obj = this.objAllCheckopints[key];
       let updatedCheckpointObj = {
         coords: JSON.stringify(obj.getLatLng()),
-        //time: obj.options.time
-        time: this.timePoint
+        time: obj.options.time
+        // time: this.timePoint
       };
       // обновляем контрольную точку
       this.trackProvider.updateCheckpoint(key, updatedCheckpointObj);
@@ -239,6 +245,7 @@ export class CheckpointPanelComponent {
   }
 
   private editCheckpointMarker(e) {
+    debugger;
     // устанавливаем тип редактированного объекта - маркер
     this.typeEditedObj = 'maker';
 
@@ -267,10 +274,12 @@ export class CheckpointPanelComponent {
   }
 
   private removeMarkerClass(markerIconClass: string) {
-    this.selectedCheckpointMarker.originalEvent.target.classList.remove(markerIconClass);
+    // this.selectedCheckpointMarker.originalEvent.target.classList.remove(markerIconClass);
+    this.selectedCheckpointMarker.sourceTarget._icon.classList.remove(markerIconClass);
   }
   private addMarkerClass(markerIconClass: string) {
-    this.selectedCheckpointMarker.originalEvent.target.classList.add(markerIconClass);
+    // this.selectedCheckpointMarker.originalEvent.target.classList.add(markerIconClass);
+    this.selectedCheckpointMarker.sourceTarget._icon.classList.add(markerIconClass);
   }
 
   private drawCheckpointOnTrack() {
@@ -296,6 +305,7 @@ export class CheckpointPanelComponent {
 
   private stopDrawEvent() {
     this.map.on('draw:editstop', (e) => {
+      debugger
       this.editBtnPressed = false;
       let markerIconClass = 'selected';
       // удаляем класс с предыдущего выбранного маркера
@@ -306,6 +316,7 @@ export class CheckpointPanelComponent {
 
   private editDrawEvent() {
     this.map.on('draw:edited', (e) => {
+      debugger;
       this.updateCheckpointInBd();
     });
   }

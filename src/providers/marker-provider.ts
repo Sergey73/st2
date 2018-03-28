@@ -84,6 +84,7 @@ export class MarkerProvider {
     let icon = L.divIcon({
       html: markerPath,
       iconAnchor: [50, 35],
+      iconSize: [100, 70],
       className: `${type}-marker`
     });
     return icon;
