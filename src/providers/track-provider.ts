@@ -48,7 +48,6 @@ export class TrackProvider {
     public mapProvider: MapProvider,
     public userDataProvider: UserDataProvider
     ) {
-
   }
 
   public createTrackLayer() {
@@ -89,7 +88,7 @@ export class TrackProvider {
     this.selectedTrack.key = arr[index].key;
     this.selectedTrack.path = path;
     this.selectedTrack.number = arr[index].number;
-    this.selectedTrack.checkpoint = arr[index].checkpoint;
+    this.selectedTrack.checkpoint = arr[index].checkpoint ? arr[index].checkpoint : {};
   
     // событие после которого будут отрисованы контрольные точки
     this.events.publish('trackProvider: trackShown');
