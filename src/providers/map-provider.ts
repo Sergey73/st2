@@ -17,7 +17,7 @@ export class MapProvider {
   ) {
     this.mapToken = 'pk.eyJ1Ijoic2VyZ2V5NzMiLCJhIjoiY2lyM3JhNXR1MDAydGh6bWM3ZzBjaGlrYyJ9.MxdICo0uhxAtmyWpA_CeVw';
     this.mapStyle = 'mapbox.streets';
-    this.mapMinZoom = 10;
+    // this.mapMinZoom = 10;
   }
 
   public getMap() {  

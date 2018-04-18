@@ -84,33 +84,34 @@ export class DevelopProvider {
     // // end тест на много водителей// для разработки
 
     this.moveMarkerInterval = setInterval(() => {
-      if (data.myLongitude > 48.24920654296876 && left) {
-        up = true;
-        val = (data.myLongitude.toFixed(num)-0) * d;
-        data.myLongitude = (val - 1)/d;
-      } else if (data.myLatitude < 54.36935859782679 && up) {
-        left = false;
-        val = (data.myLatitude.toFixed(num)-0) * d;
-        data.myLatitude = (val + 1)/d;
-      } else if (data.myLongitude <  48.380355834960945 && !left) {
-        up = false;
-        val = (data.myLongitude.toFixed(num)-0) * d;
-        data.myLongitude = (val + 1)/d;
-      } else if (data.myLatitude > 54.30801120099681 && !up) {
-        val = (data.myLatitude.toFixed(num)-0) * d;
-        data.myLatitude = (val - 1)/d;
-      } else {
-        left = true;
-      }
-      // // end тест2  на много водителей// для разработки
-      // for (let j=0; j< arr.length; j++) {
-      //   let l = (((myLatitude.toFixed(num)-0) * d) + j) /100000
-      //   let l2 = (((myLongitude.toFixed(num)-0) * d) + j) /100000
-      //   arr[j].setLatLng([l, l2 ]);
-      // }
-      // // end тест2 на много водителей// для разработки
+    //   // if (data.myLongitude > 48.24920654296876 && left) {
+    //   //   up = true;
+    //   //   val = (data.myLongitude.toFixed(num)-0) * d;
+    //   //   data.myLongitude = (val - 1)/d;
+    //   // } else if (data.myLatitude < 54.36935859782679 && up) {
+    //   //   left = false;
+    //   //   val = (data.myLatitude.toFixed(num)-0) * d;
+    //   //   data.myLatitude = (val + 1)/d;
+    //   // } else if (data.myLongitude <  48.380355834960945 && !left) {
+    //   //   up = false;
+    //   //   val = (data.myLongitude.toFixed(num)-0) * d;
+    //   //   data.myLongitude = (val + 1)/d;
+    //   // } else if (data.myLatitude > 54.30801120099681 && !up) {
+    //   //   val = (data.myLatitude.toFixed(num)-0) * d;
+    //   //   data.myLatitude = (val - 1)/d;
+    //   // } else {
+    //   //   left = true;
+    //   // }
+      
+    //   // // end тест2  на много водителей// для разработки
+    //   // for (let j=0; j< arr.length; j++) {
+    //   //   let l = (((myLatitude.toFixed(num)-0) * d) + j) /100000
+    //   //   let l2 = (((myLongitude.toFixed(num)-0) * d) + j) /100000
+    //   //   arr[j].setLatLng([l, l2 ]);
+    //   // }
+    //   // // end тест2 на много водителей// для разработки
 
-      data.selfMarker.setLatLng([data.myLatitude, data.myLongitude]);
+    //   data.selfMarker.setLatLng([data.myLatitude, data.myLongitude]);
       // если тоггл включег тогда запускаем функцию для позиционируем карты относительно маркера
       if (data.watchToSelfMarker) this.refreshMapCenterPosition(data.myLatitude, data.myLongitude);
     },1000);

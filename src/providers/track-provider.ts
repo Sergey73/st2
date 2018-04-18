@@ -18,9 +18,7 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 
 @Injectable()
 export class TrackProvider {
-  // private tracksDb: FirebaseListObservable<any>;
   private tracksDb: AngularFireList<any>;
-  // private tracksObs: Observable<any[]>;
 
   // все существующие маршруты. ( переделать на allTracksData)
   public tracksData: Array<any>;
@@ -99,9 +97,6 @@ export class TrackProvider {
 
   // добавляем данные контрольной точки в БД
   public saveCheckpointInBd(obj) {
-    // let ref = this.tracksDb.$ref.ref;
-    // let arrPoint = ref.child(this.selectedTrack.key + '/checkpoint').push();
-    // arrPoint.set(obj);
     const ref = this.fireDb.list('/tracks/' + this.selectedTrack.key + '/checkpoint')
     ref.push(obj).then(res => {
       // добавляем точку в локальный массив, 
@@ -112,9 +107,6 @@ export class TrackProvider {
 
   // обновление данных контрольной точки в БД
   public updateCheckpoint(key: string, obj) {
-    /*this.tracksDb.$ref.ref
-      .child(`${this.selectedTrack.key}/checkpoint/${key}`)
-      .update(obj);*/
     this.fireDb
       .list(`/tracks/${this.selectedTrack.key}/checkpoint`)
       .update(key, obj)

@@ -36,6 +36,8 @@ import { CheckpointPanelComponent } from '../components/checkpoint-panel/checkpo
 import { TrackPanelComponent } from '../components/track-panel/track-panel';
 import { TimerProvider } from '../providers/timer/timer';
 
+import { Geolocation } from '@ionic-native/geolocation';
+import { NativeGeocoder } from '@ionic-native/native-geocoder';
 export const firebaseConfig = {
   apiKey: 'AIzaSyD8cHdez2j1JTcQ4hfPoFs3YCsRSgtPfGY',
   authDomain: 'streetcity73-a464b.firebaseapp.com',
@@ -93,7 +95,9 @@ export const firebaseConfig = {
     MarkerProvider,
     TimerProvider,
     AngularFireAuth,
-    AngularFireDatabase
+    AngularFireDatabase,
+    Geolocation,
+    NativeGeocoder,
   ]
 })
 export class AppModule {}

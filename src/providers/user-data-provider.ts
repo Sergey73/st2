@@ -17,6 +17,7 @@ export class UserDataProvider {
     key: string,          // ключ в БД
     myLatitude: any,
     myLongitude: any,
+    heading: number,
     name: string,
     role: string,
     selfMarker: any,      // маркер своего местоположения 
@@ -32,6 +33,7 @@ export class UserDataProvider {
     key: '',
     myLatitude: 54.30801120099681,
     myLongitude: 48.39649200439454,
+    heading: 0,
     name: '',
     role: '',
     selfMarker: null,

@@ -56,6 +56,7 @@ constructor(
 
     // как только данные о текущем юзере придут происходит событие
     this.events.subscribe('coord: start', (coords) => {
+      debugger;
       this.la = coords.latitude;
       this.lo = coords.longitude
     });

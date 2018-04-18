@@ -99,9 +99,9 @@ export class MarkerProvider {
       .attr('height', 50);
 
     const context = d3.path();
-    context.moveTo(30, 100);
+    context.moveTo(45, 50);
     context.lineTo(50, 25);
-    context.lineTo(70, 100);
+    context.lineTo(55, 50);
     context.closePath();
 
     

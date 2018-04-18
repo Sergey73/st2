@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { NavController, Events } from 'ionic-angular';
-// import { Geolocation } from 'ionic-native';
+import { NavController, Events, Platform } from 'ionic-angular';
+import { Geolocation, Geoposition } from '@ionic-native/geolocation';
+import { NativeGeocoder, NativeGeocoderReverseResult } from '@ionic-native/native-geocoder';
 
 import * as L from 'mapbox.js';
 
@@ -18,6 +19,7 @@ import { MapProvider } from '../../providers/map-provider';
 
 // services
 import { ToastService } from '../../services/toast.service';
+import { timeout } from 'd3';
 
 
 @Component({
@@ -67,7 +69,7 @@ export class HomePage {
   // }
   private localOnlineOtherUsers: Object = {};
 
-  // частота обновления координат в милисекундах других водителей
+  // частота обновления координат в милисекундах 
   private intervalUpdateSelfCoords: number = 1000;
 
   // когда марекер выходит за экран, перемещаем карту, чтобы маркер был в центре экрана 
@@ -86,8 +88,15 @@ export class HomePage {
     public developProvider: DevelopProvider,
     public markerProvider: MarkerProvider,
     public mapProvider: MapProvider,
-    public events: Events
+    public events: Events,
+
+    private platform: Platform,
+    public geolocation: Geolocation, 
+    public geocoder: NativeGeocoder,
   ) {
+
+  }
+  ngAfterViewInit() {
 
   }
 
@@ -181,53 +190,49 @@ export class HomePage {
   }
   // end menu
 
-  // private getSelfCoords() {
-  //   let data = this.userDataProvider.userData;
+  private getSelfCoords() {
+    let data = this.userDataProvider.userData;
+    const m = document.getElementsByClassName('self-marker');
+    const p = m[0].getElementsByTagName('path');
+    const selfMarker = p[0];
 
+    let watch = this.geolocation.watchPosition({
+      maximumAge: 1000, 
+      timeout: 2000, 
+      enableHighAccuracy: true
+    });
+  
+    watch.subscribe( (resp) => {
+      // console.dir(resp);
+      // console.log('Latitude: '            + resp.coords.latitude          + '\n' +
+      //         'Longitude: '         + resp.coords.longitude         + '\n' +
+      //         'Altitude: '          + resp.coords.altitude          + '\n' +
+      //         'Accuracy: '          + resp.coords.accuracy          + '\n' +
+      //         'Altitude Accuracy: ' + resp.coords.altitudeAccuracy  + '\n' +
+      //         'Heading: '           + resp.coords.heading           + '\n' +
+      //         'Speed: '             + resp.coords.speed             + '\n' +
+      //         'Timestamp: '         + resp.timestamp                + '\n');
 
-  //   var watch = Geolocation.watchPosition({
-  //     // maximumAge: 1000, 
-  //     timeout: 2000, 
-  //     enableHighAccuracy: true
-  //   });
-    
-  //   watch.subscribe( (resp) => {
-
-  //     // console.dir(resp);
-  //     // console.log('Latitude: '            + resp.coords.latitude          + '\n' +
-  //     //         'Longitude: '         + resp.coords.longitude         + '\n' +
-  //     //         'Altitude: '          + resp.coords.altitude          + '\n' +
-  //     //         'Accuracy: '          + resp.coords.accuracy          + '\n' +
-  //     //         'Altitude Accuracy: ' + resp.coords.altitudeAccuracy  + '\n' +
-  //     //         'Heading: '           + resp.coords.heading           + '\n' +
-  //     //         'Speed: '             + resp.coords.speed             + '\n' +
-  //     //         'Timestamp: '         + resp.timestamp                + '\n');
-
-
-  //     // var lat: any = resp.coords.latitude;
-  //     // var lon: any = resp.coords.longitude;
-  //     // myLatitude = ((lat.toFixed(4) * 10000) + 2) / 10000;
-  //     // myLongitude = ((lon.toFixed(4) * 10000) + 2) / 10000;
-     
-
-  //     data.myLatitude = resp.coords.latitude;
-  //     data.myLongitude = resp.coords.longitude;
-      
-  //     this.events.publish('coord: start', resp.coords);
-
-  //     data.selfMarker.setLatLng([data.myLatitude, data.myLongitude]);
-
-  //     // this.setPosition(resp.coords.latitude, resp.coords.longitude);
-  //   });
-  //   // var lat: any = 54.311096;
-  //   // var lon: any = 48.3257941;
-    
-  //   // setInterval(() => {
-  //   //   lat =  ((lat.toFixed(4) * 10000) + 2) / 10000;
-  //   //   lon =  ((lon.toFixed(4) * 10000) + 2) / 10000;
-  //   //   this.setPosition(lat, lon);
-  //   // }, 3000);
-  // }
+      if (resp.coords) {
+        const lat: any = resp.coords.latitude;
+        const lon: any = resp.coords.longitude;
+        const heading = resp.coords.heading;
+        const myLatitude = ((lat.toFixed(6) * 1000000) + 2) / 1000000;
+        const myLongitude = ((lon.toFixed(6) * 1000000) + 2) / 1000000;
+        data.myLatitude = myLatitude;
+        data.myLongitude = myLongitude;
+        
+        this.events.publish('coord: start', resp.coords);
+        data.selfMarker.setLatLng([data.myLatitude, data.myLongitude]);
+        
+        if (!heading) {
+          return;
+        }
+        data.heading = Math.round(heading);
+        selfMarker.setAttribute(`transform`,`rotate(${data.heading} 50 25)`);
+      }
+    });
+  }
 
   private getSelfUserData() {
     this.userDataProvider.getData();
@@ -263,7 +268,9 @@ export class HomePage {
     // функция имитирует передвижение текущего водителя
     // удалить после разработки !!! 
     this.developProvider.moveMarker();
-    
+    this.platform.ready().then(() => {
+      this.getSelfCoords()
+    });
     this.showBtnStop = true;
     this.showBtnStart = false;
     this.showBtnResumeLap = false;
@@ -375,13 +382,12 @@ export class HomePage {
     this.updateCoordsInterval = setInterval(() => {
       // говорим что другие водители будут учитывать координаты этого водителя
       data.inMove = true;
-
       let obj = {
         'publicData/latitude': data.myLatitude,
         'publicData/longitude': data.myLongitude,
-        'publicData/inMove': data.inMove
+        'publicData/inMove': data.inMove,
+        'publicData/heading': data.heading,
       };
-
       // обновляем данные
       this.userDataProvider.updateData(obj).then( authData => {
 
