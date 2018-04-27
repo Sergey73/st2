@@ -4,6 +4,7 @@ import { Geolocation, Geoposition } from '@ionic-native/geolocation';
 import { NativeGeocoder, NativeGeocoderReverseResult } from '@ionic-native/native-geocoder';
 
 import * as L from 'mapbox.js';
+import * as leafletGeometryutil from 'leaflet-geometryutil';
 
 // pages
 import { LoginPage } from '../../pages/login/login';
@@ -192,9 +193,9 @@ export class HomePage {
 
   private getSelfCoords() {
     let data = this.userDataProvider.userData;
-    const m = document.getElementsByClassName('self-marker');
-    const p = m[0].getElementsByTagName('path');
-    const selfMarker = p[0];
+    // const m = document.getElementsByClassName('self-marker');
+    // const p = m[0].getElementsByTagName('path');
+    // const selfMarker = p[0];
 
     let watch = this.geolocation.watchPosition({
       maximumAge: 1000, 
@@ -203,16 +204,6 @@ export class HomePage {
     });
   
     watch.subscribe( (resp) => {
-      // console.dir(resp);
-      // console.log('Latitude: '            + resp.coords.latitude          + '\n' +
-      //         'Longitude: '         + resp.coords.longitude         + '\n' +
-      //         'Altitude: '          + resp.coords.altitude          + '\n' +
-      //         'Accuracy: '          + resp.coords.accuracy          + '\n' +
-      //         'Altitude Accuracy: ' + resp.coords.altitudeAccuracy  + '\n' +
-      //         'Heading: '           + resp.coords.heading           + '\n' +
-      //         'Speed: '             + resp.coords.speed             + '\n' +
-      //         'Timestamp: '         + resp.timestamp                + '\n');
-
       if (resp.coords) {
         const lat: any = resp.coords.latitude;
         const lon: any = resp.coords.longitude;
@@ -228,8 +219,34 @@ export class HomePage {
         if (!heading) {
           return;
         }
-        data.heading = Math.round(heading);
-        selfMarker.setAttribute(`transform`,`rotate(${data.heading} 50 25)`);
+        
+
+
+        const c = [myLatitude, myLongitude];
+        let result;
+        // получаем координаты маркера
+        this.trackProvider.trackLayer._geojson.geometry.coordinates.forEach(path => {
+          let startPoint = null;
+          let endPoint = null;
+          path.forEach((coords) => {
+            if (startPoint === null) {
+              startPoint = coords;
+            } else {
+              endPoint = coords;
+              result = leafletGeometryutil.belongsSegment(c, startPoint, endPoint, 0.2);
+              if (result) {
+                
+                console.dir(`good`);
+                console.dir(startPoint[0]);
+                console.dir(startPoint[1]);
+              } else {
+                startPoint = coords;
+              }
+            }
+          })
+        })
+        // data.heading = Math.round(heading);
+        // selfMarker.setAttribute(`transform`,`rotate(${data.heading} 50 25)`);
       }
     });
   }
@@ -390,6 +407,38 @@ export class HomePage {
       };
       // обновляем данные
       this.userDataProvider.updateData(obj).then( authData => {
+
+        // const point = L.latLng (data.myLatitude, data.myLongitude);
+        const point = L.latLng (48.397,54.309);
+        let result;
+        // получаем координаты маркера
+        this.trackProvider.trackLayer._geojson.geometry.coordinates.forEach(path => {
+          let startPoint = null;
+          let endPoint = null;
+          path.forEach((coords) => {
+            if (startPoint === null) {
+              startPoint = L.latLng(
+                coords[0],
+                coords[1],
+              )
+            } else {
+              endPoint = L.latLng(
+                coords[0],
+                coords[1],
+              )
+              result = leafletGeometryutil.belongsSegment(point, startPoint, endPoint, 1);
+              if (result) {
+                
+                console.dir(`good`);
+                console.dir(startPoint[0]);
+                console.dir(startPoint[1]);
+              } else {
+                startPoint = coords;
+              }
+            }
+          })
+        })
+
 
       }, error => {
         console.dir(error);

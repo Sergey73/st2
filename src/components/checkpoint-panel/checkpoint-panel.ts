@@ -107,7 +107,7 @@ export class CheckpointPanelComponent {
     this.coutnerPoint = this.coutnerPoint ? 
       ++this.coutnerPoint : 1;
     let coords = e.layer.getLatLng();
-
+    debugger
     // сохранение в бд в миллисекундах
     // // время через которое нужно быть в точке,  если точку старта брать за нуль.
     // let arrTime = this.timePoint.split(':');
